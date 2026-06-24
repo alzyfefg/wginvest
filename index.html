@@ -891,6 +891,132 @@ button[onclick="doRegister()"]:active {
   transform: translateY(-1px);
   box-shadow: 0 3px 10px rgba(0,212,170,.2);
 }
+
+/* ══════════════════════════════════════
+   SMART INVEST — PREMIUM REDESIGN v2
+══════════════════════════════════════ */
+
+/* Fade-in wrapper */
+.si-section{opacity:0;transform:translateY(18px);transition:opacity .45s ease,transform .45s ease}
+.si-section.in{opacity:1;transform:translateY(0)}
+
+/* ── Progress Ring ── */
+.si-ring-wrap{display:flex;justify-content:center;align-items:center;margin:0 auto 22px;position:relative;width:200px;height:200px}
+.si-ring-svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.si-ring-track{fill:none;stroke:rgba(255,255,255,.07);stroke-width:10}
+.si-ring-fill{fill:none;stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 1.2s cubic-bezier(.25,.46,.45,.94),stroke .5s ease}
+.si-ring-fill.state-idle{stroke:rgba(0,212,170,.25)}
+.si-ring-fill.state-active{stroke:url(#siGrad);filter:drop-shadow(0 0 6px rgba(0,212,170,.45))}
+.si-ring-fill.state-completed{stroke:#00d4aa;filter:drop-shadow(0 0 14px rgba(0,212,170,.75));animation:siRingPulse 2s ease-in-out infinite}
+@keyframes siRingPulse{0%,100%{filter:drop-shadow(0 0 10px rgba(0,212,170,.6))}50%{filter:drop-shadow(0 0 20px rgba(0,212,170,.95))}}
+.si-ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2px}
+.si-ring-pct{font-size:30px;font-weight:900;color:var(--text);line-height:1;font-variant-numeric:tabular-nums}
+.si-ring-pct sup{font-size:15px;color:var(--text3);font-weight:700;vertical-align:super}
+.si-ring-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;font-weight:700}
+.si-ring-time{font-size:11px;color:var(--ac);font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:.5px}
+
+/* Outer ring glow track */
+.si-ring-glow{position:absolute;inset:8px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,170,.04) 0%,transparent 70%);pointer-events:none}
+
+/* ── Stats Row ── */
+.si-stats-row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+.si-stat{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:14px 12px;text-align:center;transition:border-color .2s,transform .2s}
+.si-stat:hover{border-color:rgba(0,212,170,.18);transform:translateY(-1px)}
+.si-stat-val{font-size:17px;font-weight:900;color:var(--text);font-variant-numeric:tabular-nums;line-height:1.15}
+.si-stat-lbl{font-size:9.5px;color:var(--text3);margin-top:4px;letter-spacing:.3px;font-weight:600}
+
+/* ── Investment Card ── */
+.si-invest-card{position:relative;border-radius:20px;overflow:hidden;margin-bottom:14px;background:rgba(8,18,36,.85);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.si-invest-card.state-active{border-color:rgba(26,134,219,.3);box-shadow:0 0 0 1px rgba(26,134,219,.15),0 8px 40px rgba(0,0,0,.5)}
+.si-invest-card.state-completed{border-color:rgba(0,212,170,.35);box-shadow:0 0 0 1px rgba(0,212,170,.2),0 8px 40px rgba(0,212,170,.1)}
+/* Animated top border */
+.si-invest-card::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:2px;background:linear-gradient(90deg,transparent,rgba(0,212,170,.8),transparent);animation:siCardSweep 3s ease-in-out infinite}
+@keyframes siCardSweep{0%{left:-100%}50%{left:100%}100%{left:100%}}
+.si-invest-card-inner{padding:20px}
+
+/* Card header */
+.si-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.si-card-brand{display:flex;align-items:center;gap:9px}
+.si-card-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--p),var(--ac));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 4px 12px rgba(0,212,170,.25)}
+.si-card-title{font-size:13px;font-weight:900;color:var(--text)}
+.si-card-sub{font-size:9.5px;color:var(--text3);margin-top:1px;letter-spacing:.3px}
+
+/* Status badge */
+.si-badge-v2{font-size:10px;font-weight:700;padding:5px 11px;border-radius:20px;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.si-badge-v2.idle{background:rgba(255,255,255,.06);color:var(--text3);border:1px solid rgba(255,255,255,.1)}
+.si-badge-v2.active{background:rgba(26,86,219,.15);color:#60a5fa;border:1px solid rgba(26,86,219,.3)}
+.si-badge-v2.completed{background:rgba(0,212,170,.12);color:var(--ac);border:1px solid rgba(0,212,170,.3)}
+/* Pulse dot */
+.si-dot{width:7px;height:7px;border-radius:50%;background:currentColor;animation:siDotPulse 1.6s ease-in-out infinite}
+@keyframes siDotPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+
+/* Yield display */
+.si-yield-hero{text-align:center;padding:6px 0 18px}
+.si-yield-hero-lbl{font-size:10px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;font-weight:700}
+.si-yield-hero-num{display:flex;align-items:baseline;justify-content:center;gap:4px}
+.si-yield-hero-big{font-size:52px;font-weight:900;color:var(--ac);letter-spacing:-3px;line-height:1;text-shadow:0 0 40px rgba(0,212,170,.3)}
+.si-yield-hero-pct{font-size:22px;font-weight:800;color:var(--ac);opacity:.75}
+
+/* Details grid */
+.si-details-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.si-detail{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);border-radius:11px;padding:11px 13px;transition:border-color .2s}
+.si-detail:hover{border-color:rgba(255,255,255,.1)}
+.si-detail-lbl{font-size:9.5px;color:var(--text3);margin-bottom:4px;letter-spacing:.3px;font-weight:600}
+.si-detail-val{font-size:14px;font-weight:900;color:var(--text)}
+
+/* Linear progress */
+.si-linear-wrap{margin-bottom:16px}
+.si-linear-meta{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);font-weight:600;margin-bottom:6px}
+.si-linear-track{height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+.si-linear-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--p),var(--ac));transition:width .5s ease;position:relative;overflow:hidden}
+.si-linear-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);animation:siShimmer 1.8s linear infinite}
+
+/* Countdown boxes */
+.si-countdown{display:flex;justify-content:center;align-items:flex-end;gap:8px;margin:12px 0 18px}
+.si-count-unit{text-align:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px 0;min-width:58px}
+.si-count-num{font-size:24px;font-weight:900;color:var(--ac);font-variant-numeric:tabular-nums;letter-spacing:1px;line-height:1}
+.si-count-sep{font-size:22px;font-weight:900;color:var(--text3);padding-bottom:14px;line-height:1}
+.si-count-lbl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-top:4px;font-weight:700}
+
+/* Success box */
+.si-success-box{background:linear-gradient(135deg,rgba(0,212,170,.1),rgba(0,168,132,.06));border:1px solid rgba(0,212,170,.25);border-radius:16px;padding:18px;margin-bottom:14px;text-align:center}
+.si-success-emoji{font-size:32px;margin-bottom:10px;display:block;animation:siEmojiBounce .6s cubic-bezier(.34,1.56,.64,1)}
+@keyframes siEmojiBounce{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
+.si-success-lbl{font-size:11px;color:var(--text3);margin-bottom:6px}
+.si-success-amt{font-size:30px;font-weight:900;color:var(--ac);line-height:1;text-shadow:0 0 30px rgba(0,212,170,.3)}
+.si-success-sub{font-size:11px;color:var(--text3);margin-top:6px}
+
+/* CTA Buttons */
+.si-cta{width:100%;border:none;border-radius:14px;padding:16px;font-family:Vazirmatn,sans-serif;font-size:15px;font-weight:900;color:#fff;cursor:pointer;position:relative;overflow:hidden;transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s ease}
+.si-cta::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.14) 0%,transparent 60%);pointer-events:none}
+.si-cta.primary{background:linear-gradient(135deg,#1a56db,#00d4aa);box-shadow:0 4px 8px rgba(0,0,0,.25),0 8px 24px rgba(0,212,170,.2)}
+.si-cta.primary:hover{transform:translateY(-3px);box-shadow:0 8px 16px rgba(0,0,0,.3),0 16px 36px rgba(0,212,170,.28)}
+.si-cta.primary:active{transform:translateY(1px);box-shadow:0 2px 6px rgba(0,0,0,.2);transition-duration:.08s}
+.si-cta.withdraw{background:linear-gradient(135deg,#059669,#00d4aa);box-shadow:0 4px 8px rgba(0,0,0,.25),0 8px 24px rgba(0,212,170,.22)}
+.si-cta.withdraw:hover{transform:translateY(-3px);box-shadow:0 8px 16px rgba(0,0,0,.3),0 16px 36px rgba(0,212,170,.3)}
+.si-cta.withdraw:active{transform:translateY(1px);transition-duration:.08s}
+.si-cta:disabled{opacity:.35;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+
+/* Trust badges */
+.si-trust-row{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin-top:14px;margin-bottom:6px}
+.si-trust-badge{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text3);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:20px;padding:5px 11px;font-weight:600;white-space:nowrap}
+
+/* Skeleton loader */
+.si-skeleton{background:linear-gradient(90deg,rgba(255,255,255,.04) 0%,rgba(255,255,255,.09) 50%,rgba(255,255,255,.04) 100%);background-size:200% 100%;animation:siSkelShimmer 1.5s ease infinite;border-radius:10px}
+@keyframes siSkelShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* Bottom nav active glow */
+.bnav-btn.on .bi{filter:drop-shadow(0 0 6px rgba(0,212,170,.6))}
+.bnav-btn{transition:color .2s ease,transform .15s ease!important}
+
+/* Light mode overrides */
+body.light .si-invest-card{background:rgba(255,255,255,.92);border-color:rgba(0,0,0,.06)}
+body.light .si-stat{background:#fff;border-color:rgba(0,0,0,.06);box-shadow:0 2px 10px rgba(26,86,219,.06)}
+body.light .si-detail{background:rgba(0,0,0,.02);border-color:rgba(0,0,0,.06)}
+body.light .si-count-unit{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.07)}
+body.light .si-trust-badge{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.07)}
+body.light .si-ring-track{stroke:rgba(0,0,0,.07)}
+body.light .si-ring-pct{color:var(--text)}
 </style>
 </head>
 
@@ -1266,6 +1392,7 @@ async function loadMatches(){
 function siFmt(n){return parseFloat(n||0).toFixed(2);}
 
 function renderSmartInvest(c,inv){
+  // ── Calculations (unchanged logic) ──
   var bal=P?parseFloat(P.balance||0):0;
   var isActive=inv&&inv.status==="active";
   var isCompleted=inv&&inv.status==="completed";
@@ -1276,88 +1403,186 @@ function renderSmartInvest(c,inv){
   var profitAmt=inv?parseFloat(inv.amount)*parseFloat(inv.profit_pct)/100:0;
   var finalAmt=inv?parseFloat(inv.amount)+profitAmt:0;
 
-  var html='<div class="si-fade" id="siWrap">';
+  // Ring constants
+  var R=80,CIRC=Math.round(2*Math.PI*R*100)/100; // 502.65
+  var ringPct=isActive?Math.min(100,Math.round((elapsed/lockMs)*100)):isCompleted?100:0;
+  var ringOffset=CIRC*(1-ringPct/100);
+  var ringFillClass=isCompleted?'state-completed':isActive?'state-active':'state-idle';
 
-  // Summary cards
-  html+='<div class="si-summary-grid">';
-  html+='<div class="si-summary-card"><div class="si-summary-label">موجودی قابل استفاده</div><div class="si-summary-value">$'+siFmt(bal)+'</div></div>';
-  html+='<div class="si-summary-card"><div class="si-summary-label">سرمایه‌گذاری فعال</div><div class="si-summary-value">'+(inv&&!isCompleted&&inv.status!=="withdrawn"?'$'+siFmt(inv.amount):'—')+'</div></div>';
-  html+='<div class="si-summary-card"><div class="si-summary-label">سود آماده برداشت</div><div class="si-summary-value" style="color:var(--ac)">'+(isCompleted?'$'+siFmt(profitAmt):'$0.00')+'</div></div>';
-  html+='<div class="si-summary-card"><div class="si-summary-label">زمان باقی‌مانده</div><div class="si-summary-value" id="siRemainLabel">'+(isActive?fmtRemain(remainMs):'—')+'</div></div>';
-  html+='</div>';
+  // Time helper
+  function p2(n){return n<10?'0'+n:String(n);}
+  var rs=Math.max(0,Math.floor(remainMs/1000));
+  var rh=Math.floor(rs/3600),rm=Math.floor((rs%3600)/60),rsc=rs%60;
 
-  // Main bond-certificate style card
-  var cardClass='si-card'+(isActive?' active':'')+(isCompleted?' completed':'');
-  var badgeClass=isCompleted?'completed':(isActive?'active':'available');
-  var badgeText=isCompleted?'تکمیل شده':(isActive?'فعال':'آماده سرمایه‌گذاری');
-  html+='<div class="'+cardClass+'">';
-  html+='<div class="si-card-strip"><span>WGINVEST · FIXED YIELD CERTIFICATE</span><span>#'+(inv?String(inv.id).slice(0,8).toUpperCase():'—')+'</span></div>';
-  html+='<div class="si-card-inner">';
-  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">';
-  html+='<div style="font-size:16px;font-weight:900;color:var(--text)">💎 WGInvest</div>';
-  html+='<span class="si-badge '+badgeClass+'">'+badgeText+'</span>';
-  html+='</div>';
+  // ── HTML Build ──
+  var h=[];
+  h.push('<div class="si-section" id="siWrap">');
 
-  if(!inv||inv.status==="withdrawn"){
-    // Available state — big ticker-style yield display
-    html+='<div class="si-yield-display"><span class="si-yield-num">'+_siSettings.profit_pct+'</span><span class="si-yield-pct">%</span></div>';
-    html+='<div class="si-yield-label">سود ثابت در هر دوره</div>';
-    html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">';
-    html+='<div style="background:rgba(255,255,255,.03);border-radius:10px;padding:10px;text-align:center"><div style="font-size:10.5px;color:var(--text3);margin-bottom:4px">مدت قفل</div><div style="font-size:15px;font-weight:900;color:var(--text)">'+fmtLockLabel(_siSettings.lock_minutes)+'</div></div>';
-    html+='<div style="background:rgba(255,255,255,.03);border-radius:10px;padding:10px;text-align:center"><div style="font-size:10.5px;color:var(--text3);margin-bottom:4px">حداقل سرمایه</div><div style="font-size:15px;font-weight:900;color:var(--text)">$'+siFmt(_siSettings.min_amount)+'</div></div>';
-    html+='</div>';
-    if(_siSettings.enabled===false){
-      html+='<div style="text-align:center;padding:12px;color:var(--text3);font-size:13px">⏸ Smart Invest توسط مدیر غیرفعال شده</div>';
-    }else{
-      html+='<button class="si-btn" id="siStartBtn" onclick="openInvestModal()">شروع سرمایه‌گذاری</button>';
-    }
-  }else if(isActive){
-    // Active state
-    var pct=Math.min(100,Math.round((elapsed/lockMs)*100));
-    html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">';
-    html+='<div style="background:rgba(255,255,255,.03);border-radius:10px;padding:10px;text-align:center"><div style="font-size:10.5px;color:var(--text3);margin-bottom:4px">مقدار قفل‌شده</div><div style="font-size:16px;font-weight:900;color:var(--text)">$'+siFmt(inv.amount)+'</div></div>';
-    html+='<div style="background:rgba(255,255,255,.03);border-radius:10px;padding:10px;text-align:center"><div style="font-size:10.5px;color:var(--text3);margin-bottom:4px">مقدار نهایی</div><div style="font-size:16px;font-weight:900;color:var(--gold)">$'+siFmt(finalAmt)+'</div></div>';
-    html+='</div>';
-    html+='<div class="si-timer" id="siTimerDisplay">'+fmtRemain(remainMs)+'</div>';
-    html+='<div class="si-progress-wrap"><div class="si-progress-bar" id="siProgressBar" style="width:'+pct+'%"></div></div>';
-    html+='<div style="font-size:11px;color:var(--text3);text-align:center;margin-bottom:14px">شما در حال حاضر یک سرمایه‌گذاری فعال دارید</div>';
-    html+='<button class="si-btn" disabled>سرمایه‌گذاری جدید پس از اتمام دوره فعلی</button>';
+  // ── Progress Ring ──
+  h.push('<div class="si-ring-wrap">');
+  h.push('<svg class="si-ring-svg" viewBox="0 0 200 200" width="200" height="200">');
+  h.push('<defs><linearGradient id="siGrad" x1="0%" y1="0%" x2="100%" y2="100%">');
+  h.push('<stop offset="0%" style="stop-color:#1a56db"/><stop offset="100%" style="stop-color:#00d4aa"/></linearGradient></defs>');
+  h.push('<circle class="si-ring-track" cx="100" cy="100" r="'+R+'"/>');
+  h.push('<circle id="siProgressRing" class="si-ring-fill '+ringFillClass+'" cx="100" cy="100" r="'+R+'"');
+  h.push(' stroke-dasharray="'+CIRC+'" stroke-dashoffset="'+ringOffset+'"/>');
+  h.push('</svg>');
+  h.push('<div class="si-ring-center">');
+  h.push('<div class="si-ring-pct" id="siRingPct">'+ringPct+'<sup>%</sup></div>');
+  if(isActive){
+    h.push('<div class="si-ring-label">در حال کسب سود</div>');
+    h.push('<div class="si-ring-time" id="siRingTime">'+fmtRemain(remainMs)+'</div>');
   }else if(isCompleted){
-    // Completed state
-    html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">';
-    html+='<div style="background:rgba(255,255,255,.03);border-radius:10px;padding:10px;text-align:center"><div style="font-size:10.5px;color:var(--text3);margin-bottom:4px">سرمایه اصلی</div><div style="font-size:16px;font-weight:900;color:var(--text)">$'+siFmt(inv.amount)+'</div></div>';
-    html+='<div style="background:rgba(255,255,255,.03);border-radius:10px;padding:10px;text-align:center"><div style="font-size:10.5px;color:var(--text3);margin-bottom:4px">سود</div><div style="font-size:16px;font-weight:900;color:var(--ac)">+$'+siFmt(profitAmt)+'</div></div>';
-    html+='</div>';
-    html+='<div style="background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);border-radius:12px;padding:14px;margin-bottom:16px;text-align:center">';
-    html+='<div style="font-size:11px;color:var(--text3);margin-bottom:4px">مقدار قابل برداشت</div>';
-    html+='<div style="font-size:24px;font-weight:900;color:var(--ac)">$'+siFmt(finalAmt)+'</div></div>';
-    html+='<button class="si-btn si-btn-withdraw" id="siWithdrawBtn" data-invid="'+inv.id+'" data-final="'+finalAmt+'">برداشت وجه</button>';
+    h.push('<div class="si-ring-label" style="color:var(--ac)">آماده دریافت ✦</div>');
+  }else{
+    h.push('<div class="si-ring-label">آماده سرمایه‌گذاری</div>');
   }
-  html+='</div></div></div>';
-  c.innerHTML=html;
+  h.push('</div></div>'); // ring-center + ring-wrap
 
+  // ── Stats Row ──
+  h.push('<div class="si-stats-row">');
+  h.push('<div class="si-stat"><div class="si-stat-val" style="color:var(--gold)">$'+siFmt(bal)+'</div><div class="si-stat-lbl">موجودی شما</div></div>');
+  if(isActive){
+    h.push('<div class="si-stat"><div class="si-stat-val" style="color:#60a5fa">$'+siFmt(inv.amount)+'</div><div class="si-stat-lbl">در حال قفل</div></div>');
+    h.push('<div class="si-stat"><div class="si-stat-val" style="color:var(--text3)" id="siRemainLabel">'+fmtRemain(remainMs)+'</div><div class="si-stat-lbl">زمان باقی</div></div>');
+    h.push('<div class="si-stat"><div class="si-stat-val" style="color:var(--ac)">+$'+siFmt(profitAmt)+'</div><div class="si-stat-lbl">سود مورد انتظار</div></div>');
+  }else if(isCompleted){
+    h.push('<div class="si-stat"><div class="si-stat-val" style="color:var(--ac)">+$'+siFmt(profitAmt)+'</div><div class="si-stat-lbl">سود کسب شده</div></div>');
+    h.push('<div class="si-stat"><div class="si-stat-val" style="color:var(--gold)">$'+siFmt(finalAmt)+'</div><div class="si-stat-lbl">قابل دریافت</div></div>');
+    h.push('<div class="si-stat"><div class="si-stat-val" style="color:var(--ac)">'+(inv.profit_pct||_siSettings.profit_pct)+'%</div><div class="si-stat-lbl">بازدهی</div></div>');
+  }else{
+    h.push('<div class="si-stat"><div class="si-stat-val" style="color:var(--ac)">'+_siSettings.profit_pct+'%</div><div class="si-stat-lbl">سود ثابت</div></div>');
+    h.push('<div class="si-stat"><div class="si-stat-val">'+fmtLockLabel(_siSettings.lock_minutes)+'</div><div class="si-stat-lbl">مدت قفل</div></div>');
+    h.push('<div class="si-stat"><div class="si-stat-val">$'+siFmt(_siSettings.min_amount)+'</div><div class="si-stat-lbl">حداقل سرمایه</div></div>');
+  }
+  h.push('</div>'); // stats-row
+
+  // ── Investment Card ──
+  var cardState=isCompleted?'state-completed':isActive?'state-active':'';
+  h.push('<div class="si-invest-card '+cardState+'"><div class="si-invest-card-inner">');
+
+  // Card header
+  h.push('<div class="si-card-head">');
+  h.push('<div class="si-card-brand"><div class="si-card-icon">💎</div>');
+  h.push('<div><div class="si-card-title">WGInvest</div><div class="si-card-sub">Fixed Yield Certificate · #'+(inv?String(inv.id).slice(0,8).toUpperCase():'——')+'</div></div></div>');
+  // Badge
+  if(isCompleted){
+    h.push('<div class="si-badge-v2 completed">✦ آماده دریافت</div>');
+  }else if(isActive){
+    h.push('<div class="si-badge-v2 active"><span class="si-dot"></span>فعال</div>');
+  }else{
+    h.push('<div class="si-badge-v2 idle">آماده سرمایه‌گذاری</div>');
+  }
+  h.push('</div>'); // card-head
+
+  // ── State content ──
+  if(!inv||inv.status==="withdrawn"){
+    // Available
+    h.push('<div class="si-yield-hero">');
+    h.push('<div class="si-yield-hero-lbl">سود ثابت در هر دوره</div>');
+    h.push('<div class="si-yield-hero-num"><span class="si-yield-hero-big">'+_siSettings.profit_pct+'</span><span class="si-yield-hero-pct">%</span></div>');
+    h.push('</div>');
+    h.push('<div class="si-details-grid">');
+    h.push('<div class="si-detail"><div class="si-detail-lbl">مدت قفل</div><div class="si-detail-val">'+fmtLockLabel(_siSettings.lock_minutes)+'</div></div>');
+    h.push('<div class="si-detail"><div class="si-detail-lbl">حداقل سرمایه</div><div class="si-detail-val">$'+siFmt(_siSettings.min_amount)+'</div></div>');
+    h.push('<div class="si-detail"><div class="si-detail-lbl">نوع سود</div><div class="si-detail-val">ثابت</div></div>');
+    h.push('<div class="si-detail"><div class="si-detail-lbl">ارز پشتیبان</div><div class="si-detail-val">USDT</div></div>');
+    h.push('</div>');
+    if(_siSettings.enabled===false){
+      h.push('<div style="text-align:center;padding:14px;color:var(--text3);font-size:13px;background:rgba(255,255,255,.03);border-radius:11px">⏸ Smart Invest توسط مدیر غیرفعال شده</div>');
+    }else{
+      h.push('<button class="si-cta primary" id="siStartBtn">🚀 شروع سرمایه‌گذاری</button>');
+    }
+
+  }else if(isActive){
+    // Active
+    h.push('<div class="si-details-grid">');
+    h.push('<div class="si-detail"><div class="si-detail-lbl">مقدار قفل‌شده</div><div class="si-detail-val">$'+siFmt(inv.amount)+'</div></div>');
+    h.push('<div class="si-detail"><div class="si-detail-lbl">مقدار نهایی</div><div class="si-detail-val" style="color:var(--gold)">$'+siFmt(finalAmt)+'</div></div>');
+    h.push('<div class="si-detail"><div class="si-detail-lbl">سود مورد انتظار</div><div class="si-detail-val" style="color:var(--ac)">+$'+siFmt(profitAmt)+'</div></div>');
+    h.push('<div class="si-detail"><div class="si-detail-lbl">بازدهی</div><div class="si-detail-val" style="color:var(--ac)">'+inv.profit_pct+'%</div></div>');
+    h.push('</div>');
+    // Countdown
+    h.push('<div class="si-countdown">');
+    h.push('<div class="si-count-unit"><div class="si-count-num" id="siTimerH">'+p2(rh)+'</div><div class="si-count-lbl">ساعت</div></div>');
+    h.push('<div class="si-count-sep">:</div>');
+    h.push('<div class="si-count-unit"><div class="si-count-num" id="siTimerM">'+p2(rm)+'</div><div class="si-count-lbl">دقیقه</div></div>');
+    h.push('<div class="si-count-sep">:</div>');
+    h.push('<div class="si-count-unit"><div class="si-count-num" id="siTimerS">'+p2(rsc)+'</div><div class="si-count-lbl">ثانیه</div></div>');
+    h.push('</div>');
+    // Linear progress
+    var linPct=Math.min(100,Math.round((elapsed/lockMs)*100));
+    h.push('<div class="si-linear-wrap">');
+    h.push('<div class="si-linear-meta"><span>پیشرفت دوره</span><span id="siProgressPctLbl">'+linPct+'%</span></div>');
+    h.push('<div class="si-linear-track"><div class="si-linear-fill" id="siProgressBar" style="width:'+linPct+'%"></div></div>');
+    h.push('</div>');
+    h.push('<button class="si-cta" disabled>⏳ در انتظار پایان دوره</button>');
+
+  }else if(isCompleted){
+    // Completed
+    h.push('<div class="si-success-box">');
+    h.push('<span class="si-success-emoji">🎉</span>');
+    h.push('<div class="si-success-lbl">سود آماده دریافت</div>');
+    h.push('<div class="si-success-amt">+$'+siFmt(profitAmt)+'</div>');
+    h.push('<div class="si-success-sub">مقدار نهایی: <strong style="color:var(--gold)">$'+siFmt(finalAmt)+'</strong></div>');
+    h.push('</div>');
+    h.push('<div class="si-details-grid" style="margin-bottom:16px">');
+    h.push('<div class="si-detail"><div class="si-detail-lbl">سرمایه اصلی</div><div class="si-detail-val">$'+siFmt(inv.amount)+'</div></div>');
+    h.push('<div class="si-detail"><div class="si-detail-lbl">سود کسب‌شده</div><div class="si-detail-val" style="color:var(--ac)">+$'+siFmt(profitAmt)+'</div></div>');
+    h.push('</div>');
+    h.push('<button class="si-cta withdraw" id="siWithdrawBtn" data-invid="'+inv.id+'" data-final="'+finalAmt+'">💰 دریافت وجه ($'+siFmt(finalAmt)+')</button>');
+  }
+
+  h.push('</div></div>'); // card-inner + invest-card
+
+  // Trust badges
+  h.push('<div class="si-trust-row">');
+  h.push('<div class="si-trust-badge">🔒 سرمایه‌گذاری امن</div>');
+  h.push('<div class="si-trust-badge">🛡️ رمزگذاری‌شده</div>');
+  h.push('<div class="si-trust-badge">💎 USDT</div>');
+  h.push('</div>');
+
+  h.push('</div>'); // si-section
+  c.innerHTML=h.join('');
+
+  // Fade in
   setTimeout(function(){var w=document.getElementById('siWrap');if(w)w.classList.add('in');},30);
 
+  // Wire buttons
   var startBtn=document.getElementById('siStartBtn');
-  if(startBtn){startBtn.onclick=null;startBtn.addEventListener('click',openInvestModal);}
+  if(startBtn)startBtn.addEventListener('click',openInvestModal);
   var wBtn=document.getElementById('siWithdrawBtn');
   if(wBtn)wBtn.onclick=function(){withdrawInvestment(this.dataset.invid,parseFloat(this.dataset.final));};
 
+  // Live timer (unchanged logic, updated element IDs)
   if(isActive){
     _siTimer=setInterval(function(){
-      var newElapsed=Date.now()-new Date(inv.started_at).getTime();
-      var newRemain=Math.max(0,lockMs-newElapsed);
-      if(newRemain<=0){
-        clearInterval(_siTimer);_siTimer=null;
-        loadMatches();
-        return;
-      }
-      var lbl=document.getElementById('siTimerDisplay');
+      var ne=Date.now()-new Date(inv.started_at).getTime();
+      var nr=Math.max(0,lockMs-ne);
+      if(nr<=0){clearInterval(_siTimer);_siTimer=null;loadMatches();return;}
+      // Countdown boxes
+      var s=Math.floor(nr/1000),hh=Math.floor(s/3600),mm=Math.floor((s%3600)/60),ss=s%60;
+      var elH=document.getElementById('siTimerH'),elM=document.getElementById('siTimerM'),elS=document.getElementById('siTimerS');
+      if(elH)elH.textContent=p2(hh);
+      if(elM)elM.textContent=p2(mm);
+      if(elS)elS.textContent=p2(ss);
+      // Stat label
       var lbl2=document.getElementById('siRemainLabel');
+      if(lbl2)lbl2.textContent=fmtRemain(nr);
+      // Ring time
+      var rt=document.getElementById('siRingTime');
+      if(rt)rt.textContent=fmtRemain(nr);
+      // Linear progress
+      var np=Math.min(100,Math.round((ne/lockMs)*100));
       var bar=document.getElementById('siProgressBar');
-      if(lbl)lbl.textContent=fmtRemain(newRemain);
-      if(lbl2)lbl2.textContent=fmtRemain(newRemain);
-      if(bar)bar.style.width=Math.min(100,Math.round((newElapsed/lockMs)*100))+'%';
+      if(bar)bar.style.width=np+'%';
+      var pl=document.getElementById('siProgressPctLbl');
+      if(pl)pl.textContent=np+'%';
+      // Ring
+      var ring=document.getElementById('siProgressRing');
+      if(ring)ring.setAttribute('stroke-dashoffset',CIRC*(1-np/100));
+      var rp=document.getElementById('siRingPct');
+      if(rp)rp.innerHTML=np+'<sup>%</sup>';
     },1000);
   }
 }
