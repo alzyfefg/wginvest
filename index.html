@@ -994,7 +994,6 @@ button[onclick="doRegister()"]:active {
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded",function(){
 var SBU="https://xlhxavcuiligklyklojd.supabase.co";
 var SBK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhsaHhhdmN1aWxpZ2tseWtsb2pkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxNjkwOTQsImV4cCI6MjA5NTc0NTA5NH0.Ax4axC_P87XdGFNZuVTMfg14w5pU2K0La4lFGFI-_o8";
 var ADMIN="alikatakiamiri@gmail.com";
@@ -2843,7 +2842,6 @@ async function init(){
     await enterApp();
   }
 }
-init();
 async function loadAdminTickets2(c){
   var res=await sb.from('tickets').select('*,ticket_messages(*)').order('created_at',{ascending:false}).limit(30);
   var data=res.data||[];
@@ -2997,7 +2995,9 @@ async function closeTicket(ticketId){
   toast("✅ تیکت بسته شد","green");
   loadAdmin();
 }
-});
+
+// Init runs after Supabase and Chart.js are loaded (scripts in <head> are blocking)
+init();
 </script>
 </body>
 </html>
