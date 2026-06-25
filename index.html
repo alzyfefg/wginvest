@@ -1973,9 +1973,6 @@ function goTab(tab){
   else if(tab==="support")loadSupport();
   else if(tab==="model")loadInvestModel();
   setTimeout(initScrollAnim,300);
-  // Refresh banner after tab load
-  var bg=document.getElementById("heroBg");
-  if(bg&&!bg.innerHTML.trim())applyTheme();
 }
 
 
