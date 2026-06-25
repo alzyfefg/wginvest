@@ -119,16 +119,156 @@ body.light .theme-toggle-stars{opacity:0}
 .main-wrap{padding-top:54px;padding-bottom:70px}
 
 /* ── HERO ── */
-.hero{color:#fff;padding:0;text-align:center;position:relative;overflow:hidden;min-height:145px;display:flex;flex-direction:column;justify-content:flex-end}
+.hero{color:#fff;padding:0;text-align:center;position:relative;overflow:hidden;min-height:0;display:flex;flex-direction:column;justify-content:flex-end}
 .hero-bg{position:absolute;inset:0;width:100%;height:100%}
 .hero-bg svg{width:100%;height:100%;display:block}
-.hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(4,10,20,.9) 0%,rgba(4,10,20,.4) 55%,transparent 100%)}
-.hero-content{position:relative;z-index:1;padding:16px 16px 20px}
-.hero-tag{font-size:10px;letter-spacing:3px;color:var(--ac);text-transform:uppercase;margin-bottom:6px;font-weight:700;opacity:.9}
-.hero h1{font-size:1.4rem;font-weight:900;line-height:1.25;margin-bottom:5px}
-.hero h1 em{color:#fcd34d;font-style:normal}
-.hero p{font-size:11px;color:rgba(255,255,255,.65)}
+.hero-overlay{display:none}
+.hero-content{position:relative;z-index:1;padding:0}
+.hero-tag{display:none}
+.hero h1{display:none}
+.hero p{display:none}
 .player-silhouette{display:none}
+
+/* ── DASHBOARD HERO ── */
+.dhero{
+  position:relative;overflow:hidden;
+  background:linear-gradient(145deg,#081120 0%,#0B1730 40%,#0E223F 70%,rgba(0,50,45,.6) 100%);
+  padding:18px 16px 16px;
+  border-radius:0 0 22px 22px;
+  border-bottom:1px solid rgba(0,212,170,.1);
+}
+.dhero::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 60% 50% at 80% 20%,rgba(0,212,170,.07) 0%,transparent 60%),
+    radial-gradient(ellipse 40% 40% at 10% 80%,rgba(26,86,219,.09) 0%,transparent 55%);
+  animation:dheroBg 8s ease-in-out infinite alternate;
+}
+@keyframes dheroBg{
+  0%{opacity:.6}
+  100%{opacity:1}
+}
+/* Floating particles */
+.dhero-particles{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+.dhero-p{
+  position:absolute;
+  border-radius:50%;
+  background:rgba(0,212,170,.15);
+  animation:floatP linear infinite;
+  opacity:0;
+}
+@keyframes floatP{
+  0%{transform:translateY(0) scale(1);opacity:0}
+  15%{opacity:1}
+  85%{opacity:.5}
+  100%{transform:translateY(-120px) scale(.6);opacity:0}
+}
+
+/* Header row */
+.dhero-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.dhero-greeting{font-size:12px;color:rgba(255,255,255,.55);}
+.dhero-name{font-size:15px;font-weight:900;color:#fff;margin-top:1px;}
+.dhero-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(0,212,170,.12);border:1px solid rgba(0,212,170,.22);
+  border-radius:20px;padding:4px 12px;
+  font-size:10px;font-weight:700;color:var(--ac);letter-spacing:.4px;
+}
+.dhero-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--ac);animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+
+/* Stats grid */
+.dhero-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  margin-bottom:14px;
+}
+.dhero-card{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:14px;padding:12px 14px;
+  position:relative;overflow:hidden;
+  transition:transform .2s ease,box-shadow .2s ease;
+  opacity:0;transform:translateY(16px);
+  animation:cardIn .4s ease forwards;
+}
+.dhero-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3);}
+.dhero-card:active{transform:scale(.98);}
+.dhero-card::after{
+  content:"";position:absolute;top:0;left:0;right:0;height:1.5px;
+  border-radius:14px 14px 0 0;
+}
+.dhero-card.c1::after{background:linear-gradient(90deg,var(--ac),var(--p));}
+.dhero-card.c2::after{background:linear-gradient(90deg,#f59e0b,#ef4444);}
+.dhero-card.c3::after{background:linear-gradient(90deg,#8b5cf6,var(--ac));}
+.dhero-card.c4::after{background:linear-gradient(90deg,var(--p),#8b5cf6);}
+@keyframes cardIn{to{opacity:1;transform:translateY(0)}}
+.dhero-card:nth-child(1){animation-delay:.05s}
+.dhero-card:nth-child(2){animation-delay:.13s}
+.dhero-card:nth-child(3){animation-delay:.21s}
+.dhero-card:nth-child(4){animation-delay:.29s}
+
+.dhero-card-lbl{font-size:9px;color:rgba(255,255,255,.45);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+.dhero-card-icon{font-size:13px;}
+.dhero-card-val{font-size:19px;font-weight:900;color:#fff;letter-spacing:-.5px;line-height:1;}
+.dhero-card-sub{font-size:9px;color:rgba(255,255,255,.35);margin-top:4px;}
+.dhero-card.c1 .dhero-card-val{color:var(--ac);}
+.dhero-card.c2 .dhero-card-val{color:#f59e0b;}
+.dhero-card.c3 .dhero-card-val{color:#a78bfa;}
+.dhero-card.c4 .dhero-card-val{color:var(--p);}
+
+/* Progress ring row */
+.dhero-ring-row{
+  display:flex;align-items:center;gap:16px;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:14px;padding:14px;
+}
+.dhero-ring-wrap{position:relative;flex-shrink:0;width:68px;height:68px;}
+.dhero-ring-svg{transform:rotate(-90deg);width:68px;height:68px;}
+.dhero-ring-bg{fill:none;stroke:rgba(255,255,255,.07);stroke-width:5;}
+.dhero-ring-fill{
+  fill:none;stroke-width:5;stroke-linecap:round;
+  stroke:url(#ringGrad);
+  transition:stroke-dashoffset 1.2s cubic-bezier(.25,.46,.45,.94);
+}
+.dhero-ring-center{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.dhero-ring-pct{font-size:14px;font-weight:900;color:#fff;}
+.dhero-ring-lbl{font-size:8px;color:rgba(255,255,255,.4);margin-top:1px;}
+.dhero-ring-info{flex:1;}
+.dhero-ring-title{font-size:12px;font-weight:800;color:#fff;margin-bottom:4px;}
+.dhero-ring-desc{font-size:10px;color:rgba(255,255,255,.45);line-height:1.5;}
+.dhero-ring-ticks{
+  display:flex;justify-content:space-between;
+  margin-top:8px;padding-top:8px;
+  border-top:1px solid rgba(255,255,255,.06);
+}
+.dhero-ring-tick{font-size:9px;color:rgba(255,255,255,.3);}
+.dhero-ring-tick.active{color:var(--ac);font-weight:700;}
+
+/* Light mode overrides */
+body.light .dhero{
+  background:linear-gradient(145deg,#1a3a6e 0%,#1e4d8c 50%,#0d3060 100%);
+  border-bottom-color:rgba(0,212,170,.2);
+}
+body.light .dhero-card{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.15);}
+body.light .dhero-card:hover{box-shadow:0 8px 24px rgba(0,0,0,.2);}
+body.light .dhero-ring-row{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.15);}
+body.light .dhero-card-lbl{color:rgba(255,255,255,.6);}
+body.light .dhero-card-sub{color:rgba(255,255,255,.5);}
+body.light .dhero-ring-desc{color:rgba(255,255,255,.6);}
+body.light .dhero-ring-tick{color:rgba(255,255,255,.4);}
+body.light .dhero-greeting{color:rgba(255,255,255,.7);}
+body.light .dhero-name{color:#fff;}
+
+/* Light mode general improvements */
+body.light{background:#F7F9FC;}
+body.light .icard{background:#fff;border-color:#E5EAF2;box-shadow:0 1px 4px rgba(15,23,42,.05),0 4px 16px rgba(15,23,42,.04);}
+body.light .fin{background:#f8faff;border-color:#d4dbe9;color:#1A202C;}
+body.light .fin:focus{border-color:#00B894;box-shadow:0 0 0 3px rgba(0,184,148,.1);}
+body.light .wrap{background:#F7F9FC;}
+body.light .main-wrap{background:#F7F9FC;}
 
 /* ── BOTTOM NAV ── */
 .bnav{position:fixed;bottom:0;left:0;right:0;background:rgba(7,15,30,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.06);display:flex;height:64px;z-index:100;transition:background .3s}
@@ -1362,14 +1502,68 @@ body.light .im-phil{background:linear-gradient(135deg,rgba(26,86,219,.06),rgba(0
   </div>
 </div>
 <div class="main-wrap">
-  <div class="hero" id="heroBanner">
-    <div class="hero-bg" id="heroBg"></div>
-    <div class="hero-overlay"></div>
-    <div class="hero-content">
-      <div class="hero-tag" id="hero_tag">💎 سرمایه‌گذاری هوشمند</div>
-      <h1 id="hero_h">سرمایه‌ات رو <em>رشد بده</em></h1>
-      <p id="hero_s">با قفل کردن دارایی، سود ثابت ۲.۵٪ پس از پایان دوره دریافت کن</p>
-      <div class="player-silhouette"></div>
+  <div class="dhero" id="heroBanner">
+    <div class="dhero-particles" id="dheroParticles"></div>
+    <div class="dhero-head">
+      <div>
+        <div class="dhero-greeting" id="dh_greeting">Welcome back</div>
+        <div class="dhero-name" id="dh_name">—</div>
+      </div>
+      <div class="dhero-badge" id="dh_badge">
+        <span class="dhero-badge-dot"></span>
+        <span id="dh_badge_lbl">LIVE</span>
+      </div>
+    </div>
+    <div class="dhero-grid" id="dheroGrid">
+      <div class="dhero-card c1" id="dhc_bal">
+        <div class="dhero-card-lbl"><span class="dhero-card-icon">💰</span><span id="dhl_bal">Available</span></div>
+        <div class="dhero-card-val" id="dhv_bal">—</div>
+        <div class="dhero-card-sub" id="dhs_bal">USDT</div>
+      </div>
+      <div class="dhero-card c2" id="dhc_inv">
+        <div class="dhero-card-lbl"><span class="dhero-card-icon">🔒</span><span id="dhl_inv">Active Invest</span></div>
+        <div class="dhero-card-val" id="dhv_inv">—</div>
+        <div class="dhero-card-sub" id="dhs_inv">USDT</div>
+      </div>
+      <div class="dhero-card c3" id="dhc_prf">
+        <div class="dhero-card-lbl"><span class="dhero-card-icon">📈</span><span id="dhl_prf">Cycle Profit</span></div>
+        <div class="dhero-card-val" id="dhv_prf">—</div>
+        <div class="dhero-card-sub" id="dhs_prf">USDT</div>
+      </div>
+      <div class="dhero-card c4" id="dhc_time">
+        <div class="dhero-card-lbl"><span class="dhero-card-icon">⏱</span><span id="dhl_time">Time Left</span></div>
+        <div class="dhero-card-val" id="dhv_time">—</div>
+        <div class="dhero-card-sub" id="dhs_time">h : m : s</div>
+      </div>
+    </div>
+    <div class="dhero-ring-row">
+      <div class="dhero-ring-wrap">
+        <svg class="dhero-ring-svg" viewBox="0 0 68 68">
+          <defs>
+            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00D4AA"/>
+              <stop offset="100%" stop-color="#0099FF"/>
+            </linearGradient>
+          </defs>
+          <circle class="dhero-ring-bg" cx="34" cy="34" r="29"/>
+          <circle class="dhero-ring-fill" id="dheroRingFill" cx="34" cy="34" r="29" stroke-dasharray="182.21" stroke-dashoffset="182.21"/>
+        </svg>
+        <div class="dhero-ring-center">
+          <div class="dhero-ring-pct" id="dheroRingPct">0%</div>
+          <div class="dhero-ring-lbl" id="dhl_prog">Progress</div>
+        </div>
+      </div>
+      <div class="dhero-ring-info">
+        <div class="dhero-ring-title" id="dh_ring_title">Cycle Progress</div>
+        <div class="dhero-ring-desc" id="dh_ring_desc">No active investment</div>
+        <div class="dhero-ring-ticks" id="dheroTicks">
+          <span class="dhero-ring-tick" id="dht0">0%</span>
+          <span class="dhero-ring-tick" id="dht1">25%</span>
+          <span class="dhero-ring-tick" id="dht2">50%</span>
+          <span class="dhero-ring-tick" id="dht3">75%</span>
+          <span class="dhero-ring-tick" id="dht4">100%</span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1427,7 +1621,8 @@ im_s2_title:"نحوه مدیریت سرمایه",im_s2_text:"سرمایه اعض
 im_s3_title:"چرا سرمایه‌گذاری مبتنی بر خزانه‌داری",im_s3_text:"اوراق خزانه‌داری ایالات متحده از جمله تثبیت‌شده‌ترین دارایی‌های با درآمد ثابت در بازارهای مالی جهانی هستند.\n\nساختار آن‌ها بر حفظ سرمایه، ایجاد بازده و ثبات مالی بلندمدت تأکید دارد نه رفتار بازار سفته‌بازانه.\n\nاین فلسفه پایه و اساس مدل سرمایه‌گذاری WGInvest را تشکیل می‌دهد.",
 im_tl_title:"چگونه کار می‌کند",im_tl1_title:"واریز وجه",im_tl1_desc:"USDT خود را از طریق شبکه TRC20 یا BEP20 واریز کنید",im_tl2_title:"انتخاب دوره سرمایه‌گذاری",im_tl2_desc:"دوره و مبلغ سرمایه‌گذاری خود را انتخاب کنید",im_tl3_title:"تخصیص سرمایه",im_tl3_desc:"سرمایه شما در استراتژی‌های درآمد ثابت تخصیص می‌یابد",im_tl4_title:"دوره قفل",im_tl4_desc:"سرمایه شما برای مدت تعیین‌شده قفل می‌شود",im_tl5_title:"سررسید",im_tl5_desc:"دوره سرمایه‌گذاری به پایان می‌رسد و سود محقق می‌شود",im_tl6_title:"دریافت سود",im_tl6_desc:"سود ثابت خود را دریافت و به موجودی اضافه کنید",
 im_s5_title:"چرا اعضا WGInvest را انتخاب می‌کنند",im_f1_title:"ساختار بازدهی ثابت",im_f1_sub:"سود قابل پیش‌بینی بدون وابستگی به نوسانات بازار",im_f2_title:"استراتژی سرمایه‌گذاری مبتنی بر خزانه‌داری",im_f2_sub:"الهام گرفته از اوراق قرضه دولتی ایالات متحده",im_f3_title:"دوره‌های قفل شفاف",im_f3_sub:"شرایط روشن، بدون هزینه‌های پنهان",im_f4_title:"تخصیص ساختاریافته سرمایه",im_f4_sub:"رویکرد منضبط برای مدیریت دارایی",im_f5_title:"تمرکز سرمایه‌گذاری بلندمدت",im_f5_sub:"ساخته شده برای رشد پایدار در طول زمان",im_f6_title:"بدون نیاز به معاملات فعال",im_f6_sub:"سرمایه‌گذاری کنید، قفل کنید، سود دریافت کنید",
-im_s6_title:"فلسفه سرمایه‌گذاری ما",im_s6_quote:"\"ثروت پایدار از طریق تخصیص منضبط سرمایه ساخته می‌شود.\"",im_s6_text:"ما بر این باوریم که خلق ثروت پایدار از طریق تخصیص منضبط سرمایه، سرمایه‌گذاری با درآمد ثابت و استراتژی‌های مدیریت ریسک ساخته می‌شود نه از طریق سفته‌بازی کوتاه‌مدت.\n\nتمرکز ما بر ثبات، ساختار و رشد بلندمدت سرمایه باقی می‌ماند."},
+im_s6_title:"فلسفه سرمایه‌گذاری ما",im_s6_quote:"\"ثروت پایدار از طریق تخصیص منضبط سرمایه ساخته می‌شود.\"",im_s6_text:"ما بر این باوریم که خلق ثروت پایدار از طریق تخصیص منضبط سرمایه، سرمایه‌گذاری با درآمد ثابت و استراتژی‌های مدیریت ریسک ساخته می‌شود نه از طریق سفته‌بازی کوتاه‌مدت.\n\nتمرکز ما بر ثبات، ساختار و رشد بلندمدت سرمایه باقی می‌ماند.",
+dh_greeting:"خوش برگشتی",dh_avail_bal:"موجودی",dh_active_inv:"سرمایه‌گذاری",dh_cycle_profit:"سود دوره",dh_time_left:"زمان باقی",dh_progress:"پیشرفت",dh_no_inv:"فعال نیست",dh_live:"زنده",dh_cycle_prog:"پیشرفت دوره",dh_no_active:"سرمایه‌گذاری فعالی ندارید"},
 en:{dir:"ltr",logo:"WGInvest",sub:"Fixed-Yield Investment",login:"Login",reg:"Register",email:"Email",pass:"Password",pass2:"Confirm Password",btn_in:"Login ⚡",btn_up:"Register Free 🚀",logout:"Logout",matches:"Invest",profile:"Profile",wallet:"Wallet",team:"Team",bal:"Balance",wins:"Wins",loses:"Losses",refs:"Referrals",acc:"Accuracy",no_m:"No active investment",pick:"How much do you want to invest?",waiting:"Locked — waiting for cycle to end",win_m:"✅ Profit received",lose_m:"Refunded",deadline:"Cycle ended",invite:"Personal Invite Link",copy_link:"Copy Invite Link",team_struct:"My Team Structure",no_team:"No referrals yet",deposit:"Deposit USDT (TRC20)",withdraw:"Withdraw USDT (TRC20)",amount:"Amount (USDT)",tx_hash:"TX Hash",upload_receipt:"Upload Transaction Screenshot",submit_dep:"📤 Submit Deposit",dest_addr:"Destination Wallet",min_w:"Amount (min 5 USDT)",w_pass:"🔐 Withdrawal Password",submit_w:"📥 Submit Withdrawal",tx_hist:"Transaction History",no_tx:"No transactions",dashboard:"📊 Dashboard",total_pred:"Total Invested",win_rate:"Yield Rate",today_p:"Today Profit",tomorrow:"Next Cycle",kyc_t:"🪪 Identity",kyc_ok:"✅ Identity verified.",kyc_hint:"Upload ID to enable withdrawals.",kyc_up:"Upload ID Card",wp_t:"🔐 Withdrawal Password",wp_ok:"✅ Password set.",wp_new:"New Password",wp_rep:"Confirm",wp_save:"Save Password 🔐",wp_change:"Change Password",dname:"Display Name",save:"Save",compound:"📈 Compound Growth — 2.5% per cycle",today_earn:"Today Profit",tx_dep:"💳 Deposit",tx_wit:"💸 Withdrawal",tx_ok:"✅ Approved",tx_rej:"❌ Rejected",tx_pend:"⏳ Pending",accuracy:"Accuracy",stake_title:"💰 How much to invest?",stake_hint:"Fixed +2.5% profit after lock period",cancel:"Cancel",w_info:"Withdrawal requests take 1-24 hours to be approved.",w_info_t:"Processing Time",ok:"Got it",claim_profit:"💰 Claim Profit",profit_claimed:"Profit Claimed",growth_chart:"📈 Capital Growth Chart",quick_menu:"Quick Access",support_title:"Support",new_ticket:"New Ticket",ticket_subject:"Subject",ticket_msg:"Your message",send_ticket:"Send Ticket",my_tickets:"My Tickets",no_tickets:"No tickets yet",ticket_open:"Open",ticket_closed:"Closed",ticket_reply:"Reply",send_reply:"Send Reply",adm_tickets:"Manage Tickets",qm_matches:"Invest",qm_wallet:"Finance",qm_team:"Referrals",qm_deposit:"Deposit",qm_withdraw:"Withdraw",qm_support:"Support",growth_desc:"X: Number of games | Y: Balance ($)",archive:"Investment History",archive_empty:"No history yet",move_archive:"Move to Archive",archived_on:"Archived",
 w_total_bal:"Total Balance",w_dep_title:"Deposit",w_dep_desc:"Add USDT balance via TRC20 or BEP20 network",w_dep_btn:"Deposit Funds",w_wit_title:"Withdraw",w_wit_desc:"Transfer balance to your USDT wallet via any network",w_wit_btn:"Withdraw Funds",tx_all:"All",
 si_earning:"Earning Yield",si_ready_claim:"Ready to Claim ✦",si_ready_invest:"Ready to Invest",si_your_bal:"Your Balance",si_locked_stat:"Locked",si_time_left:"Time Left",si_exp_profit:"Expected Profit",si_earned_profit:"Profit Earned",si_claimable:"Claimable",si_yield_rate:"Yield",si_fixed_profit:"Fixed Profit",si_lock_period:"Lock Period",si_min_invest:"Min. Investment",si_badge_ready:"✦ Ready to Claim",si_badge_active:"Active",si_badge_idle:"Ready to Invest",si_per_cycle:"Fixed Yield Per Cycle",si_profit_type:"Profit Type",si_fixed:"Fixed",si_asset:"Supported Asset",si_disabled_msg:"⏸ Smart Invest disabled by admin",si_start_btn:"🚀 Start Investing",si_locked_amt:"Locked Amount",si_final_amt:"Final Amount",si_hr:"Hr",si_min_lbl:"Min",si_sec_lbl:"Sec",si_cycle_prog:"Cycle Progress",si_wait_end:"⏳ Waiting for cycle to end",si_profit_ready:"Profit Ready to Claim",si_final_lbl:"Final Amount:",si_principal:"Principal",si_earned2:"Profit Earned",si_trust1:"🔒 Secure Investment",si_trust2:"🛡️ Encrypted",
@@ -1451,7 +1646,8 @@ im_s2_title:"How Capital Is Managed",im_s2_text:"Member capital is allocated int
 im_s3_title:"Why Treasury-Based Investments",im_s3_text:"U.S. Treasury securities are among the most established fixed-income asset classes in global financial markets.\n\nTheir structure emphasizes capital preservation, yield generation, and long-term financial stability rather than speculative market behavior.\n\nThis philosophy serves as the foundation of the WGInvest investment model.",
 im_tl_title:"How It Works",im_tl1_title:"Deposit Funds",im_tl1_desc:"Deposit USDT via TRC20 or BEP20 network",im_tl2_title:"Select Investment Cycle",im_tl2_desc:"Choose your investment period and amount",im_tl3_title:"Capital Allocation",im_tl3_desc:"Your capital is allocated into fixed-income strategies",im_tl4_title:"Lock Period",im_tl4_desc:"Capital is locked for the defined duration",im_tl5_title:"Maturity",im_tl5_desc:"Investment cycle ends and profit is realized",im_tl6_title:"Claim Profit",im_tl6_desc:"Receive your fixed yield and add it to your balance",
 im_s5_title:"Why Members Choose WGInvest",im_f1_title:"Fixed Yield Structure",im_f1_sub:"Predictable returns not tied to market volatility",im_f2_title:"Treasury-Based Investment Strategy",im_f2_sub:"Inspired by U.S. government bond principles",im_f3_title:"Transparent Lock Periods",im_f3_sub:"Clear terms, no hidden conditions",im_f4_title:"Structured Capital Allocation",im_f4_sub:"Disciplined approach to asset management",im_f5_title:"Long-Term Investment Focus",im_f5_sub:"Built for sustainable growth over time",im_f6_title:"No Active Trading Required",im_f6_sub:"Deposit, lock, and claim — it's that simple",
-im_s6_title:"Our Investment Philosophy",im_s6_quote:"\"Sustainable wealth is built through disciplined capital allocation.\"",im_s6_text:"We believe sustainable wealth creation is built through disciplined capital allocation, fixed-income investing, and risk-managed strategies rather than short-term speculation.\n\nOur focus remains on consistency, structure, and long-term capital growth."},
+im_s6_title:"Our Investment Philosophy",im_s6_quote:"\"Sustainable wealth is built through disciplined capital allocation.\"",im_s6_text:"We believe sustainable wealth creation is built through disciplined capital allocation, fixed-income investing, and risk-managed strategies rather than short-term speculation.\n\nOur focus remains on consistency, structure, and long-term capital growth.",
+dh_greeting:"Welcome back",dh_avail_bal:"Available",dh_active_inv:"Active Invest",dh_cycle_profit:"Cycle Profit",dh_time_left:"Time Left",dh_progress:"Progress",dh_no_inv:"No Investment",dh_live:"LIVE",dh_cycle_prog:"Cycle Progress",dh_no_active:"No active investment"},
 ar:{dir:"rtl",logo:"WGInvest",sub:"استثمار بعائد ثابت",login:"دخول",reg:"تسجيل",email:"البريد",pass:"كلمة المرور",pass2:"تأكيد",btn_in:"دخول ⚡",btn_up:"تسجيل مجاني 🚀",logout:"خروج",matches:"استثمار",profile:"الملف",wallet:"المحفظة",team:"الفريق",bal:"الرصيد",wins:"الأرباح",loses:"السحوبات",refs:"محالون",acc:"الدقة",no_m:"لا مباريات",pick:"كم تريد أن تستثمر؟",waiting:"مقفل — في انتظار نهاية الدورة",win_m:"✅ تم استلام الربح",lose_m:"تمت الاستعادة",deadline:"انتهى الوقت",invite:"رابط الدعوة",copy_link:"نسخ الرابط",team_struct:"هيكل فريقي",no_team:"لا إحالات",deposit:"إيداع USDT",withdraw:"سحب USDT",amount:"المبلغ",tx_hash:"TX Hash",upload_receipt:"رفع صورة المعاملة",submit_dep:"📤 تأكيد الإيداع",dest_addr:"عنوان المحفظة",min_w:"المبلغ (5 USDT)",w_pass:"🔐 كلمة سر السحب",submit_w:"📥 تأكيد السحب",tx_hist:"سجل المعاملات",no_tx:"لا معاملات",dashboard:"📊 لوحة التحكم",total_pred:"إجمالي الاستثمار",win_rate:"معدل العائد",today_p:"ربح اليوم",tomorrow:"الغد",kyc_t:"🪪 التحقق",kyc_ok:"✅ تم التحقق.",kyc_hint:"ارفع بطاقة الهوية.",kyc_up:"رفع بطاقة الهوية",wp_t:"🔐 كلمة سر السحب",wp_ok:"✅ تم التعيين.",wp_new:"كلمة سر جديدة",wp_rep:"تأكيد",wp_save:"حفظ كلمة السر 🔐",wp_change:"تغيير كلمة السر",dname:"الاسم",save:"حفظ",compound:"📈 فائدة مركبة 2.5%",today_earn:"ربح اليوم",tx_dep:"💳 إيداع",tx_wit:"💸 سحب",tx_ok:"✅ موافق",tx_rej:"❌ مرفوض",tx_pend:"⏳ انتظار",accuracy:"الدقة",stake_title:"💰 كم تستثمر؟",stake_hint:"عائد ثابت +2.5% بعد فترة القفل",cancel:"إلغاء",w_info:"طلبات السحب تستغرق 1-24 ساعة.",w_info_t:"وقت المعالجة",ok:"فهمت",claim_profit:"💰 استلام الربح",profit_claimed:"تم الاستلام",growth_chart:"📈 مخطط النمو",quick_menu:"وصول سريع",support_title:"الدعم",new_ticket:"تذكرة جديدة",ticket_subject:"الموضوع",ticket_msg:"رسالتك",send_ticket:"إرسال التذكرة",my_tickets:"تذاكري",no_tickets:"لا توجد تذاكر",ticket_open:"مفتوح",ticket_closed:"مغلق",ticket_reply:"رد",send_reply:"إرسال الرد",adm_tickets:"إدارة التذاكر",qm_matches:"استثمار",qm_wallet:"مالية",qm_team:"إحالات",qm_deposit:"إيداع",qm_withdraw:"سحب",qm_support:"دعم",growth_desc:"X: عدد الدورات | Y: الرصيد ($)",archive:"سجل الاستثمار",archive_empty:"لا يوجد سجل",move_archive:"نقل إلى الأرشيف",archived_on:"تم الأرشفة",
 w_total_bal:"الرصيد الكلي",w_dep_title:"إيداع",w_dep_desc:"إضافة رصيد USDT عبر شبكة TRC20 أو BEP20",w_dep_btn:"إيداع الأموال",w_wit_title:"سحب",w_wit_desc:"تحويل الرصيد إلى محفظة USDT عبر أي شبكة",w_wit_btn:"سحب الأموال",tx_all:"الكل",
 si_earning:"جاري كسب العائد",si_ready_claim:"جاهز للاستلام ✦",si_ready_invest:"جاهز للاستثمار",si_your_bal:"رصيدك",si_locked_stat:"مقفل",si_time_left:"الوقت المتبقي",si_exp_profit:"الربح المتوقع",si_earned_profit:"الربح المكتسب",si_claimable:"قابل للاستلام",si_yield_rate:"العائد",si_fixed_profit:"ربح ثابت",si_lock_period:"مدة القفل",si_min_invest:"الحد الأدنى",si_badge_ready:"✦ جاهز للاستلام",si_badge_active:"نشط",si_badge_idle:"جاهز للاستثمار",si_per_cycle:"عائد ثابت لكل دورة",si_profit_type:"نوع الربح",si_fixed:"ثابت",si_asset:"الأصل المدعوم",si_disabled_msg:"⏸ Smart Invest معطل من قبل المشرف",si_start_btn:"🚀 ابدأ الاستثمار",si_locked_amt:"المبلغ المقفل",si_final_amt:"المبلغ النهائي",si_hr:"ساعة",si_min_lbl:"دقيقة",si_sec_lbl:"ثانية",si_cycle_prog:"تقدم الدورة",si_wait_end:"⏳ انتظار انتهاء الدورة",si_profit_ready:"الربح جاهز للاستلام",si_final_lbl:"المبلغ النهائي:",si_principal:"رأس المال",si_earned2:"الربح المكتسب",si_trust1:"🔒 استثمار آمن",si_trust2:"🛡️ مشفر",
@@ -1475,7 +1671,8 @@ im_s2_title:"كيف تُدار رأس المال",im_s2_text:"يُخصص رأس 
 im_s3_title:"لماذا الاستثمارات المبنية على الخزانة",im_s3_text:"سندات الخزانة الأمريكية من بين أكثر فئات الأصول ذات الدخل الثابت رسوخاً في الأسواق المالية العالمية.\n\nهيكلها يركز على الحفاظ على رأس المال وتوليد العائد والاستقرار المالي بدلاً من السلوك المضاربي.\n\nهذه الفلسفة هي أساس نموذج الاستثمار في WGInvest.",
 im_tl_title:"كيف يعمل",im_tl1_title:"إيداع الأموال",im_tl1_desc:"أودع USDT عبر شبكة TRC20 أو BEP20",im_tl2_title:"اختيار دورة الاستثمار",im_tl2_desc:"اختر فترة الاستثمار والمبلغ",im_tl3_title:"تخصيص رأس المال",im_tl3_desc:"يُخصص رأس مالك في استراتيجيات الدخل الثابت",im_tl4_title:"فترة القفل",im_tl4_desc:"يُقفل رأس المال للمدة المحددة",im_tl5_title:"الاستحقاق",im_tl5_desc:"تنتهي دورة الاستثمار ويتحقق الربح",im_tl6_title:"استلام الربح",im_tl6_desc:"استلم عائدك الثابت وأضفه إلى رصيدك",
 im_s5_title:"لماذا يختار الأعضاء WGInvest",im_f1_title:"هيكل عائد ثابت",im_f1_sub:"عوائد قابلة للتنبؤ غير مرتبطة بتقلبات السوق",im_f2_title:"استراتيجية استثمار مبنية على الخزانة",im_f2_sub:"مستوحاة من مبادئ السندات الحكومية الأمريكية",im_f3_title:"فترات قفل شفافة",im_f3_sub:"شروط واضحة بدون شروط مخفية",im_f4_title:"تخصيص منظم لرأس المال",im_f4_sub:"نهج منضبط لإدارة الأصول",im_f5_title:"تركيز على الاستثمار طويل الأمد",im_f5_sub:"مصمم للنمو المستدام على مر الزمن",im_f6_title:"لا تداول نشط مطلوب",im_f6_sub:"أودع، اقفل، واستلم",
-im_s6_title:"فلسفة استثمارنا",im_s6_quote:"\"الثروة المستدامة تُبنى من خلال التخصيص المنضبط لرأس المال.\"",im_s6_text:"نؤمن بأن خلق الثروة المستدامة يتحقق من خلال التخصيص المنضبط لرأس المال والاستثمار في الدخل الثابت واستراتيجيات إدارة المخاطر بدلاً من المضاربة قصيرة الأمد.\n\nيبقى تركيزنا على الاتساق والهيكل والنمو طويل الأمد."},
+im_s6_title:"فلسفة استثمارنا",im_s6_quote:"\"الثروة المستدامة تُبنى من خلال التخصيص المنضبط لرأس المال.\"",im_s6_text:"نؤمن بأن خلق الثروة المستدامة يتحقق من خلال التخصيص المنضبط لرأس المال والاستثمار في الدخل الثابت واستراتيجيات إدارة المخاطر بدلاً من المضاربة قصيرة الأمد.\n\nيبقى تركيزنا على الاتساق والهيكل والنمو طويل الأمد.",
+dh_greeting:"مرحباً بعودتك",dh_avail_bal:"الرصيد",dh_active_inv:"الاستثمار",dh_cycle_profit:"ربح الدورة",dh_time_left:"الوقت المتبقي",dh_progress:"التقدم",dh_no_inv:"لا استثمار",dh_live:"مباشر",dh_cycle_prog:"تقدم الدورة",dh_no_active:"لا يوجد استثمار نشط"},
 tr:{dir:"ltr",logo:"WGInvest",sub:"Sabit Getirili Yatırım",login:"Giriş",reg:"Kayıt",email:"E-posta",pass:"Şifre",pass2:"Onayla",btn_in:"Giriş ⚡",btn_up:"Ücretsiz Kayıt 🚀",logout:"Çıkış",matches:"Yatırım",profile:"Profil",wallet:"Cüzdan",team:"Takım",bal:"Bakiye",wins:"Kâr",loses:"Geri Ödeme",refs:"Referans",acc:"Doğruluk",no_m:"Aktif maç yok",pick:"Ne kadar yatırmak istersin?",waiting:"Kilitli — döngü sonu bekleniyor",win_m:"✅ Kâr alındı",lose_m:"Geri ödendi",deadline:"Süre doldu",invite:"Davet Linki",copy_link:"Linki Kopyala",team_struct:"Takım Yapısı",no_team:"Referans yok",deposit:"USDT Yatır",withdraw:"USDT Çek",amount:"Miktar",tx_hash:"TX Hash",upload_receipt:"Görsel Yükle",submit_dep:"📤 Yatırım",dest_addr:"Hedef Cüzdan",min_w:"Miktar (min 5)",w_pass:"🔐 Çekim Şifresi",submit_w:"📥 Çekim",tx_hist:"İşlem Geçmişi",no_tx:"İşlem yok",dashboard:"📊 Panel",total_pred:"Toplam Yatırım",win_rate:"Getiri Oranı",today_p:"Bugün",tomorrow:"Yarın",kyc_t:"🪪 Kimlik",kyc_ok:"✅ Doğrulandı.",kyc_hint:"Kimlik yükle.",kyc_up:"Kimlik Yükle",wp_t:"🔐 Çekim Şifresi",wp_ok:"✅ Ayarlandı.",wp_new:"Yeni Şifre",wp_rep:"Onayla",wp_save:"Şifreyi Kaydet 🔐",wp_change:"Şifreyi Değiştir",dname:"Ad",save:"Kaydet",compound:"📈 Bileşik %3",today_earn:"Bugün",tx_dep:"💳 Yatırım",tx_wit:"💸 Çekim",tx_ok:"✅ Onay",tx_rej:"❌ Red",tx_pend:"⏳ Bekle",accuracy:"Doğruluk",stake_title:"💰 Ne kadar?",stake_hint:"Kilit süresi sonunda sabit +%2.5 kâr",cancel:"İptal",w_info:"Çekimler 1-24 saat sürer.",w_info_t:"Süre",ok:"Anladım",claim_profit:"💰 Kârı Al",profit_claimed:"Alındı",growth_chart:"📈 Büyüme",quick_menu:"Hızlı Erişim",support_title:"Destek",new_ticket:"Yeni Bilet",ticket_subject:"Konu",ticket_msg:"Mesajınız",send_ticket:"Bilet Gönder",my_tickets:"Biletlerim",no_tickets:"Bilet yok",ticket_open:"Açık",ticket_closed:"Kapalı",ticket_reply:"Yanıt",send_reply:"Yanıt Gönder",adm_tickets:"Biletleri Yönet",qm_matches:"Yatırım",qm_wallet:"Finans",qm_team:"Referanslar",qm_deposit:"Yatır",qm_withdraw:"Çek",qm_support:"Destek",growth_desc:"X: Döngü | Y: Bakiye ($)",archive:"Yatırım Geçmişi",archive_empty:"Geçmiş yok",move_archive:"Arşive Taşı",archived_on:"Arşivlendi",
 w_total_bal:"Toplam Bakiye",w_dep_title:"Yatırım",w_dep_desc:"TRC20 veya BEP20 ağı üzerinden USDT bakiyesi ekle",w_dep_btn:"Para Yatır",w_wit_title:"Çekim",w_wit_desc:"Bakiyeni herhangi bir ağ üzerinden USDT cüzdanına aktar",w_wit_btn:"Para Çek",tx_all:"Tümü",
 si_earning:"Getiri Kazanılıyor",si_ready_claim:"Almaya Hazır ✦",si_ready_invest:"Yatırmaya Hazır",si_your_bal:"Bakiyeniz",si_locked_stat:"Kilitli",si_time_left:"Kalan Süre",si_exp_profit:"Beklenen Kâr",si_earned_profit:"Kazanılan Kâr",si_claimable:"Alınabilir",si_yield_rate:"Getiri",si_fixed_profit:"Sabit Kâr",si_lock_period:"Kilit Süresi",si_min_invest:"Min. Yatırım",si_badge_ready:"✦ Almaya Hazır",si_badge_active:"Aktif",si_badge_idle:"Yatırmaya Hazır",si_per_cycle:"Döngü Başına Sabit Getiri",si_profit_type:"Kâr Türü",si_fixed:"Sabit",si_asset:"Desteklenen Varlık",si_disabled_msg:"⏸ Smart Invest yönetici tarafından devre dışı",si_start_btn:"🚀 Yatırıma Başla",si_locked_amt:"Kilitli Miktar",si_final_amt:"Nihai Miktar",si_hr:"Sa",si_min_lbl:"Dk",si_sec_lbl:"Sn",si_cycle_prog:"Döngü İlerlemesi",si_wait_end:"⏳ Döngü sonu bekleniyor",si_profit_ready:"Kâr Almaya Hazır",si_final_lbl:"Nihai Miktar:",si_principal:"Anapara",si_earned2:"Kazanılan Kâr",si_trust1:"🔒 Güvenli Yatırım",si_trust2:"🛡️ Şifreli",
@@ -1499,7 +1696,8 @@ im_s2_title:"Sermaye Nasıl Yönetilir",im_s2_text:"Üye sermayesi, hazineye day
 im_s3_title:"Neden Hazineye Dayalı Yatırımlar",im_s3_text:"ABD Hazine menkul kıymetleri, küresel finansal piyasalardaki en köklü sabit gelirli varlık sınıfları arasındadır.\n\nYapıları, spekülatif piyasa davranışı yerine sermaye koruma, getiri üretimi ve uzun vadeli finansal istikrara vurgu yapar.\n\nBu felsefe, WGInvest yatırım modelinin temelini oluşturur.",
 im_tl_title:"Nasıl Çalışır",im_tl1_title:"Para Yatır",im_tl1_desc:"TRC20 veya BEP20 ağı üzerinden USDT yatırın",im_tl2_title:"Yatırım Dönemi Seç",im_tl2_desc:"Yatırım sürenizi ve miktarınızı seçin",im_tl3_title:"Sermaye Tahsisi",im_tl3_desc:"Sermayeniz sabit gelirli stratejilere tahsis edilir",im_tl4_title:"Kilit Süresi",im_tl4_desc:"Sermaye belirlenen süre için kilitlenir",im_tl5_title:"Vade",im_tl5_desc:"Yatırım dönemi sona erer ve kâr gerçekleşir",im_tl6_title:"Kârı Al",im_tl6_desc:"Sabit getirinizi alın ve bakiyenize ekleyin",
 im_s5_title:"Üyeler Neden WGInvest'i Seçiyor",im_f1_title:"Sabit Getiri Yapısı",im_f1_sub:"Piyasa dalgalanmalarına bağlı olmayan öngörülebilir getiriler",im_f2_title:"Hazineye Dayalı Yatırım Stratejisi",im_f2_sub:"ABD devlet tahvili ilkelerinden ilham alınmıştır",im_f3_title:"Şeffaf Kilit Süreleri",im_f3_sub:"Gizli koşul olmayan açık şartlar",im_f4_title:"Yapılandırılmış Sermaye Tahsisi",im_f4_sub:"Varlık yönetimine disiplinli yaklaşım",im_f5_title:"Uzun Vadeli Yatırım Odağı",im_f5_sub:"Zaman içinde sürdürülebilir büyüme için tasarlandı",im_f6_title:"Aktif Alım Satım Gerekmez",im_f6_sub:"Yatır, kilitle ve al — bu kadar basit",
-im_s6_title:"Yatırım Felsefemiz",im_s6_quote:"\"Sürdürülebilir servet, disiplinli sermaye tahsisiyle inşa edilir.\"",im_s6_text:"Sürdürülebilir servet yaratmanın kısa vadeli spekülasyon yerine disiplinli sermaye tahsisi, sabit gelirli yatırım ve risk yönetimli stratejilerle gerçekleştiğine inanıyoruz.\n\nOdağımız tutarlılık, yapı ve uzun vadeli sermaye büyümesi üzerine kalıyor."},
+im_s6_title:"Yatırım Felsefemiz",im_s6_quote:"\"Sürdürülebilir servet, disiplinli sermaye tahsisiyle inşa edilir.\"",im_s6_text:"Sürdürülebilir servet yaratmanın kısa vadeli spekülasyon yerine disiplinli sermaye tahsisi, sabit gelirli yatırım ve risk yönetimli stratejilerle gerçekleştiğine inanıyoruz.\n\nOdağımız tutarlılık, yapı ve uzun vadeli sermaye büyümesi üzerine kalıyor.",
+dh_greeting:"Tekrar hoş geldin",dh_avail_bal:"Bakiye",dh_active_inv:"Yatırım",dh_cycle_profit:"Döngü Kârı",dh_time_left:"Kalan Süre",dh_progress:"İlerleme",dh_no_inv:"Yatırım Yok",dh_live:"CANLI",dh_cycle_prog:"Döngü İlerlemesi",dh_no_active:"Aktif yatırım yok"},
 hi:{dir:"ltr",logo:"WGInvest",sub:"फिक्स्ड यील्ड निवेश",login:"लॉगिन",reg:"रजिस्टर",email:"ईमेल",pass:"पासवर्ड",pass2:"दोहराएं",btn_in:"लॉगिन ⚡",btn_up:"मुफ्त रजिस्टर 🚀",logout:"लॉगआउट",matches:"निवेश",profile:"प्रोफाइल",wallet:"वॉलेट",team:"टीम",bal:"बैलेंस",wins:"लाभ",loses:"वापसी",refs:"रेफरल",acc:"सटीकता",no_m:"कोई मैच नहीं",pick:"कितना निवेश करना चाहते हैं?",waiting:"लॉक — चक्र समाप्ति की प्रतीक्षा",win_m:"✅ लाभ प्राप्त हुआ",lose_m:"वापस कर दिया गया",deadline:"समय खत्म",invite:"आमंत्रण लिंक",copy_link:"लिंक कॉपी",team_struct:"टीम",no_team:"कोई रेफरल नहीं",deposit:"USDT जमा",withdraw:"USDT निकालें",amount:"राशि",tx_hash:"TX Hash",upload_receipt:"स्क्रीनशॉट",submit_dep:"📤 जमा",dest_addr:"वॉलेट",min_w:"राशि (5+)",w_pass:"🔐 पासवर्ड",submit_w:"📥 निकासी",tx_hist:"इतिहास",no_tx:"कोई नहीं",dashboard:"📊 डैशबोर्ड",total_pred:"कुल निवेश",win_rate:"प्रतिफल दर",today_p:"आज",tomorrow:"कल",kyc_t:"🪪 पहचान",kyc_ok:"✅ सत्यापित।",kyc_hint:"ID अपलोड करें।",kyc_up:"ID अपलोड",wp_t:"🔐 पासवर्ड",wp_ok:"✅ सेट।",wp_new:"नया पासवर्ड",wp_rep:"दोहराएं",wp_save:"पासवर्ड सेव 🔐",wp_change:"बदलें",dname:"नाम",save:"सेव",compound:"📈 2.5% दैनिक",today_earn:"आज",tx_dep:"💳 जमा",tx_wit:"💸 निकासी",tx_ok:"✅ स्वीकृत",tx_rej:"❌ अस्वीकृत",tx_pend:"⏳ लंबित",accuracy:"सटीकता",stake_title:"💰 कितना निवेश?",stake_hint:"लॉक अवधि के बाद निश्चित +2.5% लाभ",cancel:"रद्द",w_info:"1-24 घंटे लगते हैं।",w_info_t:"समय",ok:"समझ गया",claim_profit:"💰 मुनाफा लें",profit_claimed:"लिया",growth_chart:"📈 वृद्धि",quick_menu:"त्वरित पहुँच",support_title:"सहायता",new_ticket:"नया टिकट",ticket_subject:"विषय",ticket_msg:"आपका संदेश",send_ticket:"टिकट भेजें",my_tickets:"मेरे टिकट",no_tickets:"कोई टिकट नहीं",ticket_open:"खुला",ticket_closed:"बंद",ticket_reply:"जवाब",send_reply:"जवाब भेजें",adm_tickets:"टिकट प्रबंधन",qm_matches:"निवेश",qm_wallet:"वित्त",qm_team:"रेफरल",qm_deposit:"जमा",qm_withdraw:"निकासी",qm_support:"सहायता",growth_desc:"X: चक्र | Y: बैलेंस ($)",archive:"निवेश इतिहास",archive_empty:"कोई इतिहास नहीं",move_archive:"आर्काइव करें",archived_on:"आर्काइव हुआ"},
 ur:{dir:"rtl",logo:"WGInvest",sub:"فکسڈ منافع سرمایہ کاری",login:"لاگ ان",reg:"رجسٹر",email:"ای میل",pass:"پاس ورڈ",pass2:"دوبارہ",btn_in:"لاگ ان ⚡",btn_up:"مفت رجسٹر 🚀",logout:"باہر",matches:"سرمایہ کاری",profile:"پروفائل",wallet:"والیٹ",team:"ٹیم",bal:"بیلنس",wins:"منافع",loses:"واپسی",refs:"ریفرل",acc:"درستگی",no_m:"کوئی میچ نہیں",pick:"کتنی سرمایہ کاری کرنا چاہتے ہیں؟",waiting:"مقفل — دورانیہ ختم ہونے کا انتظار",win_m:"✅ منافع موصول ہوا",lose_m:"واپس کر دیا گیا",deadline:"وقت ختم",invite:"دعوت لنک",copy_link:"لنک کاپی",team_struct:"ٹیم",no_team:"کوئی ریفرل نہیں",deposit:"USDT جمع",withdraw:"USDT نکالیں",amount:"رقم",tx_hash:"TX Hash",upload_receipt:"اسکرین شاٹ",submit_dep:"📤 جمع",dest_addr:"والیٹ",min_w:"رقم (5+)",w_pass:"🔐 پاس ورڈ",submit_w:"📥 نکاسی",tx_hist:"تاریخ",no_tx:"کوئی نہیں",dashboard:"📊 ڈیش بورڈ",total_pred:"کل سرمایہ کاری",win_rate:"منافع کی شرح",today_p:"آج",tomorrow:"کل",kyc_t:"🪪 شناخت",kyc_ok:"✅ تصدیق شدہ۔",kyc_hint:"شناختی کارڈ اپلوڈ کریں۔",kyc_up:"شناختی کارڈ",wp_t:"🔐 پاس ورڈ",wp_ok:"✅ سیٹ۔",wp_new:"نیا پاس ورڈ",wp_rep:"تصدیق",wp_save:"پاس ورڈ محفوظ 🔐",wp_change:"تبدیل کریں",dname:"نام",save:"محفوظ",compound:"📈 2.5% یومیہ",today_earn:"آج",tx_dep:"💳 جمع",tx_wit:"💸 نکاسی",tx_ok:"✅ منظور",tx_rej:"❌ مسترد",tx_pend:"⏳ انتظار",accuracy:"درستگی",stake_title:"💰 کتنا سرمایہ؟",stake_hint:"لاک پیریڈ کے بعد مستقل +2.5% منافع",cancel:"منسوخ",w_info:"1-24 گھنٹے لگتے ہیں۔",w_info_t:"وقت",ok:"سمجھ گیا",claim_profit:"💰 منافع لیں",profit_claimed:"لیا گیا",growth_chart:"📈 نمو چارٹ",quick_menu:"فوری رسائی",support_title:"سپورٹ",new_ticket:"نیا ٹکٹ",ticket_subject:"موضوع",ticket_msg:"آپ کا پیغام",send_ticket:"ٹکٹ بھیجیں",my_tickets:"میرے ٹکٹ",no_tickets:"کوئی ٹکٹ نہیں",ticket_open:"کھلا",ticket_closed:"بند",ticket_reply:"جواب",send_reply:"جواب بھیجیں",adm_tickets:"ٹکٹ مینجمنٹ",qm_matches:"سرمایہ کاری",qm_wallet:"مالیات",qm_team:"ریفرل",qm_deposit:"جمع",qm_withdraw:"نکاسی",qm_support:"سپورٹ",growth_desc:"X: دورانیہ | Y: بیلنس ($)",archive:"سرمایہ کاری کی تاریخ",archive_empty:"کوئی تاریخ موجود نہیں",move_archive:"آرکائیو کریں",archived_on:"آرکائیو ہوا"}
 ,
@@ -1532,6 +1730,7 @@ function applyLang(){
   for(var lid in lb){var lel=document.getElementById(lid);if(lel)lel.textContent=t(lb[lid]);}
   document.querySelectorAll(".litem").forEach(function(el,i){el.classList.toggle("cur",["fa","en","ar","tr","hi","ur"][i]===lang);});
   document.querySelectorAll("#authFlags button").forEach(function(el,i){el.classList.toggle("cur",["fa","en","ar","tr","hi","ur"][i]===lang);});
+  if(typeof updateHeroDashboard==="function"&&P)try{updateHeroDashboard(null);}catch(e){}
 }
 function setLang(l){lang=l;localStorage.setItem("lang",l);document.getElementById("ldrop").classList.remove("open");applyLang();if(U)goTab(curTab);}
 function toggleLD(){document.getElementById("ldrop").classList.toggle("open");}
@@ -1542,16 +1741,7 @@ function applyTheme(){
   }else{
     document.body.classList.remove("light");
   }
-  var bg=document.getElementById("heroBg");
-  if(bg){
-    if(isLight){
-      bg.style.background="linear-gradient(135deg,#1a56db 0%,#0ea5e9 50%,#00d4aa 100%)";
-      bg.innerHTML="";
-    }else{
-      bg.style.background="linear-gradient(135deg,#020c1b 0%,#050e20 60%,#071525 100%)";
-      bg.innerHTML="";
-    }
-  }
+  // heroBg removed — dhero handles its own background via CSS
 }
 function toggleTheme(){isLight=!isLight;localStorage.setItem("theme",isLight?"light":"dark");applyTheme();}
 var _toastTimer=null;
@@ -1636,6 +1826,86 @@ function updateBal(){
   var nav=document.getElementById("navBal");if(nav)nav.textContent="$"+b;
   var sb2=document.getElementById("sBal");if(sb2)sb2.textContent="$"+b;
 }
+function updateHeroDashboard(inv){
+  var bal=P?parseFloat(P.balance||0):0;
+  var name=(P&&P.display_name)||t('default_name');
+  // Greeting & name
+  var dg=document.getElementById("dh_greeting");if(dg)dg.textContent=t('dh_greeting')+',';
+  var dn=document.getElementById("dh_name");if(dn)dn.textContent=name;
+  var db=document.getElementById("dh_badge_lbl");if(db)db.textContent=t('dh_live');
+  // Labels
+  var dhl_bal=document.getElementById("dhl_bal");if(dhl_bal)dhl_bal.textContent=t('dh_avail_bal');
+  var dhl_inv=document.getElementById("dhl_inv");if(dhl_inv)dhl_inv.textContent=t('dh_active_inv');
+  var dhl_prf=document.getElementById("dhl_prf");if(dhl_prf)dhl_prf.textContent=t('dh_cycle_profit');
+  var dhl_time=document.getElementById("dhl_time");if(dhl_time)dhl_time.textContent=t('dh_time_left');
+  var dhl_prog=document.getElementById("dhl_prog");if(dhl_prog)dhl_prog.textContent=t('dh_progress');
+  var drt=document.getElementById("dh_ring_title");if(drt)drt.textContent=t('dh_cycle_prog');
+  // Values
+  var isActive=inv&&inv.status==="active";
+  var isCompleted=inv&&inv.status==="completed";
+  var lockMs=inv?inv.lock_minutes*60000:0;
+  var elapsed=inv?(Date.now()-new Date(inv.started_at).getTime()):0;
+  var remainMs=isActive?Math.max(0,lockMs-elapsed):0;
+  if(isActive&&remainMs<=0){isCompleted=true;isActive=false;}
+  var profitAmt=inv?parseFloat(inv.amount)*parseFloat(inv.profit_pct)/100:0;
+  var ringPct=isActive?Math.min(100,Math.round((elapsed/lockMs)*100)):isCompleted?100:0;
+  // Balance card - count up
+  var vbal=document.getElementById("dhv_bal");
+  if(vbal){
+    var start=0,end=bal,dur=800,startTime=null;
+    function stepBal(ts){if(!startTime)startTime=ts;var p=Math.min((ts-startTime)/dur,1);vbal.textContent='$'+(start+(end-start)*p).toFixed(2);if(p<1)requestAnimationFrame(stepBal);}
+    requestAnimationFrame(stepBal);
+  }
+  // Active invest card
+  var vinv=document.getElementById("dhv_inv");
+  if(vinv)vinv.textContent=isActive?('$'+parseFloat(inv.amount).toFixed(2)):t('dh_no_inv');
+  // Profit card
+  var vprf=document.getElementById("dhv_prf");
+  if(vprf)vprf.textContent=(isActive||isCompleted)?('$'+profitAmt.toFixed(2)):('$0.00');
+  // Time card
+  var vtime=document.getElementById("dhv_time");
+  if(vtime){
+    if(isActive&&remainMs>0){
+      var rs=Math.floor(remainMs/1000),rh=Math.floor(rs/3600),rm=Math.floor((rs%3600)/60),rsc=rs%60;
+      function p2(n){return n<10?'0'+n:String(n);}
+      vtime.textContent=p2(rh)+':'+p2(rm)+':'+p2(rsc);
+    } else {
+      vtime.textContent=isCompleted?t('si_badge_ready'):'—';
+    }
+  }
+  // Progress ring
+  var CIRC=182.21;
+  var fill=document.getElementById("dheroRingFill");
+  if(fill){
+    fill.style.strokeDashoffset=CIRC*(1-ringPct/100);
+  }
+  var rpct=document.getElementById("dheroRingPct");
+  if(rpct)rpct.textContent=ringPct+'%';
+  // Tick highlights
+  var ticks=[0,25,50,75,100];
+  ticks.forEach(function(v,i){
+    var el=document.getElementById("dht"+i);
+    if(el)el.className='dhero-ring-tick'+(ringPct>=v?' active':'');
+  });
+  // Ring desc
+  var rd=document.getElementById("dh_ring_desc");
+  if(rd)rd.textContent=isActive?(''+ringPct+'% '+t('dh_cycle_prog')):isCompleted?t('si_badge_ready'):t('dh_no_active');
+  // Spawn particles
+  var pp=document.getElementById("dheroParticles");
+  if(pp&&!pp.dataset.init){
+    pp.dataset.init="1";
+    for(var i=0;i<12;i++){
+      var p=document.createElement("div");
+      p.className="dhero-p";
+      p.style.left=(Math.random()*100)+'%';
+      p.style.bottom='-10px';
+      p.style.width=p.style.height=(2+Math.random()*3)+'px';
+      p.style.animationDuration=(3+Math.random()*4)+'s';
+      p.style.animationDelay=(Math.random()*4)+'s';
+      pp.appendChild(p);
+    }
+  }
+}
 async function enterApp(){
   showPage("mainPage");
   // Resolve email from all possible Supabase sources
@@ -1658,6 +1928,7 @@ async function enterApp(){
   var adminEmail=(ADMIN||"").toLowerCase().trim();
   isAdmin=!!(resolvedEmail&&adminEmail&&resolvedEmail===adminEmail);
   applyLang();
+  updateHeroDashboard(null);
   goTab("matches");
   setTimeout(applyTheme,100);
   try{loadStats();}catch(e){}
@@ -1744,6 +2015,7 @@ async function loadMatches(){
       if(r.data&&r.data.length)inv=r.data[0];
     }catch(e){}
   }
+  updateHeroDashboard(inv);
   renderSmartInvest(c,inv);
 }
 
