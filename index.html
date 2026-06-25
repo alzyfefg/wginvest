@@ -20,11 +20,12 @@
   --glow:0 0 20px rgba(0,212,170,.15);
 }
 body.light{
-  --bg:#f0f4ff;--bg2:#e4ecff;--bg3:#d8e6ff;
-  --card:#fff;--card2:#f8faff;
-  --border:#d0dcf0;--border2:#b8ccee;
-  --text:#0f1e36;--text2:#4a6a8a;--text3:#8aaac8;
-  --sh:0 2px 14px rgba(26,86,219,.08);--sh2:0 8px 32px rgba(26,86,219,.15);
+  --bg:#f4f7fb;--bg2:#eaeff8;--bg3:#dde5f4;
+  --card:#ffffff;--card2:#f8faff;
+  --border:#dde3ee;--border2:#c8d3e8;
+  --text:#0f172a;--text2:#334155;--text3:#64748b;
+  --sh:0 1px 3px rgba(15,23,42,.06),0 4px 14px rgba(15,23,42,.05);
+  --sh2:0 8px 32px rgba(15,23,42,.1);
   --glow:0 0 20px rgba(26,86,219,.1);
 }
 *{margin:0;padding:0;box-sizing:border-box}
@@ -70,7 +71,7 @@ body{font-family:'Vazirmatn',sans-serif;background:var(--bg);min-height:100vh;co
 
 /* ── TOPBAR ── */
 .topbar{position:fixed;top:0;left:0;right:0;background:rgba(7,15,30,.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06);z-index:100;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;transition:background .3s}
-body.light .topbar{background:rgba(255,255,255,.9)}
+body.light .topbar{background:rgba(255,255,255,.97);border-bottom:1px solid var(--border);box-shadow:0 1px 8px rgba(15,23,42,.06)}
 .topbar-logo{display:flex;align-items:center;gap:9px}
 .topbar-logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--p),var(--ac));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 8px rgba(0,212,170,.25)}
 .topbar-logo-text{font-size:15px;font-weight:900;background:linear-gradient(135deg,#fff,var(--ac));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -97,20 +98,20 @@ body.light .topbar-logo-text{background:linear-gradient(135deg,var(--p),var(--ac
 .main-wrap{padding-top:54px;padding-bottom:70px}
 
 /* ── HERO ── */
-.hero{color:#fff;padding:0;text-align:center;position:relative;overflow:hidden;min-height:170px;display:flex;flex-direction:column;justify-content:flex-end}
+.hero{color:#fff;padding:0;text-align:center;position:relative;overflow:hidden;min-height:145px;display:flex;flex-direction:column;justify-content:flex-end}
 .hero-bg{position:absolute;inset:0;width:100%;height:100%}
 .hero-bg svg{width:100%;height:100%;display:block}
 .hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(4,10,20,.9) 0%,rgba(4,10,20,.4) 55%,transparent 100%)}
-.hero-content{position:relative;z-index:1;padding:18px 16px 20px}
+.hero-content{position:relative;z-index:1;padding:16px 16px 20px}
 .hero-tag{font-size:10px;letter-spacing:3px;color:var(--ac);text-transform:uppercase;margin-bottom:6px;font-weight:700;opacity:.9}
 .hero h1{font-size:1.4rem;font-weight:900;line-height:1.25;margin-bottom:5px}
 .hero h1 em{color:#fcd34d;font-style:normal}
 .hero p{font-size:11px;color:rgba(255,255,255,.65)}
-.player-silhouette{position:absolute;bottom:0;right:16px;width:75px;height:115px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 160'%3E%3Cellipse cx='50' cy='20' rx='18' ry='20' fill='rgba(255,255,255,0.12)'/%3E%3Cpath d='M25 60 Q50 45 75 60 L80 120 Q65 115 50 118 Q35 115 20 120 Z' fill='rgba(255,255,255,0.12)'/%3E%3Cpath d='M25 60 L15 100 Q20 105 28 98 L35 70' fill='rgba(255,255,255,0.1)'/%3E%3Cpath d='M75 60 L85 100 Q80 105 72 98 L65 70' fill='rgba(255,255,255,0.1)'/%3E%3Cpath d='M35 118 L30 155 Q38 158 42 152 L45 125' fill='rgba(255,255,255,0.1)'/%3E%3Cpath d='M65 118 L70 155 Q62 158 58 152 L55 125' fill='rgba(255,255,255,0.1)'/%3E%3C/svg%3E") no-repeat center;background-size:contain;pointer-events:none;z-index:1;opacity:.5}
+.player-silhouette{display:none}
 
 /* ── BOTTOM NAV ── */
 .bnav{position:fixed;bottom:0;left:0;right:0;background:rgba(7,15,30,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.06);display:flex;height:64px;z-index:100;transition:background .3s}
-body.light .bnav{background:rgba(255,255,255,.95)}
+body.light .bnav{background:rgba(255,255,255,.98);border-top:1px solid var(--border);box-shadow:0 -1px 8px rgba(15,23,42,.05)}
 .bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:none;cursor:pointer;font-family:'Vazirmatn',sans-serif;font-size:9px;color:var(--text3);transition:all .2s;padding:6px 4px;position:relative}
 .bnav-btn .bi{font-size:21px;line-height:1;transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
 .bnav-btn.on{color:var(--ac)}
@@ -125,7 +126,7 @@ body.light .bnav{background:rgba(255,255,255,.95)}
 
 /* ── MATCH CARD ── */
 .mcard{background:rgba(255,255,255,.03);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:15px;margin-bottom:12px;box-shadow:var(--sh);transition:all .25s;animation:fadeUp .35s ease both}
-body.light .mcard{background:rgba(255,255,255,.85);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.7);box-shadow:0 4px 20px rgba(26,86,219,.08)}
+body.light .mcard{background:#fff;backdrop-filter:none;border:1px solid var(--border);box-shadow:var(--sh)}
 .mcard:hover{border-color:rgba(0,212,170,.2);box-shadow:0 6px 24px rgba(0,212,170,.08),var(--glow)}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 .mt{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}
@@ -166,7 +167,7 @@ body.light .mcard{background:rgba(255,255,255,.85);backdrop-filter:blur(12px);bo
 
 /* ── CARDS ── */
 .icard{background:rgba(255,255,255,.03);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:var(--sh);transition:all .3s}
-body.light .icard{background:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.7)}
+body.light .icard{background:#fff;border:1px solid var(--border);box-shadow:var(--sh)}
 .ctitle{font-size:12px;font-weight:700;color:var(--ac);margin-bottom:13px;display:flex;align-items:center;gap:7px;letter-spacing:.3px}
 
 /* ── PROFILE HEADER ── */
@@ -182,7 +183,7 @@ body.light .icard{background:rgba(255,255,255,.85);border:1px solid rgba(255,255
 /* ── STAT GRID ── */
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:13px}
 .stat-card{background:rgba(255,255,255,.03);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.07);border-radius:13px;padding:13px;display:flex;align-items:center;gap:11px;transition:all .2s}
-body.light .stat-card{background:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.6)}
+body.light .stat-card{background:#fff;border:1px solid var(--border);box-shadow:var(--sh)}
 .stat-card:hover{border-color:rgba(0,212,170,.2);transform:translateY(-1px)}
 .stat-card .sc-icon{width:38px;height:38px;background:rgba(0,212,170,.1);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .stat-card .sc-val{font-size:17px;font-weight:900;color:var(--text)}
@@ -191,7 +192,7 @@ body.light .stat-card{background:rgba(255,255,255,.8);border:1px solid rgba(255,
 /* ── QUICK MENU ── */
 .quick-menu{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:13px}
 .qm-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;background:rgba(255,255,255,.03);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.07);border-radius:15px;padding:16px 8px;cursor:pointer;transition:all .2s;font-family:'Vazirmatn',sans-serif}
-body.light .qm-btn{background:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.6)}
+body.light .qm-btn{background:#fff;border:1px solid var(--border);box-shadow:var(--sh)}
 .qm-btn:hover{border-color:rgba(0,212,170,.25);transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,212,170,.1)}
 .qm-btn:active{transform:scale(.96)}
 .qm-icon{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:21px}
@@ -252,7 +253,7 @@ body.light .qm-btn{background:rgba(255,255,255,.8);border:1px solid rgba(255,255
 
 /* ── ADMIN ── */
 .adm-sec{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:15px;margin-bottom:12px;box-shadow:var(--sh)}
-body.light .adm-sec{background:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.7)}
+body.light .adm-sec{background:#fff;border:1px solid var(--border);box-shadow:var(--sh)}
 .adm-t{font-size:12px;font-weight:700;color:var(--ac);margin-bottom:12px;letter-spacing:.3px}
 .adm-row{display:flex;gap:7px;margin-bottom:8px;flex-wrap:wrap}
 .adm-in{flex:1;min-width:100px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'Vazirmatn',sans-serif;font-size:12px;outline:none;transition:all .2s}
@@ -1010,13 +1011,84 @@ button[onclick="doRegister()"]:active {
 .bnav-btn{transition:color .2s ease,transform .15s ease!important}
 
 /* Light mode overrides */
-body.light .si-invest-card{background:rgba(255,255,255,.92);border-color:rgba(0,0,0,.06)}
-body.light .si-stat{background:#fff;border-color:rgba(0,0,0,.06);box-shadow:0 2px 10px rgba(26,86,219,.06)}
-body.light .si-detail{background:rgba(0,0,0,.02);border-color:rgba(0,0,0,.06)}
-body.light .si-count-unit{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.07)}
-body.light .si-trust-badge{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.07)}
-body.light .si-ring-track{stroke:rgba(0,0,0,.07)}
+body.light .si-invest-card{background:#fff;border-color:var(--border);box-shadow:var(--sh)}
+body.light .si-stat{background:#fff;border-color:var(--border);box-shadow:var(--sh)}
+body.light .si-detail{background:var(--bg2);border-color:var(--border)}
+body.light .si-count-unit{background:var(--bg2);border-color:var(--border)}
+body.light .si-trust-badge{background:var(--bg2);border-color:var(--border);color:var(--text2)}
+body.light .si-ring-track{stroke:var(--border2)}
 body.light .si-ring-pct{color:var(--text)}
+body.light .si-section{background:transparent}
+body.light .si-ring-label{color:var(--text2)}
+body.light .si-ring-time{color:var(--text3)}
+body.light .si-stat-lbl{color:var(--text3)}
+body.light .si-card-title{color:var(--text)}
+body.light .si-card-sub{color:var(--text3)}
+body.light .si-detail-lbl{color:var(--text3)}
+body.light .si-detail-val{color:var(--text)}
+body.light .si-yield-hero-lbl{color:var(--text2)}
+body.light .si-linear-meta{color:var(--text2)}
+body.light .si-linear-track{background:var(--bg3)}
+body.light .si-success-lbl{color:var(--text2)}
+body.light .si-success-sub{color:var(--text3)}
+
+/* ── LIGHT MODE: COMPREHENSIVE OVERRIDES ── */
+/* Topbar elements */
+body.light .topbar-bal{background:rgba(26,86,219,.07);border-color:rgba(26,86,219,.18)}
+body.light .icon-btn{background:#f0f4ff;border-color:var(--border);color:var(--text2)}
+body.light .nbtn{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#dc2626}
+
+/* Nav */
+body.light .bnav-btn{color:var(--text3)}
+body.light .bnav-btn.on{color:var(--p)}
+
+/* Form inputs */
+body.light .fin{background:#fff;border:1.5px solid var(--border);color:var(--text)}
+body.light .fin:focus{border-color:var(--p);background:#fff;box-shadow:0 0 0 3px rgba(26,86,219,.08)}
+body.light .fin::placeholder{color:var(--text3)}
+
+/* Cards & sections */
+body.light .ph{background:linear-gradient(145deg,rgba(26,86,219,.12) 0%,rgba(0,212,170,.08) 60%,#fff 100%);border-color:var(--border)}
+body.light .db-box{background:rgba(26,86,219,.05);border-color:rgba(26,86,219,.12)}
+body.light .db-item{background:var(--bg2);border-color:var(--border)}
+body.light .cbox{background:rgba(0,212,170,.05);border-color:rgba(0,212,170,.18)}
+body.light .chart-wrap{background:var(--bg2);border-color:var(--border)}
+body.light .pred-st{background:var(--bg2);border-color:var(--border);color:var(--text2)}
+body.light .tlogo{background:var(--bg2);border-color:var(--border)}
+
+/* Transaction & wallet */
+body.light .tx-tab{background:var(--bg2);border:1px solid var(--border);color:var(--text2)}
+body.light .tx-tab.on{background:linear-gradient(135deg,var(--p),var(--ac));color:#fff;border-color:transparent}
+body.light .tx-item{background:var(--bg2);border:1px solid var(--border)}
+body.light .wallet-balance-card{background:linear-gradient(135deg,#1a56db 0%,#0ea5e9 50%,#00d4aa 100%)}
+body.light .fc-card{background:#fff;border:1px solid var(--border);box-shadow:var(--sh)}
+body.light .fc-card-title{color:var(--text)}
+body.light .fc-card-desc{color:var(--text3)}
+body.light .fc-card-btn{background:linear-gradient(135deg,var(--p),var(--ac));color:#fff}
+body.light .net-card{background:#fff;border:1.5px solid var(--border)}
+body.light .net-card.selected{border-color:var(--p);background:rgba(26,86,219,.04)}
+body.light .net-name{color:var(--text)}
+body.light .net-time{color:var(--text3)}
+
+/* Team & ref */
+body.light .ref-card{background:#fff;border:1px solid var(--border);box-shadow:var(--sh)}
+body.light .team-tree-item{background:#fff;border:1px solid var(--border)}
+body.light .uarea{border-color:var(--border2);background:var(--bg2)}
+body.light .uarea:hover{border-color:var(--p);background:rgba(26,86,219,.04)}
+
+/* Misc */
+body.light .sec{color:var(--text3)}
+body.light .sec::after{background:linear-gradient(90deg,var(--border),transparent)}
+body.light .warn-box{background:#fff8f0;border:1px solid #fed7aa;border-radius:11px;padding:12px}
+body.light .warn-item{color:#92400e}
+body.light .kyc-b.none{background:var(--bg3);border-color:var(--border);color:var(--text3)}
+body.light .flow-step{color:var(--text3)}
+body.light .flow-step.active{color:var(--p)}
+body.light .flow-step.done{color:var(--ac)}
+body.light .dep-addr{background:var(--bg2);border:1px solid var(--border)}
+body.light .wnote{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);color:#dc2626}
+body.light .ebox p{color:var(--text3)}
+body.light .adm-btn{background:rgba(26,86,219,.07);border-color:rgba(26,86,219,.2);color:var(--p)}
 </style>
 </head>
 
@@ -1160,7 +1232,7 @@ es:{dir:"ltr",logo:"WGInvest",sub:"Inversión de rendimiento fijo",login:"Entrar
 ru:{dir:"ltr",logo:"WGInvest",sub:"Инвестиции с фиксированной доходностью",login:"Войти",reg:"Регистрация",email:"Email",pass:"Пароль",pass2:"Подтвердить",btn_in:"Войти ⚡",btn_up:"Регистрация 🚀",logout:"Выйти",matches:"Инвестиции",profile:"Профиль",wallet:"Кошелёк",team:"Команда",bal:"Баланс",wins:"Прибыль",loses:"Возвраты",refs:"Рефералы",acc:"Аккаунт",no_m:"Нет матчей",pick:"Сколько вы хотите инвестировать?",waiting:"Заблокировано — ожидание конца цикла",win_m:"✅ Прибыль получена",lose_m:"Возвращено",deadline:"Срок",invite:"Пригласить",copy_link:"Копировать",team_struct:"Структура",no_team:"Нет команды",deposit:"Депозит",withdraw:"Вывод",amount:"Сумма",tx_hash:"TX хэш",upload_receipt:"Чек",submit_dep:"Отправить",dest_addr:"Адрес",min_w:"Мин 5 USDT",w_pass:"Пароль",submit_w:"Запросить",tx_hist:"История",no_tx:"Нет",dashboard:"Панель",total_pred:"Всего инвестировано",win_rate:"Норма доходности",today_p:"Сегодня",tomorrow:"Завтра",kyc_t:"Верификация",kyc_ok:"✅ Верифицирован",kyc_hint:"Загрузить ID",kyc_up:"Загрузить",wp_t:"Пароль вывода",wp_ok:"✅ Установлен",wp_new:"Новый",wp_rep:"Подтвердить",wp_save:"Сохранить",wp_change:"Изменить",dname:"Имя",save:"Сохранить",compound:"Сложный",today_earn:"Сегодня",tx_dep:"Депозит",tx_wit:"Вывод",tx_ok:"✅",tx_rej:"❌",tx_pend:"⏳",accuracy:"Точность",stake_title:"Ставка",stake_hint:"Фиксированная прибыль +2.5% после периода блокировки",cancel:"Отмена",w_info:"Инфо",w_info_t:"Время",ok:"ОК",claim_profit:"Получить",profit_claimed:"✅ Получено",growth_chart:"Рост",quick_menu:"Меню",support_title:"Поддержка",new_ticket:"Новый",ticket_subject:"Тема",ticket_msg:"Сообщение",send_ticket:"Отправить",my_tickets:"Тикеты",no_tickets:"Нет",ticket_open:"Открытый",ticket_closed:"Закрытый",ticket_reply:"Ответить",send_reply:"Отправить",adm_tickets:"Тикеты",qm_matches:"Инвестиции",qm_wallet:"Кошелёк",qm_team:"Команда",qm_deposit:"Депозит",qm_withdraw:"Вывод",qm_support:"Поддержка",growth_desc:"X: Циклы | Y: Баланс ($)",archive:"История инвестиций",archive_empty:"История отсутствует",move_archive:"Архивировать",archived_on:"Архивировано"},
 pt:{dir:"ltr",logo:"WGInvest",sub:"Investimento de rendimento fixo",login:"Entrar",reg:"Cadastrar",email:"Email",pass:"Senha",pass2:"Confirmar",btn_in:"Entrar ⚡",btn_up:"Cadastrar 🚀",logout:"Sair",matches:"Investir",profile:"Perfil",wallet:"Carteira",team:"Equipe",bal:"Saldo",wins:"Lucros",loses:"Reembolsos",refs:"Indicações",acc:"Conta",no_m:"Sem partidas",pick:"Quanto você quer investir?",waiting:"Bloqueado — aguardando fim do ciclo",win_m:"✅ Lucro recebido",lose_m:"Reembolsado",deadline:"Prazo",invite:"Convidar",copy_link:"Copiar",team_struct:"Estrutura",no_team:"Sem equipe",deposit:"Depósito",withdraw:"Saque",amount:"Valor",tx_hash:"Hash TX",upload_receipt:"Recibo",submit_dep:"Enviar",dest_addr:"Endereço",min_w:"Mín 5 USDT",w_pass:"Senha",submit_w:"Solicitar",tx_hist:"Histórico",no_tx:"Sem",dashboard:"Painel",total_pred:"Total investi",win_rate:"Taxa de retorno",today_p:"Hoje",tomorrow:"Amanhã",kyc_t:"Verificação",kyc_ok:"✅ Verificado",kyc_hint:"Enviar ID",kyc_up:"Enviar",wp_t:"Senha saque",wp_ok:"✅ Definido",wp_new:"Nova",wp_rep:"Confirmar",wp_save:"Salvar",wp_change:"Alterar",dname:"Nome",save:"Salvar",compound:"Composto",today_earn:"Hoje",tx_dep:"Depósito",tx_wit:"Saque",tx_ok:"✅",tx_rej:"❌",tx_pend:"⏳",accuracy:"Precisão",stake_title:"Aposta",stake_hint:"Lucro fixo de +2.5% após o período de bloqueio",cancel:"Cancelar",w_info:"Info",w_info_t:"Tempo",ok:"OK",claim_profit:"Reclamar",profit_claimed:"✅ Reclamado",growth_chart:"Crescimento",quick_menu:"Menu",support_title:"Suporte",new_ticket:"Novo",ticket_subject:"Assunto",ticket_msg:"Mensagem",send_ticket:"Enviar",my_tickets:"Tickets",no_tickets:"Nenhum",ticket_open:"Aberto",ticket_closed:"Fechado",ticket_reply:"Responder",send_reply:"Enviar",adm_tickets:"Tickets",qm_matches:"Investir",qm_wallet:"Carteira",qm_team:"Equipe",qm_deposit:"Depósito",qm_withdraw:"Saque",qm_support:"Suporte",growth_desc:"X: Ciclos | Y: Saldo ($)",archive:"Histórico de investimentos",archive_empty:"Sem histórico",move_archive:"Arquivar",archived_on:"Arquivado"}};
 
-var lang=localStorage.getItem("lang")||"fa";
+var lang=localStorage.getItem("lang")||"en";
 function t(k){return(TR[lang]&&TR[lang][k])?TR[lang][k]:(TR.fa[k]||k);}
 
 function applyLang(){
@@ -1196,7 +1268,7 @@ function applyTheme(){
   var bg=document.getElementById("heroBg");
   if(bg){
     if(isLight){
-      bg.style.background="linear-gradient(135deg,#e8f4fd 0%,#dbeafe 60%,#e0f2fe 100%)";
+      bg.style.background="linear-gradient(135deg,#1a56db 0%,#0ea5e9 50%,#00d4aa 100%)";
       bg.innerHTML="";
     }else{
       bg.style.background="linear-gradient(135deg,#020c1b 0%,#050e20 60%,#071525 100%)";
