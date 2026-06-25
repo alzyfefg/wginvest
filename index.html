@@ -2491,34 +2491,39 @@ async function loadProfile(){
 async function loadGrowthChart(){
   var ctx=document.getElementById("growthChart");if(!ctx)return;
   if(growthChart){growthChart.destroy();growthChart=null;}
-  var res=await sb.from("predictions").select("*,matches(result,match_time)").eq("user_id",U.id).order("created_at",{ascending:true});
-  if(!res.data||!res.data.length){
-    var tc=isLight?"#64748b":"#94a3b8";
-    growthChart=new Chart(ctx,{type:"line",data:{labels:["شروع"],datasets:[{label:t("bal"),data:[parseFloat(P.balance||0)],borderColor:"#00d4aa",backgroundColor:"rgba(0,212,170,.08)",fill:true,tension:.4,pointBackgroundColor:"#00d4aa",pointRadius:4,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:tc,font:{size:9}},grid:{color:"rgba(148,163,184,.1)"}},y:{ticks:{color:tc,font:{size:9},callback:function(v){return "$"+v;}},grid:{color:"rgba(148,163,184,.1)"}}}}});
+  var tc=isLight?"#64748b":"#94a3b8";
+
+  // Fetch real transactions: approved deposits, approved withdrawals, claimed profits
+  var [depRes,witRes,invRes]=await Promise.all([
+    sb.from("deposits").select("amount,updated_at").eq("user_id",U.id).eq("status","approved").order("updated_at",{ascending:true}),
+    sb.from("withdrawals").select("amount,created_at").eq("user_id",U.id).eq("status","approved").order("created_at",{ascending:true}),
+    sb.from("investments").select("amount,profit_pct,withdrawn_at").eq("user_id",U.id).eq("status","withdrawn").order("withdrawn_at",{ascending:true})
+  ]);
+
+  var events=[];
+  (depRes.data||[]).forEach(function(d){events.push({date:new Date(d.updated_at),delta:parseFloat(d.amount||0),label:"💳"});});
+  (witRes.data||[]).forEach(function(w){events.push({date:new Date(w.created_at),delta:-parseFloat(w.amount||0),label:"📤"});});
+  (invRes.data||[]).forEach(function(i){var profit=parseFloat(i.amount||0)*parseFloat(i.profit_pct||0)/100;events.push({date:new Date(i.withdrawn_at),delta:profit,label:"💰"});});
+  events.sort(function(a,b){return a.date-b.date;});
+
+  if(!events.length){
+    var curBal=parseFloat(P.balance||0);
+    growthChart=new Chart(ctx,{type:"line",data:{labels:[t("dh_no_inv")],datasets:[{label:t("bal"),data:[curBal],borderColor:"#00d4aa",backgroundColor:"rgba(0,212,170,.08)",fill:true,tension:.4,pointBackgroundColor:"#00d4aa",pointRadius:4,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:tc,font:{size:9}},grid:{color:"rgba(148,163,184,.1)"}},y:{ticks:{color:tc,font:{size:9},callback:function(v){return "$"+v;}},grid:{color:"rgba(148,163,184,.1)"}}}}});
     return;
   }
-  var finished=res.data.filter(function(p){return p.matches&&p.matches.result;});
-  var labels=["شروع"],data=[],bal=parseFloat(P.balance||0);
-  // Calculate starting balance by reversing
-  finished.forEach(function(p){
-    var stk=parseFloat(p.stake||0);
-    if(p.predicted_score!==p.matches.result)bal-=stk*.025;
-    else bal+=stk;
+
+  var labels=[],data=[],bal=0;
+  var fmt=function(d){return d.toLocaleDateString(['fa','ar','ur'].indexOf(lang)>=0?'fa-IR':'en-US',{month:'short',day:'numeric'});};
+  events.forEach(function(e){
+    bal=Math.max(0,bal+e.delta);
+    labels.push(e.label+' '+fmt(e.date));
+    data.push(parseFloat(bal.toFixed(2)));
   });
-  bal=Math.max(0,bal);
-  data.push(parseFloat(bal.toFixed(2)));
-  finished.forEach(function(p,i){
-    var stk=parseFloat(p.stake||0);
-    if(p.predicted_score!==p.matches.result)bal+=stk*.025;
-    else bal=Math.max(0,bal-stk);
-    labels.push("بازی "+(i+1));
-    data.push(parseFloat(Math.max(0,bal).toFixed(2)));
-  });
-  var tc=isLight?"#64748b":"#94a3b8";
+
   growthChart=new Chart(ctx,{
     type:"line",
-    data:{labels:labels,datasets:[{label:t("bal"),data:data,borderColor:"#00d4aa",backgroundColor:"rgba(0,212,170,.08)",fill:true,tension:.4,pointBackgroundColor:"#00d4aa",pointRadius:4,pointHoverRadius:6,borderWidth:2.5}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return "$"+ctx.parsed.y.toFixed(2);}}}},scales:{x:{ticks:{color:tc,font:{family:"Vazirmatn",size:9},maxTicksLimit:8},grid:{color:"rgba(148,163,184,.1)"}},y:{ticks:{color:tc,font:{family:"Vazirmatn",size:9},callback:function(v){return "$"+v;}},grid:{color:"rgba(148,163,184,.1)"}}}}
+    data:{labels:labels,datasets:[{label:t("bal"),data:data,borderColor:"#00d4aa",backgroundColor:"rgba(0,212,170,.08)",fill:true,tension:.4,pointBackgroundColor:data.map(function(v,i){return i>0&&data[i]<data[i-1]?"#ef4444":"#00d4aa";}),pointRadius:4,pointHoverRadius:6,borderWidth:2.5}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return "$"+c.parsed.y.toFixed(2);}}}},scales:{x:{ticks:{color:tc,font:{family:"Vazirmatn",size:9},maxTicksLimit:8},grid:{color:"rgba(148,163,184,.1)"}},y:{ticks:{color:tc,font:{family:"Vazirmatn",size:9},callback:function(v){return "$"+v;}},grid:{color:"rgba(148,163,184,.1)"}}}}
   });
 }
 async function saveWP(){var p1=document.getElementById("wp1").value,p2=document.getElementById("wp2").value;if(!p1||!p2)return toast(t("err_wpass_required"),"red");if(p1!==p2)return toast(t("err_wpass_mismatch"),"red");if(p1.length<4)return toast(t("err_wpass_min4"),"red");await sb.from("profiles").update({withdrawal_pass:p1}).eq("user_id",U.id);P.withdrawal_pass=p1;toast(t("ok_wpass_set"),"green");loadProfile();}
