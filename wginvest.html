@@ -1463,6 +1463,77 @@ body.light .im-phil{background:linear-gradient(135deg,rgba(26,86,219,.06),rgba(0
 .plan-btn.vip{background:linear-gradient(135deg,#7c3aed,#d97706,#fcd34d);color:#fff;box-shadow:0 4px 20px rgba(124,58,237,.3),0 0 0 1px rgba(255,190,50,.2);text-shadow:0 1px 3px rgba(0,0,0,.4);letter-spacing:.5px}
 .plan-btn.vip:hover{box-shadow:0 8px 32px rgba(124,58,237,.45),0 0 20px rgba(252,211,77,.25);transform:translateY(-2px)}
 .plan-btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+
+/* ── PORTFOLIO DASHBOARD ── */
+.pf-dash{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.pf-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 16px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s}
+.pf-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.3)}
+.pf-card::before{content:'';position:absolute;top:-20px;right:-20px;width:70px;height:70px;border-radius:50%;opacity:.12;pointer-events:none}
+.pf-card.avail::before{background:var(--ac)}
+.pf-card.bonus::before{background:#f59e0b}
+.pf-card.locked::before{background:#8b5cf6}
+.pf-card.total::before{background:var(--p)}
+.pf-card-icon{font-size:20px;margin-bottom:6px}
+.pf-card-label{font-size:10px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:4px}
+.pf-card-val{font-size:16px;font-weight:900;color:var(--text)}
+.pf-card.avail .pf-card-val{color:var(--ac)}
+.pf-card.bonus .pf-card-val{color:#f59e0b}
+.pf-card.locked .pf-card-val{color:#8b5cf6}
+.pf-card.total .pf-card-val{background:linear-gradient(135deg,var(--p),var(--ac));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pf-card-sub{font-size:9px;color:var(--text3);margin-top:2px}
+
+/* ── ACTIVE/COMPLETED INVESTMENT CARD ── */
+.inv-active-card{background:var(--card);border:1.5px solid rgba(0,212,170,.2);border-radius:20px;padding:20px 18px;margin:0 0 16px;position:relative;overflow:hidden}
+.inv-active-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--ac),var(--p));border-radius:2px 2px 0 0}
+.inv-completed-card{background:var(--card);border:1.5px solid rgba(0,212,170,.35);border-radius:20px;padding:20px 18px;margin:0 0 16px;position:relative;overflow:hidden;box-shadow:0 0 30px rgba(0,212,170,.08)}
+.inv-completed-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#00d4aa,#fcd34d);border-radius:2px 2px 0 0}
+.inv-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.inv-card-status{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.5px}
+.inv-card-status.active{color:var(--ac)}
+.inv-card-status.done{color:#fcd34d}
+.inv-card-status-dot{width:7px;height:7px;border-radius:50%;animation:statusPulse 1.5s ease-in-out infinite}
+.inv-card-status-dot.active{background:var(--ac);box-shadow:0 0 8px var(--ac)}
+.inv-card-status-dot.done{background:#fcd34d;box-shadow:0 0 8px #fcd34d;animation:none}
+@keyframes statusPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+.inv-ring-wrap{display:flex;justify-content:center;margin:12px 0 16px}
+.inv-stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.inv-stat-item{background:rgba(255,255,255,.04);border-radius:12px;padding:10px 12px;text-align:center}
+.inv-stat-lbl{font-size:9px;color:var(--text3);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:3px}
+.inv-stat-val{font-size:13px;font-weight:900;color:var(--text)}
+.inv-timer-row{display:flex;justify-content:center;gap:8px;margin-bottom:14px}
+.inv-timer-box{background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:10px;padding:8px 12px;text-align:center;min-width:52px}
+.inv-timer-num{font-size:20px;font-weight:900;color:var(--ac);font-variant-numeric:tabular-nums}
+.inv-timer-lbl{font-size:8px;color:var(--text3);letter-spacing:.5px}
+.inv-claim-btn{width:100%;background:linear-gradient(135deg,#1a56db,#00d4aa);color:#fff;border:none;border-radius:13px;padding:14px;font-family:Vazirmatn,sans-serif;font-size:15px;font-weight:900;cursor:pointer;box-shadow:0 4px 20px rgba(0,212,170,.3);letter-spacing:.3px;transition:all .2s}
+.inv-claim-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,212,170,.45)}
+
+/* ── INVESTMENT HISTORY ── */
+.inv-hist-section{margin-top:24px}
+.inv-hist-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.inv-hist-title{font-size:14px;font-weight:900;color:var(--text)}
+.inv-hist-filters{display:flex;gap:6px;flex-wrap:wrap}
+.inv-hist-filter{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-family:Vazirmatn,sans-serif;font-size:10px;font-weight:700;color:var(--text2);cursor:pointer;transition:all .2s}
+.inv-hist-filter.on{background:rgba(0,212,170,.15);border-color:var(--ac);color:var(--ac)}
+.inv-hist-item{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;transition:transform .18s}
+.inv-hist-item:hover{transform:translateX(-2px)}
+.inv-hist-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.inv-hist-icon.active{background:rgba(0,212,170,.12)}
+.inv-hist-icon.withdrawn{background:rgba(252,211,77,.12)}
+.inv-hist-icon.completed{background:rgba(139,92,246,.12)}
+.inv-hist-body{flex:1;min-width:0}
+.inv-hist-plan{font-size:11px;font-weight:900;color:var(--text)}
+.inv-hist-date{font-size:9px;color:var(--text3);margin-top:2px}
+.inv-hist-right{text-align:left}
+.inv-hist-amt{font-size:13px;font-weight:900;color:var(--text)}
+.inv-hist-profit{font-size:11px;color:var(--ac);font-weight:700}
+.inv-hist-badge{display:inline-block;padding:2px 7px;border-radius:6px;font-size:9px;font-weight:700;margin-top:3px}
+.inv-hist-badge.active{background:rgba(0,212,170,.15);color:var(--ac)}
+.inv-hist-badge.withdrawn{background:rgba(252,211,77,.15);color:#fcd34d}
+.inv-hist-badge.completed{background:rgba(139,92,246,.15);color:#a78bfa}
+.inv-hist-empty{text-align:center;padding:24px;color:var(--text3);font-size:13px}
+
+/* ── MEMBER ID BADGE ── */
+.member-id-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(26,86,219,.1);border:1px solid rgba(26,86,219,.25);border-radius:8px;padding:3px 9px;font-size:11px;font-weight:900;color:var(--p)}
 .plan-lock-msg{text-align:center;font-size:10px;margin-top:8px;color:rgba(255,200,0,.6);font-weight:700}
 /* EMPTY INVEST STATE */
 .empty-invest{text-align:center;padding:40px 20px}
@@ -2150,6 +2221,7 @@ function goTab(tab){
 var _siSettings={enabled:true,profit_pct:2.5,lock_minutes:5,min_amount:20};
 var _siTimer=null;
 var _investPlans=[];
+var _lockedBalance=0;
 
 // NOTIFICATION CENTER
 var _notifOpen=false;
@@ -2264,6 +2336,33 @@ async function loadInvestPlans(){
   }
 }
 
+function renderPortfolioDash(){
+  var avail=parseFloat(P&&P.balance||0);
+  var bonus=getActiveBonus();
+  var locked=_lockedBalance||0;
+  var total=avail+bonus+locked;
+  function countUp(el,end){
+    var start=0,dur=800,t0=null;
+    function step(ts){if(!t0)t0=ts;var p=Math.min((ts-t0)/dur,1),ease=1-Math.pow(1-p,3);
+      if(el)el.textContent='$'+(start+(end-start)*ease).toFixed(2);if(p<1)requestAnimationFrame(step);}
+    requestAnimationFrame(step);
+  }
+  var h='<div class="pf-dash">'
+    +'<div class="pf-card avail"><div class="pf-card-icon">💰</div><div class="pf-card-label">Available</div><div class="pf-card-val" id="pfAvail">$'+avail.toFixed(2)+'</div><div class="pf-card-sub">قابل سرمایه‌گذاری / برداشت</div></div>'
+    +'<div class="pf-card bonus"><div class="pf-card-icon">🎁</div><div class="pf-card-label">Bonus</div><div class="pf-card-val" id="pfBonus">$'+bonus.toFixed(2)+'</div><div class="pf-card-sub">فقط قابل سرمایه‌گذاری</div></div>'
+    +'<div class="pf-card locked"><div class="pf-card-icon">🔒</div><div class="pf-card-label">Locked</div><div class="pf-card-val" id="pfLocked">$'+locked.toFixed(2)+'</div><div class="pf-card-sub">در حال سرمایه‌گذاری</div></div>'
+    +'<div class="pf-card total"><div class="pf-card-icon">📊</div><div class="pf-card-label">Total Assets</div><div class="pf-card-val" id="pfTotal">$'+total.toFixed(2)+'</div><div class="pf-card-sub">مجموع دارایی</div></div>'
+    +'</div>';
+  var mc=document.getElementById('MC');
+  if(mc)mc.insertAdjacentHTML('afterbegin',h);
+  setTimeout(function(){
+    countUp(document.getElementById('pfAvail'),avail);
+    countUp(document.getElementById('pfBonus'),bonus);
+    countUp(document.getElementById('pfLocked'),locked);
+    countUp(document.getElementById('pfTotal'),total);
+  },100);
+}
+
 var _selectedPlanData=null;
 function renderInvestPlans(c,inv){
   if(!_investPlans||!_investPlans.length){renderSmartInvest(c,inv);return;}
@@ -2304,13 +2403,15 @@ function renderInvestPlans(c,inv){
   var planHtml=h.join('');
   var origC=document.createElement('div');
   renderSmartInvest(origC,inv);
-  c.innerHTML=planHtml+origC.innerHTML;
+  c.innerHTML=planHtml+origC.innerHTML+'<div id="invHistContainer"></div>';
   var startBtn=c.querySelector('#siStartBtn');
   if(startBtn)startBtn.addEventListener('click',openInvestModal);
   var wBtn=c.querySelector('#siWithdrawBtn');
   if(wBtn)wBtn.onclick=function(){withdrawInvestment(this.dataset.invid,parseFloat(this.dataset.final));};
   var w=c.querySelector('#siWrap');
   if(w)setTimeout(function(){w.classList.add('in');},30);
+  renderPortfolioDash();
+  setTimeout(function(){renderInvestHistory(document.getElementById('invHistContainer'));},200);
 }
 
 function selectPlan(planId,planJson){
@@ -2478,6 +2579,55 @@ function showClaimSuccess(profit){
   setTimeout(function(){if(overlay.parentNode)overlay.remove();},5000);
 }
 
+async function renderInvestHistory(container){
+  if(!container||!U)return;
+  container.innerHTML='<div class="inv-hist-section"><div style="text-align:center;padding:12px"><div class="spin" style="width:20px;height:20px;margin:auto"></div></div></div>';
+  var r=await sb.from("investments").select("*").eq("user_id",U.id).order("started_at",{ascending:false}).limit(50);
+  var all=r.data||[];
+  if(!all.length){container.innerHTML='<div class="inv-hist-section"><div class="inv-hist-empty">📋 سابقه سرمایه‌گذاری وجود ندارد</div></div>';return;}
+  var curFilter='all';
+  function renderList(filter){
+    var list=filter==='all'?all:all.filter(function(x){return x.status===filter||(filter==='claimed'&&x.status==='withdrawn');});
+    var h='';
+    if(!list.length){h='<div class="inv-hist-empty">موردی یافت نشد</div>';}
+    else{list.forEach(function(inv){
+      var profit=(parseFloat(inv.amount||0)*parseFloat(inv.profit_pct||0)/100);
+      var isClaimed=inv.status==='withdrawn';
+      var isActive=inv.status==='active';
+      var icon=isActive?'⚡':isClaimed?'✅':'⏳';
+      var iconCls=isActive?'active':isClaimed?'withdrawn':'completed';
+      var badge=isActive?'active':isClaimed?'withdrawn':'completed';
+      var badgeLabel=isActive?'فعال':isClaimed?'دریافت شد':'تکمیل شده';
+      var dateStr=inv.started_at?new Date(inv.started_at).toLocaleDateString('fa-IR'):'';
+      var planName=inv.plan_name||(_siSettings._selectedPlanName||'Smart Invest');
+      h+='<div class="inv-hist-item">'
+        +'<div class="inv-hist-icon '+iconCls+'">'+icon+'</div>'
+        +'<div class="inv-hist-body">'
+        +'<div class="inv-hist-plan">'+planName+'</div>'
+        +'<div class="inv-hist-date">'+dateStr+' · '+inv.profit_pct+'% ROI</div>'
+        +'</div>'
+        +'<div class="inv-hist-right">'
+        +'<div class="inv-hist-amt">$'+siFmt(inv.amount)+'</div>'
+        +'<div class="inv-hist-profit">+$'+siFmt(profit)+'</div>'
+        +'<div class="inv-hist-badge '+badge+'">'+badgeLabel+'</div>'
+        +'</div>'
+        +'</div>';
+    });}
+    var listEl=document.getElementById('invHistList');
+    if(listEl)listEl.innerHTML=h;
+  }
+  var filters=[{k:'all',l:'همه'},{k:'active',l:'فعال'},{k:'withdrawn',l:'دریافت شده'},{k:'completed',l:'تکمیل‌شده'}];
+  var fHtml=filters.map(function(f){return '<button class="inv-hist-filter'+(f.k==='all'?' on':'')+'" onclick="invHistFilter(\''+f.k+'\')" id="ihf_'+f.k+'">'+f.l+'</button>';}).join('');
+  container.innerHTML='<div class="inv-hist-section"><div class="inv-hist-header"><div class="inv-hist-title">📋 سابقه سرمایه‌گذاری</div><div class="inv-hist-filters">'+fHtml+'</div></div><div id="invHistList"></div></div>';
+  renderList('all');
+  window._invHistData=all;
+  window.invHistFilter=function(f){
+    curFilter=f;
+    document.querySelectorAll('.inv-hist-filter').forEach(function(b){b.classList.toggle('on',b.id==='ihf_'+f);});
+    renderList(f);
+  };
+}
+
 // ADMIN PLANS MANAGEMENT
 async function loadAdminPlans(c){
   var r=await sb.from('invest_plans').select('*').order('sort_order',{ascending:true});
@@ -2553,12 +2703,19 @@ async function loadMatches(){
   if(_siTimer){clearInterval(_siTimer);_siTimer=null;}
   await loadInvestSettings();
   var inv=null;
+  var lockedAmt=0;
   if(U){
     try{
       var r=await sb.from("investments").select("*").eq("user_id",U.id).order("started_at",{ascending:false}).limit(1);
-      if(r.data&&r.data.length)inv=r.data[0];
+      if(r.data&&r.data.length){
+        inv=r.data[0];
+        if(inv&&(inv.status==='active'||inv.status==='completed')){
+          lockedAmt=parseFloat(inv.amount||0);
+        }
+      }
     }catch(e){}
   }
+  _lockedBalance=lockedAmt;
   updateHeroDashboard(inv);
   renderInvestPlans(c,inv);
 }
@@ -2958,6 +3115,7 @@ async function loadProfile(){
   html.push('<div class="ph-id">ID: #'+mid+'</div>');
   html.push('<div class="ph-av">👤</div>');
   html.push('<div class="ph-name">'+(P.display_name||"بازیکن")+'</div>');
+  html.push('<div style="margin:4px 0"><span class="member-id-badge">ID: '+(P.member_id||mid)+'</span></div>');
   html.push('<div class="ph-email">'+U.email+'</div>');
   html.push('<div class="ph-bal">$'+bal.toFixed(2)+'</div>');
   html.push('<div class="ph-bal-l">'+t("bal")+'</div>');
