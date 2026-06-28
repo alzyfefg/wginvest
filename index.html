@@ -2031,12 +2031,13 @@ function applyLang(){
   var ph={
     re:"email",rp:"pwd_placeholder",rp2:"pwd_repeat_placeholder",
     le:"email",lp:"pass",
+    refCode:"ref_code_placeholder",
     da:"dep_amount_label",dh:"dep_tx_label",wa:"dest_addr",wamt:"min_w",wpass:"w_pass",
     dname:"dname"
   };
   for(var pid in ph){var pel=document.getElementById(pid);if(pel&&pel.placeholder!==undefined)pel.placeholder=t(ph[pid]);}
   // Update labels
-  var lb={"albl_e1":"email","albl_p1":"pass","albl_e2":"email","albl_p2":"pass","albl_p3":"pass2","albl_ref":"invite"};
+  var lb={"albl_e1":"email","albl_p1":"pass","albl_e2":"email","albl_p2":"pass","albl_p3":"pass2","albl_ref":"ref_code_label"};
   for(var lid in lb){var lel=document.getElementById(lid);if(lel)lel.textContent=t(lb[lid]);}
   document.querySelectorAll(".litem").forEach(function(el,i){el.classList.toggle("cur",["fa","en","ar","tr","hi","ur"][i]===lang);});
   document.querySelectorAll("#authFlags button").forEach(function(el,i){el.classList.toggle("cur",["fa","en","ar","tr","hi","ur"][i]===lang);});
@@ -2478,10 +2479,10 @@ function renderPortfolioDash_inner(h){
   var locked=_lockedBalance||0;
   var total=avail+bonus+locked;
   h.push('<div class="pf-dash">'
-    +'<div class="pf-card avail"><div class="pf-card-icon">💰</div><div class="pf-card-label">Available</div><div class="pf-card-val" id="pfAvail">$'+avail.toFixed(2)+'</div><div class="pf-card-sub">'+t('si_your_bal')+'</div></div>'
-    +'<div class="pf-card bonus"><div class="pf-card-icon">🎁</div><div class="pf-card-label">Bonus</div><div class="pf-card-val" id="pfBonus">$'+bonus.toFixed(2)+'</div><div class="pf-card-sub">'+t('bonus_lbl')+'</div></div>'
+    +'<div class="pf-card avail"><div class="pf-card-icon">💰</div><div class="pf-card-label">'+t('bal')+'</div><div class="pf-card-val" id="pfAvail">$'+avail.toFixed(2)+'</div><div class="pf-card-sub">'+t('si_your_bal')+'</div></div>'
+    +'<div class="pf-card bonus"><div class="pf-card-icon">🎁</div><div class="pf-card-label">'+t('bonus_lbl')+'</div><div class="pf-card-val" id="pfBonus">$'+bonus.toFixed(2)+'</div><div class="pf-card-sub">'+t('bonus_active')+'</div></div>'
     +'<div class="pf-card locked"><div class="pf-card-icon">🔒</div><div class="pf-card-label">'+t('inv_locked_amt')+'</div><div class="pf-card-val" id="pfLocked">$'+locked.toFixed(2)+'</div><div class="pf-card-sub">'+t('si_locked_stat')+'</div></div>'
-    +'<div class="pf-card total"><div class="pf-card-icon">📊</div><div class="pf-card-label">Total</div><div class="pf-card-val" id="pfTotal">$'+total.toFixed(2)+'</div><div class="pf-card-sub">Total Assets</div></div>'
+    +'<div class="pf-card total"><div class="pf-card-icon">📊</div><div class="pf-card-label">'+t('dashboard')+'</div><div class="pf-card-val" id="pfTotal">$'+total.toFixed(2)+'</div><div class="pf-card-sub">'+t('total_pred')+'</div></div>'
     +'</div>');
 }
 
@@ -2578,15 +2579,21 @@ function renderInvestPlans(c,inv){
   var hasActiveInv=inv&&(inv.status==='active'||inv.status==='completed');
   var h=[];
 
+  function _pfCountUp(){
+    var avail=parseFloat(P&&P.balance||0),bonus=getActiveBonus(),locked=_lockedBalance||0,total=avail+bonus+locked;
+    function cu(el,end){var s=0,dur=700,t0=null;function st(ts){if(!t0)t0=ts;var p=Math.min((ts-t0)/dur,1),e=1-Math.pow(1-p,3);if(el)el.textContent='$'+(s+(end-s)*e).toFixed(2);if(p<1)requestAnimationFrame(st);}requestAnimationFrame(st);}
+    setTimeout(function(){cu(document.getElementById('pfAvail'),avail);cu(document.getElementById('pfBonus'),bonus);cu(document.getElementById('pfLocked'),locked);cu(document.getElementById('pfTotal'),total);},80);
+  }
+
   if(hasActiveInv){
     // Show premium active/completed card only — no plan selection needed
     renderPortfolioDash_inner(h);
     renderPremiumActiveCard(h,inv);
     c.innerHTML=h.join('')+'<div id="invHistContainer"></div>';
+    _pfCountUp();
     // wire withdraw button
     var wBtn=c.querySelector('#siWithdrawBtn');
     if(wBtn)wBtn.onclick=function(){withdrawInvestment(this.dataset.invid,parseFloat(this.dataset.final));};
-    renderPortfolioDash();
     setTimeout(function(){renderInvestHistory(document.getElementById('invHistContainer'));},200);
     // start timer if active
     if(inv&&inv.status==='active'){
@@ -2596,7 +2603,17 @@ function renderInvestPlans(c,inv){
       _siTimer=setInterval(function(){
         var ne=Date.now()-new Date(inv.started_at).getTime();
         var nr=Math.max(0,lockMs-ne);
-        if(nr<=0){clearInterval(_siTimer);_siTimer=null;loadMatches();return;}
+        if(nr<=0){
+          clearInterval(_siTimer);_siTimer=null;
+          // Render completed state locally — no DB reload to avoid scroll interruption
+          var h2=[];renderPortfolioDash_inner(h2);renderPremiumActiveCard(h2,Object.assign({},inv,{status:'completed'}));
+          c.innerHTML=h2.join('')+'<div id="invHistContainer"></div>';
+          _pfCountUp();
+          var wb2=c.querySelector('#siWithdrawBtn');
+          if(wb2)wb2.onclick=function(){withdrawInvestment(this.dataset.invid,parseFloat(this.dataset.final));};
+          setTimeout(function(){renderInvestHistory(document.getElementById('invHistContainer'));},200);
+          return;
+        }
         var s=Math.floor(nr/1000);
         var dd=Math.floor(s/86400),hh=Math.floor((s%86400)/3600),mm=Math.floor((s%3600)/60),ss=s%60;
         var eD=document.getElementById('siTimerD'),eH=document.getElementById('siTimerH'),eM=document.getElementById('siTimerM'),eS=document.getElementById('siTimerS');
@@ -2659,7 +2676,7 @@ function renderInvestPlans(c,inv){
   h.push('<div id="planDetailsSection" style="display:none"></div>');
   h.push('<div id="invHistContainer"></div>');
   c.innerHTML=h.join('');
-  renderPortfolioDash();
+  _pfCountUp();
   // Store plan data on card elements for selectPlan2
   _investPlans.forEach(function(plan){
     var card=document.getElementById('planCard_'+plan.id);
@@ -3032,7 +3049,9 @@ async function togglePlan(id,active){
   await sb.from('invest_plans').update({is_active:active}).eq('id',id);
   await logAdminAction('Investment Plan '+(active?'Enabled':'Disabled'),'Plan #'+id);
   toast((active?'✅ فعال شد':'⏸ غیرفعال شد'),'green');
-  var c=document.getElementById('adminContent');if(c)loadAdminPlans(c);
+  await loadInvestPlans();
+  var c=document.getElementById('adminContent');
+  if(c){var activeTab=document.querySelector('.adm-tab.on');if(activeTab&&activeTab.id==='at_matches')loadAdminMatches(c);else loadAdminPlans(c);}
 }
 
 async function loadInvestSettings(){
@@ -4853,17 +4872,35 @@ async function loadPyramid(){var c=document.getElementById("pyTree");var l1r=awa
 async function loadAdminMatches(c){
   await loadInvestSettings();
   var html=[];
-  html.push('<div class="adm-sec"><div class="adm-t">⚙️ تنظیمات Smart Invest</div>');
-  html.push('<div class="adm-row"><label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)"><input type="checkbox" id="siEnabled" '+(_siSettings.enabled?'checked':'')+'> فعال بودن Smart Invest</label></div>');
-  html.push('<div class="adm-row"><input class="adm-in" id="siProfitPct" type="number" step="0.1" placeholder="درصد سود" value="'+_siSettings.profit_pct+'"><input class="adm-in" id="siMinAmount" type="number" placeholder="حداقل سرمایه‌گذاری ($)" value="'+_siSettings.min_amount+'"></div>');
-  html.push('<div class="adm-row"><select class="adm-in" id="siLockPreset" onchange="document.getElementById(\'siLockMinutes\').value=this.value">'
-    +'<option value="5" '+(_siSettings.lock_minutes==5?'selected':'')+'>5 دقیقه (تست)</option>'
-    +'<option value="60" '+(_siSettings.lock_minutes==60?'selected':'')+'>1 ساعت</option>'
-    +'<option value="1440" '+(_siSettings.lock_minutes==1440?'selected':'')+'>24 ساعت</option>'
-    +'<option value="10080" '+(_siSettings.lock_minutes==10080?'selected':'')+'>7 روز</option>'
-    +'</select><input class="adm-in" id="siLockMinutes" type="number" placeholder="مدت قفل (دقیقه)" value="'+_siSettings.lock_minutes+'"></div>');
-  html.push('<button class="adm-btn" style="width:100%;margin-top:8px" onclick="saveInvestSettings()">💾 ذخیره تنظیمات</button>');
+  html.push('<div class="adm-sec"><div class="adm-t">⚙️ تنظیمات کلی Smart Invest</div>');
+  html.push('<div class="adm-row"><label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)"><input type="checkbox" id="siEnabled" '+(_siSettings.enabled?'checked':'')+'> فعال بودن Smart Invest (هر دو پلن)</label></div>');
+  html.push('<button class="adm-btn" style="width:100%;margin-top:8px" onclick="saveInvestSettings()">💾 ذخیره وضعیت</button>');
   html.push('</div>');
+
+  // Per-plan quick settings
+  var plansR=await sb.from('invest_plans').select('*').order('sort_order',{ascending:true});
+  var plans=plansR.data||[];
+  plans.forEach(function(plan){
+    var isVip=plan.theme==='vip';
+    var accentColor=isVip?'rgba(255,200,0,.2)':'rgba(0,212,170,.15)';
+    var accentText=isVip?'var(--gold)':'var(--ac)';
+    html.push('<div class="adm-sec" style="border:1px solid '+accentColor+';border-radius:16px;padding:14px">');
+    html.push('<div class="adm-t" style="color:'+accentText+'">'+(isVip?'💎':'⚡')+' '+plan.name
+      +'<span style="margin-right:8px;font-size:10px;padding:2px 8px;border-radius:20px;background:'+(plan.is_active?'rgba(0,212,170,.15)':'rgba(255,71,87,.1)')+';color:'+(plan.is_active?'var(--ac)':'var(--red)')+';">'+(plan.is_active?'✅ فعال':'⏸ غیرفعال')+'</span></div>');
+    html.push('<div class="adm-row">');
+    html.push('<div style="flex:1"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">درصد سود (%)</div><input class="adm-in" id="apl_roi_'+plan.id+'" type="number" step="0.1" min="0.1" max="100" value="'+plan.roi+'"></div>');
+    html.push('<div style="flex:1"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">مدت قفل (دقیقه)</div><input class="adm-in" id="apl_lm_'+plan.id+'" type="number" min="1" value="'+plan.lock_minutes+'"></div>');
+    html.push('</div>');
+    html.push('<div class="adm-row">');
+    html.push('<div style="flex:1"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">حداقل سرمایه ($)</div><input class="adm-in" id="apl_ma_'+plan.id+'" type="number" step="0.01" min="1" value="'+plan.min_amount+'"></div>');
+    html.push('<div style="flex:1"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">حداقل موجودی دسترسی ($)</div><input class="adm-in" id="apl_mb_'+plan.id+'" type="number" min="0" value="'+(plan.min_balance||0)+'"></div>');
+    html.push('</div>');
+    html.push('<div class="adm-row" style="margin-top:4px">');
+    html.push('<button class="adm-btn" style="flex:1" onclick="saveAdminPlan('+plan.id+')">💾 ذخیره '+(isVip?'VIP':'Standard')+'</button>');
+    html.push('<button class="adm-btn" style="background:rgba(255,71,87,.1);color:var(--red);border:1px solid rgba(255,71,87,.2)" onclick="togglePlan('+plan.id+','+(!plan.is_active)+')">'+(plan.is_active?'⏸ غیرفعال':'✅ فعال')+'</button>');
+    html.push('</div>');
+    html.push('</div>');
+  });
 
   html.push('<div class="adm-sec"><div class="adm-t">💰 تنظیم موجودی کاربر</div>');
   html.push('<div class="adm-row"><input class="adm-in" id="baEmail" placeholder="ایمیل کاربر"><input class="adm-in" id="baAmount" type="number" placeholder="مبلغ ($)"></div>');
@@ -4883,13 +4920,23 @@ async function loadAdminMatches(c){
 
 async function saveInvestSettings(){
   var enabled=document.getElementById('siEnabled').checked;
-  var profit_pct=parseFloat(document.getElementById('siProfitPct').value)||2.5;
-  var min_amount=parseFloat(document.getElementById('siMinAmount').value)||20;
-  var lock_minutes=parseInt(document.getElementById('siLockMinutes').value)||5;
-  var r=await sb.from('invest_settings').update({enabled:enabled,profit_pct:profit_pct,min_amount:min_amount,lock_minutes:lock_minutes}).eq('id',1);
+  var r=await sb.from('invest_settings').update({enabled:enabled}).eq('id',1);
   if(r.error)return toast('خطا: '+r.error.message,'red');
-  toast('✅ تنظیمات ذخیره شد','green');
+  toast('✅ وضعیت ذخیره شد','green');
   await loadInvestSettings();
+}
+
+async function saveAdminPlan(id){
+  var roi=parseFloat(document.getElementById('apl_roi_'+id)&&document.getElementById('apl_roi_'+id).value);
+  var lock_minutes=parseInt(document.getElementById('apl_lm_'+id)&&document.getElementById('apl_lm_'+id).value);
+  var min_amount=parseFloat(document.getElementById('apl_ma_'+id)&&document.getElementById('apl_ma_'+id).value);
+  var min_balance=parseFloat((document.getElementById('apl_mb_'+id)&&document.getElementById('apl_mb_'+id).value)||0);
+  if(isNaN(roi)||isNaN(lock_minutes)||isNaN(min_amount))return toast('مقادیر را کامل کنید','red');
+  var r=await sb.from('invest_plans').update({roi:roi,lock_minutes:lock_minutes,min_amount:min_amount,min_balance:min_balance}).eq('id',id);
+  if(r.error)return toast('خطا: '+r.error.message,'red');
+  await logAdminAction('Plan Updated','Plan #'+id,null,'ROI:'+roi+'%, Lock:'+lock_minutes+'min, Min:$'+min_amount);
+  toast('✅ پلن ذخیره شد','green');
+  await loadInvestPlans();
 }
 
 async function loadSIActiveList(){
