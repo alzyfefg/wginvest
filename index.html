@@ -2264,16 +2264,18 @@ async function loadInvestPlans(){
   }
 }
 
+var _selectedPlanData=null;
 function renderInvestPlans(c,inv){
   if(!_investPlans||!_investPlans.length){renderSmartInvest(c,inv);return;}
   var userBal=getTotalBal();
+  var hasActiveInv=inv&&(inv.status==='active'||inv.status==='completed');
   var h=[];
-  h.push('<div class="plans-grid">');
+  h.push('<div class="plans-grid" id="plansGrid">');
   _investPlans.forEach(function(plan){
     var isVip=plan.theme==='vip';
     var isLocked=userBal<parseFloat(plan.min_balance||0)&&parseFloat(plan.min_balance||0)>0;
     var lockPeriod=fmtLockLabel(plan.lock_minutes||5);
-    h.push('<div class="plan-card '+(isVip?'vip':'standard')+(isLocked?' locked':'')+'">'
+    h.push('<div class="plan-card '+(isVip?'vip':'standard')+(isLocked?' locked':'')+'" id="planCard_'+plan.id+'">'
       +'<div class="plan-badge '+(isVip?'vip':'standard')+'">'+(isVip?'💎 VIP EXCLUSIVE':'⚡ STANDARD')+'</div>'
       +'<div class="plan-name">'+plan.name+'</div>'
       +'<div class="plan-roi">'
@@ -2287,28 +2289,118 @@ function renderInvestPlans(c,inv){
     if(isLocked){
       h.push('<button class="plan-btn '+(isVip?'vip':'standard')+'" disabled>🔒 حداقل موجودی $'+siFmt(plan.min_balance)+' لازم است</button>');
       h.push('<div class="plan-lock-msg">موجودی شما $'+siFmt(userBal)+' است</div>');
-    }else if(inv){
+    }else if(hasActiveInv){
       h.push('<button class="plan-btn '+(isVip?'vip':'standard')+'" disabled>سرمایه‌گذاری فعال موجود است</button>');
     }else if(!_siSettings.enabled){
       h.push('<button class="plan-btn '+(isVip?'vip':'standard')+'" disabled>⏸ غیرفعال</button>');
     }else{
-      h.push('<button class="plan-btn '+(isVip?'vip':'standard')+'" onclick="openInvestModalWithPlan('+JSON.stringify(plan)+')">🚀 شروع سرمایه‌گذاری</button>');
+      var pj=JSON.stringify(plan).replace(/'/g,'\\\'');
+      h.push('<button class="plan-btn '+(isVip?'vip':'standard')+'" onclick="selectPlan(\''+plan.id+'\',\''+pj+'\')">🚀 شروع سرمایه‌گذاری</button>');
     }
     h.push('</div>');
   });
   h.push('</div>');
+  h.push('<div id="planInlineForm" style="max-height:0;overflow:hidden;opacity:0;transition:max-height .45s cubic-bezier(.25,.46,.45,.94),opacity .35s ease;margin-top:0"></div>');
   var planHtml=h.join('');
-  // Render the plans HTML + the existing tracker below
   var origC=document.createElement('div');
   renderSmartInvest(origC,inv);
   c.innerHTML=planHtml+origC.innerHTML;
-  // Re-wire buttons since renderSmartInvest sets innerHTML on origC not c
   var startBtn=c.querySelector('#siStartBtn');
   if(startBtn)startBtn.addEventListener('click',openInvestModal);
   var wBtn=c.querySelector('#siWithdrawBtn');
   if(wBtn)wBtn.onclick=function(){withdrawInvestment(this.dataset.invid,parseFloat(this.dataset.final));};
   var w=c.querySelector('#siWrap');
   if(w)setTimeout(function(){w.classList.add('in');},30);
+}
+
+function selectPlan(planId,planJson){
+  var plan=JSON.parse(planJson);
+  _selectedPlanData=plan;
+  var isVip=plan.theme==='vip';
+  // Dim other cards, highlight selected
+  document.querySelectorAll('.plan-card').forEach(function(el){
+    el.style.opacity=el.id==='planCard_'+planId?'1':'0.45';
+    el.style.transition='opacity .3s ease';
+  });
+  var userBal=getTotalBal();
+  var minAmt=parseFloat(plan.min_amount||10);
+  var profit=(minAmt*plan.roi/100).toFixed(2);
+  var final=(minAmt+parseFloat(profit)).toFixed(2);
+  var accentColor=isVip?'#f59e0b':'#00d4aa';
+  var formHtml='<div style="margin:16px 4px 4px;background:var(--card);border:1.5px solid '+(isVip?'rgba(255,190,50,.35)':'rgba(0,212,170,.2)')+';border-radius:18px;padding:20px 18px 18px;box-shadow:0 8px 32px rgba(0,0,0,.25)">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
+    +'<div style="font-size:14px;font-weight:900;color:var(--text)">'+(isVip?'💎':'⚡')+' '+plan.name+'</div>'
+    +'<button onclick="closePlanForm()" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:4px 10px;color:var(--text2);font-family:Vazirmatn,sans-serif;font-size:12px;cursor:pointer">✕ بستن</button>'
+    +'</div>'
+    +'<div style="margin-bottom:14px">'
+    +'<label style="font-size:11px;color:var(--text2);margin-bottom:5px;display:block">مبلغ سرمایه‌گذاری</label>'
+    +'<div style="display:flex;gap:8px">'
+    +'<input id="planAmtInp" type="number" min="'+minAmt+'" step="0.01" value="'+minAmt+'" oninput="updatePlanForm('+plan.roi+','+plan.lock_minutes+')" style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px 12px;color:var(--text);font-family:Vazirmatn,sans-serif;font-size:14px;outline:none">'
+    +'<button onclick="(function(){var i=document.getElementById(\'planAmtInp\');i.value=\''+siFmt(userBal)+'\';updatePlanForm('+plan.roi+','+plan.lock_minutes+');this.style.transform=\'scale(.9)\';setTimeout(function(){this.style.transform=\'\';}.bind(this),150)}).call(this)" style="background:rgba('+( isVip?'245,158,11':'0,212,170')+',.15);border:1px solid '+accentColor+';border-radius:10px;padding:10px 12px;color:'+accentColor+';font-family:Vazirmatn,sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">💰 همه</button>'
+    +'</div>'
+    +'</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">'
+    +'<div style="background:rgba(255,255,255,.04);border-radius:10px;padding:10px;text-align:center">'
+    +'<div style="font-size:10px;color:var(--text3);margin-bottom:3px">سود انتظاری</div>'
+    +'<div id="planProfitPreview" style="font-size:15px;font-weight:900;color:'+accentColor+'">+$'+profit+'</div>'
+    +'</div>'
+    +'<div style="background:rgba(255,255,255,.04);border-radius:10px;padding:10px;text-align:center">'
+    +'<div style="font-size:10px;color:var(--text3);margin-bottom:3px">مبلغ نهایی</div>'
+    +'<div id="planFinalPreview" style="font-size:15px;font-weight:900;color:var(--text)">$'+final+'</div>'
+    +'</div>'
+    +'</div>'
+    +'<div style="font-size:11px;color:var(--text3);margin-bottom:14px;text-align:center">⏱ مدت قفل: '+fmtLockLabel(plan.lock_minutes||5)+' | 📊 بازدهی: '+plan.roi+'%</div>'
+    +'<button onclick="confirmPlanInvest('+plan.roi+','+plan.lock_minutes+')" style="width:100%;background:linear-gradient(135deg,'+(isVip?'#7c3aed,#d97706,#fcd34d':'#1a56db,#00d4aa')+');color:#fff;border:none;border-radius:12px;padding:13px;font-family:Vazirmatn,sans-serif;font-size:14px;font-weight:900;cursor:pointer;box-shadow:0 4px 20px rgba('+(isVip?'124,58,237':'0,212,170')+',.3);letter-spacing:.3px">✅ تأیید و شروع سرمایه‌گذاری</button>'
+    +'</div>';
+  var formEl=document.getElementById('planInlineForm');
+  if(!formEl)return;
+  formEl.innerHTML=formHtml;
+  // Animate open
+  formEl.style.maxHeight='0';
+  formEl.style.opacity='0';
+  formEl.style.marginTop='0';
+  requestAnimationFrame(function(){
+    formEl.style.maxHeight='640px';
+    formEl.style.opacity='1';
+    formEl.style.marginTop='4px';
+  });
+  setTimeout(function(){
+    var card=document.getElementById('planCard_'+planId);
+    if(card)card.scrollIntoView({behavior:'smooth',block:'center'});
+    setTimeout(function(){formEl.scrollIntoView({behavior:'smooth',block:'nearest'});},300);
+  },150);
+}
+
+function closePlanForm(){
+  _selectedPlanData=null;
+  document.querySelectorAll('.plan-card').forEach(function(el){el.style.opacity='1';});
+  var formEl=document.getElementById('planInlineForm');
+  if(formEl){formEl.style.maxHeight='0';formEl.style.opacity='0';formEl.style.marginTop='0';}
+}
+
+function updatePlanForm(roi,lock_minutes){
+  var inp=document.getElementById('planAmtInp');
+  if(!inp)return;
+  var amt=parseFloat(inp.value)||0;
+  var profit=(amt*roi/100).toFixed(2);
+  var final=(amt+parseFloat(profit)).toFixed(2);
+  var pp=document.getElementById('planProfitPreview');
+  var fp=document.getElementById('planFinalPreview');
+  if(pp)pp.textContent='+$'+profit;
+  if(fp)fp.textContent='$'+final;
+}
+
+function confirmPlanInvest(roi,lock_minutes){
+  var inp=document.getElementById('planAmtInp');
+  if(!inp)return;
+  var amount=parseFloat(inp.value)||0;
+  if(!_selectedPlanData){return;}
+  _siSettings.profit_pct=roi;
+  _siSettings.lock_minutes=lock_minutes;
+  _siSettings.min_amount=_selectedPlanData.min_amount;
+  _siSettings._selectedPlanId=_selectedPlanData.id;
+  _siSettings._selectedPlanName=_selectedPlanData.name;
+  showInvestSummary(amount,roi,lock_minutes);
 }
 
 function openInvestModalWithPlan(plan){
