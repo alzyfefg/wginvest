@@ -54,10 +54,12 @@ body{font-family:'Vazirmatn',sans-serif;background:var(--bg);min-height:100vh;co
 .atab.on{background:linear-gradient(135deg,var(--p),var(--ac));color:#fff;box-shadow:0 4px 16px rgba(0,212,170,.25)}
 .fg{margin-bottom:14px;position:relative}
 .fg label{display:block;font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:700;letter-spacing:.8px;text-transform:uppercase}
-.fg input{width:100%;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:13px 16px;font-family:'Vazirmatn',sans-serif;font-size:14px;color:var(--text);outline:none;direction:ltr;text-align:left;transition:all .2s}
-.fg input:focus{border-color:var(--ac);background:rgba(0,212,170,.05);box-shadow:0 0 0 3px rgba(0,212,170,.1)}
-.fg input::placeholder{color:var(--text3)}
-.eye-btn{position:absolute;left:13px;bottom:12px;background:none;border:none;cursor:pointer;font-size:15px;color:var(--text3)}
+.fg input{width:100%;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:12px;padding:15px 16px;font-family:'Vazirmatn',sans-serif;font-size:14px;color:var(--text);outline:none;direction:ltr;text-align:left;transition:border-color .25s,box-shadow .25s,background .25s}
+.fg input:focus{border-color:var(--ac);background:rgba(0,212,170,.04);box-shadow:0 0 0 3px rgba(0,212,170,.12),0 0 16px rgba(0,212,170,.06)}
+.fg input::placeholder{color:var(--text3);opacity:1}
+.fg input[type="password"]{padding-left:46px}
+.eye-btn{position:absolute;left:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--text3);transition:color .2s;padding:4px;line-height:1;z-index:1}
+.eye-btn:hover{color:var(--ac)}
 .btn-p{width:100%;background:linear-gradient(135deg,#1a56db,#00d4aa);color:#fff;border:none;border-radius:12px;padding:14px;font-family:'Vazirmatn',sans-serif;font-size:15px;font-weight:900;cursor:pointer;margin-top:4px;transition:all .25s;box-shadow:0 4px 20px rgba(0,212,170,.3);letter-spacing:.3px}
 .btn-p:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,212,170,.4)}
 .btn-p:active{transform:translateY(0)}
@@ -68,6 +70,47 @@ body{font-family:'Vazirmatn',sans-serif;background:var(--bg);min-height:100vh;co
 .flags{display:flex;justify-content:center;gap:6px;margin-top:14px;flex-wrap:wrap}
 .flags button{font-size:20px;background:none;border:2px solid transparent;cursor:pointer;padding:4px;border-radius:7px;opacity:.5;transition:all .2s}
 .flags button:hover,.flags button.cur{opacity:1;border-color:var(--ac);background:rgba(0,212,170,.08)}
+
+/* ── AUTH BUTTON SPINNER ── */
+.btn-p .btn-spinner{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spinA .6s linear infinite;vertical-align:middle;margin-left:6px}
+@keyframes spinA{to{transform:rotate(360deg)}}
+
+/* ── COPY CONFIRM ── */
+.copy-confirm{display:inline-flex;align-items:center;gap:5px;background:rgba(0,212,170,.15);border:1px solid rgba(0,212,170,.35);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;color:var(--ac);animation:copyPop .2s cubic-bezier(.34,1.56,.64,1)}
+@keyframes copyPop{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+
+/* ── NETWORK BADGE ── */
+.net-pill{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:4px 11px;font-size:10px;font-weight:900;letter-spacing:.5px}
+.net-pill.trc20{background:rgba(255,71,87,.12);border:1px solid rgba(255,71,87,.3);color:#ff6b7a}
+.net-pill.bep20{background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.3);color:#fcd34d}
+
+/* ── DEP WARNING PRO ── */
+.dep-warn-pro{background:rgba(255,71,87,.07);border:1.5px solid rgba(255,71,87,.2);border-radius:13px;padding:14px 16px;margin:14px 0 4px}
+.dep-warn-pro-title{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:900;color:var(--red);margin-bottom:7px}
+.dep-warn-pro p{font-size:11px;color:rgba(255,100,120,.85);line-height:1.7}
+
+/* ── BONUS WARNING BANNER ── */
+.bonus-warn-banner{background:linear-gradient(135deg,rgba(245,158,11,.1),rgba(251,191,36,.06));border:1.5px solid rgba(245,158,11,.4);border-radius:14px;padding:14px 16px;margin-bottom:14px;display:flex;gap:11px;align-items:flex-start}
+.bonus-warn-icon{font-size:22px;flex-shrink:0;margin-top:1px}
+.bonus-warn-body{}
+.bonus-warn-title{font-size:12px;font-weight:900;color:#f59e0b;margin-bottom:4px}
+.bonus-warn-text{font-size:11px;color:rgba(245,158,11,.8);line-height:1.6}
+
+/* ── WITHDRAWAL CONFIRMATION MODAL ── */
+.with-conf-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:flex-end;justify-content:center;z-index:1100;animation:fadeInOverlay .2s ease}
+.with-conf-box{background:var(--card);border-radius:22px 22px 0 0;padding:24px 20px 32px;width:100%;max-width:460px;animation:slideUp .3s cubic-bezier(.25,.46,.45,.94)}
+.with-sum-row{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.04);border-radius:10px;padding:10px 14px;margin-bottom:8px}
+.with-sum-lbl{font-size:11px;color:var(--text2)}
+.with-sum-val{font-size:13px;font-weight:900;color:var(--text)}
+
+/* ── BONUS CONFIRM MODAL ── */
+.bonus-conf-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:1200;padding:20px;animation:fadeInOverlay .2s ease}
+.bonus-conf-box{background:var(--card);border-radius:22px;padding:28px 22px 24px;width:100%;max-width:380px;border:1px solid rgba(245,158,11,.25);box-shadow:0 0 40px rgba(245,158,11,.1)}
+
+/* ── FIN INPUT IMPROVED ── */
+.fin{width:100%;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:11px;padding:13px 14px;font-family:'Vazirmatn',sans-serif;font-size:13px;color:var(--text);outline:none;margin-bottom:9px;direction:ltr;text-align:left;transition:border-color .25s,box-shadow .25s,background .25s}
+.fin:focus{border-color:var(--ac);background:rgba(0,212,170,.04);box-shadow:0 0 0 3px rgba(0,212,170,.1),0 0 14px rgba(0,212,170,.06)}
+.fin::placeholder{color:var(--text3);opacity:1}
 
 /* ── TOPBAR ── */
 .topbar{position:fixed;top:0;left:0;right:0;background:rgba(7,15,30,.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06);z-index:100;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;transition:background .3s}
@@ -390,9 +433,6 @@ body.light .qm-btn{background:#fff;border:1px solid var(--border);box-shadow:var
 .waddr{background:rgba(0,212,170,.06);border:1.5px solid rgba(0,212,170,.2);border-radius:11px;padding:12px;font-size:10px;color:var(--ac);word-break:break-all;direction:ltr;text-align:center;margin-bottom:11px;cursor:pointer;font-weight:700;transition:all .2s;letter-spacing:.5px}
 .waddr:hover{background:rgba(0,212,170,.1);border-color:rgba(0,212,170,.35)}
 .wnote{font-size:11px;color:#c4960a;line-height:1.8;margin-bottom:12px;background:rgba(255,215,0,.05);padding:10px 12px;border-radius:9px;border:1px solid rgba(255,215,0,.15)}
-.fin{width:100%;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:11px;padding:12px 14px;font-family:'Vazirmatn',sans-serif;font-size:13px;color:var(--text);outline:none;margin-bottom:9px;direction:ltr;text-align:left;transition:all .2s}
-.fin:focus{border-color:var(--ac);background:rgba(0,212,170,.05);box-shadow:0 0 0 3px rgba(0,212,170,.08)}
-.fin::placeholder{color:var(--text3)}
 .btn-sec{width:100%;background:rgba(255,255,255,.05);color:var(--text);border:1.5px solid rgba(255,255,255,.1);border-radius:11px;padding:13px;font-family:'Vazirmatn',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-top:5px;transition:all .2s}
 .btn-sec:hover{border-color:var(--ac);color:var(--ac)}
 .tx-row{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;transition:all .2s}
@@ -1985,7 +2025,7 @@ async function doLogin(){
   var email=document.getElementById("le").value.trim().toLowerCase();
   var pass=document.getElementById("lp").value;
   if(!email||!pass)return amsg(t("err_email_pass"),"err");
-  var btn=document.getElementById("abtn_in");btn.disabled=true;btn.textContent="...";
+  var btn=document.getElementById("abtn_in");btn.disabled=true;btn.innerHTML=t("btn_in")+'<span class="btn-spinner"></span>';
   var res=await sb.auth.signInWithPassword({email:email,password:pass});
   btn.disabled=false;btn.textContent=t("btn_in");
   if(res.error)return amsg("❌ "+res.error.message,"err");
@@ -2001,7 +2041,7 @@ async function doRegister(){
   if(!email||!pass)return amsg(t("err_fill_all"),"err");
   if(pass.length<6)return amsg(t("err_pass_min6"),"err");
   if(pass!==pass2)return amsg(t("err_pass_mismatch"),"err");
-  var btn=document.getElementById("abtn_up");btn.disabled=true;btn.textContent="...";
+  var btn=document.getElementById("abtn_up");btn.disabled=true;btn.innerHTML=t("btn_up")+'<span class="btn-spinner"></span>';
   var urlRef=new URLSearchParams(window.location.search).get("ref");
   var fieldRef=document.getElementById("refCode")?document.getElementById("refCode").value.trim():null;
   var ref=urlRef||fieldRef||null;
@@ -3285,12 +3325,16 @@ function renderDepStep(c,step){
   else if(step===3){
     var addr=window._flowNetwork==="trc20"?WALLET:WALLET_BEP20;
     html.push('<div class="icard"><div class="ctitle">📥 '+t('step_deposit')+' '+(window._flowNetwork==="trc20"?"TRC20":"BEP20")+'</div>');
-    html.push('<div style="text-align:center;margin-bottom:14px">');
-    html.push('<div style="background:#fff;border-radius:14px;padding:14px;display:inline-block;box-shadow:0 4px 20px rgba(0,0,0,.3)">');
+    html.push('<div style="text-align:center;margin-bottom:16px">');
+    html.push('<div style="background:#fff;border-radius:16px;padding:16px;display:inline-block;box-shadow:0 6px 28px rgba(0,0,0,.35)">');
     html.push(generateQR(addr));
-    html.push('</div><div style="font-size:10px;color:var(--text3);margin-top:8px">'+t('dep_addr_label')+' '+(window._flowNetwork==="trc20"?"TRC20 (USDT)":"BEP20 (USDT)")+'</div></div>');
-    html.push('<div class="dep-addr" onclick="cpText(&quot;'+addr+'&quot;)"><span class="copy-icon">📋</span><span style="font-family:monospace;font-size:10px">'+addr+'</span></div>');
-    html.push('<div class="wnote">⚠️ Only USDT '+(window._flowNetwork==="trc20"?"TRC20":"BEP20 (BSC)")+' network.</div>');
+    html.push('</div>');
+    html.push('<div style="margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px">');
+    html.push('<span class="net-pill '+(window._flowNetwork==="trc20"?"trc20":"bep20")+'">'+(window._flowNetwork==="trc20"?"🔴 TRC20":"🟡 BEP20")+'</span>');
+    html.push('<span style="font-size:10px;color:var(--text3)">USDT</span>');
+    html.push('</div></div>');
+    html.push('<div class="dep-addr" id="depCopyBtn" onclick="cpTextDep(&quot;'+addr+'&quot;,this)"><span class="copy-icon">📋</span><span style="font-family:monospace;font-size:10px">'+addr+'</span></div>');
+    html.push('<div class="dep-warn-pro"><div class="dep-warn-pro-title">⚠️ مهم — شبکه صحیح را انتخاب کنید</div><p>فقط USDT از طریق شبکه <strong>'+(window._flowNetwork==="trc20"?"TRC20":"BEP20")+'</strong> ارسال کنید. ارسال از طریق شبکه اشتباه ممکن است به از دست رفتن دائمی وجوه منجر شود.</p></div>');
     html.push('<label style="font-size:11px;color:var(--text2);font-weight:700;display:block;margin-bottom:6px">'+t('dep_amount_label')+'</label>');
     html.push('<input type="number" class="fin" id="da" placeholder="'+t('dep_min_placeholder')+'" min="10">');
     html.push('<label style="font-size:11px;color:var(--text2);font-weight:700;display:block;margin-bottom:6px">'+t('dep_tx_label')+'</label>');
@@ -3357,12 +3401,17 @@ function renderWithStep(c,step){
   }
   else if(step===3){
     var bal=parseFloat(P&&P.balance||0);
+    var activeBonus=getActiveBonus();
+    // Bonus warning banner
+    if(activeBonus>0){
+      html.push('<div class="bonus-warn-banner"><div class="bonus-warn-icon">⚠️</div><div class="bonus-warn-body"><div class="bonus-warn-title">Active Bonus Detected</div><div class="bonus-warn-text">Submitting a withdrawal request will permanently cancel your Active Bonus ($'+siFmt(activeBonus)+') and all remaining Bonus Balance. This action cannot be undone.</div></div></div>');
+    }
     html.push('<div class="icard"><div class="ctitle">📤 '+t('step_withdrawal')+' '+(window._flowNetwork==="trc20"?"TRC20":"BEP20")+'</div>');
     html.push('<div style="background:rgba(0,212,170,.06);border:1px solid rgba(0,212,170,.15);border-radius:11px;padding:12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center">');
-    html.push('<span style="font-size:12px;color:var(--text2)">'+t('withdrawable_bal')+'</span>');
+    html.push('<span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.5px;text-transform:uppercase">Withdrawable Balance</span>');
     html.push('<span style="font-size:16px;font-weight:900;color:var(--gold)">$'+bal.toFixed(2)+'</span>');
     html.push('</div>');
-    html.push('<div style="background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.12);border-radius:9px;padding:10px;margin-bottom:12px;font-size:11px;color:rgba(255,215,0,.8)">'+t('selected_network')+' '+(window._flowNetwork==="trc20"?"USDT TRC20":"USDT BEP20")+'</div>');
+    html.push('<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span class="net-pill '+(window._flowNetwork==="trc20"?"trc20":"bep20")+'">'+(window._flowNetwork==="trc20"?"🔴 TRC20":"🟡 BEP20")+'</span><span style="font-size:11px;color:var(--text3)">USDT</span></div>');
     var savedAddr=window._flowNetwork==="trc20"?(P.wallet_address_trc20||""):(P.wallet_address_bep20||"");
     html.push('<div style="background:rgba(0,212,170,.06);border:1px solid rgba(0,212,170,.15);border-radius:11px;padding:12px;margin-bottom:12px">');
     html.push('<div style="font-size:10px;color:var(--text3);margin-bottom:6px;font-weight:700">'+t('saved_wallet')+'</div>');
@@ -3407,7 +3456,7 @@ function checkWarnAndNextW(){
 
 function generateQR(text){
   var encoded=encodeURIComponent(text);
-  return '<img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data='+encoded+'" width="160" height="160" style="display:block;border-radius:8px" alt="QR Code">';
+  return '<img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data='+encoded+'" width="220" height="220" style="display:block;border-radius:10px" alt="QR Code">';
 }
 
 async function loadTxNew(c){
@@ -3508,6 +3557,46 @@ async function subDep(){
   setTimeout(loadWallet,800);
 }
 
+function showWithConfirmModal(amt,net,wa,saveCheck){
+  return new Promise(function(resolve){
+    var overlay=document.createElement('div');
+    overlay.className='with-conf-overlay';
+    overlay.innerHTML='<div class="with-conf-box">'
+      +'<div style="text-align:center;margin-bottom:18px"><div style="font-size:28px;margin-bottom:6px">📤</div>'
+      +'<div style="font-size:15px;font-weight:900;color:var(--text)">تأیید درخواست برداشت</div>'
+      +'<div style="font-size:11px;color:var(--text3);margin-top:3px">جزئیات را بررسی کنید</div></div>'
+      +'<div style="margin-bottom:16px">'
+      +'<div class="with-sum-row"><span class="with-sum-lbl">💵 مبلغ برداشت</span><span class="with-sum-val" style="color:var(--red)">$'+siFmt(amt)+'</span></div>'
+      +'<div class="with-sum-row"><span class="with-sum-lbl">🌐 شبکه</span><span class="with-sum-val">USDT '+(net==="trc20"?"TRC20":"BEP20")+'</span></div>'
+      +'<div class="with-sum-row"><span class="with-sum-lbl">📍 آدرس مقصد</span><span class="with-sum-val" style="font-size:10px;font-family:monospace;direction:ltr;word-break:break-all">'+wa+'</span></div>'
+      +'<div class="with-sum-row"><span class="with-sum-lbl">⏱ زمان پردازش</span><span class="with-sum-val">۱–۲۴ ساعت</span></div>'
+      +'</div>'
+      +'<button id="withConfirmYes" style="width:100%;background:linear-gradient(135deg,#1a56db,#00d4aa);color:#fff;border:none;border-radius:12px;padding:13px;font-family:Vazirmatn,sans-serif;font-size:14px;font-weight:900;cursor:pointer;margin-bottom:8px">✅ تأیید و ارسال درخواست</button>'
+      +'<button id="withConfirmNo" style="width:100%;background:rgba(255,255,255,.05);color:var(--text2);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;font-family:Vazirmatn,sans-serif;font-size:13px;font-weight:700;cursor:pointer">انصراف</button>'
+      +'</div>';
+    document.body.appendChild(overlay);
+    overlay.querySelector('#withConfirmYes').onclick=function(){overlay.remove();resolve(true);};
+    overlay.querySelector('#withConfirmNo').onclick=function(){overlay.remove();resolve(false);};
+    overlay.onclick=function(e){if(e.target===overlay){overlay.remove();resolve(false);}};
+  });
+}
+function showBonusConfirmModal(bonusAmt){
+  return new Promise(function(resolve){
+    var overlay=document.createElement('div');
+    overlay.className='bonus-conf-overlay';
+    overlay.innerHTML='<div class="bonus-conf-box">'
+      +'<div style="text-align:center;margin-bottom:16px"><div style="font-size:36px;margin-bottom:8px">⚠️</div>'
+      +'<div style="font-size:15px;font-weight:900;color:#f59e0b;margin-bottom:6px">Bonus Warning</div>'
+      +'<div style="font-size:12px;color:var(--text2);line-height:1.7">You currently have an active bonus of <strong style="color:#f59e0b">$'+siFmt(bonusAmt)+'</strong>.<br>Submitting this withdrawal will permanently remove your Active Bonus and any unused Bonus Balance.<br><strong style="color:var(--red)">This action cannot be reversed.</strong></div></div>'
+      +'<button id="bonusConfYes" style="width:100%;background:linear-gradient(135deg,#dc2626,#f59e0b);color:#fff;border:none;border-radius:12px;padding:13px;font-family:Vazirmatn,sans-serif;font-size:14px;font-weight:900;cursor:pointer;margin-bottom:8px">Continue Withdrawal</button>'
+      +'<button id="bonusConfNo" style="width:100%;background:rgba(255,255,255,.05);color:var(--text2);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;font-family:Vazirmatn,sans-serif;font-size:13px;font-weight:700;cursor:pointer">Cancel</button>'
+      +'</div>';
+    document.body.appendChild(overlay);
+    overlay.querySelector('#bonusConfYes').onclick=function(){overlay.remove();resolve(true);};
+    overlay.querySelector('#bonusConfNo').onclick=function(){overlay.remove();resolve(false);};
+    overlay.onclick=function(e){if(e.target===overlay){overlay.remove();resolve(false);}};
+  });
+}
 async function subWith(){
   var wa=document.getElementById("wa").value.trim();
   var wamt=document.getElementById("wamt").value;
@@ -3522,6 +3611,15 @@ async function subWith(){
   if(P.withdrawal_pass!==wpass)return toast(t("err_wrong_wpass"),"red");
   if(net==='trc20'&&!wa.startsWith('T'))return toast(t("err_trc20_T"),"red");
   if(net==='bep20'&&!wa.startsWith('0x'))return toast(t("err_bep20_0x"),"red");
+  // Bonus confirmation modal (must confirm before proceeding)
+  var activeBonus=getActiveBonus();
+  if(activeBonus>0){
+    var bonusOk=await showBonusConfirmModal(activeBonus);
+    if(!bonusOk)return;
+  }
+  // Withdrawal confirmation summary modal
+  var confirmed=await showWithConfirmModal(amt,net,wa,saveCheck);
+  if(!confirmed)return;
   // Withdrawal validation: only real balance, not bonus
   if(parseFloat(P.balance||0)<amt)return toast(t("err_insuf_bal"),"red");
   var res=await sb.from("withdrawals").insert({user_id:U.id,amount:amt,wallet_address:wa,status:"pending",network:net.toUpperCase()});
@@ -3569,6 +3667,14 @@ function cpText(txt){
   navigator.clipboard.writeText(txt).then(function(){toast(t('copied'),'green');}).catch(function(){
     var ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast(t('copied'),'green');
   });
+}
+function cpTextDep(txt,btn){
+  navigator.clipboard.writeText(txt).then(function(){
+    var orig=btn.innerHTML;
+    btn.innerHTML='<span class="copy-confirm">✓ آدرس کپی شد</span>';
+    btn.style.pointerEvents='none';
+    setTimeout(function(){btn.innerHTML=orig;btn.style.pointerEvents='';},2000);
+  }).catch(function(){cpText(txt);});
 }
 
 async function broadcastMsg(){
