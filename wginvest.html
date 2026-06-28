@@ -5415,24 +5415,92 @@ async function loadTeam(){
   });
   html.push('</div></div>');
 
-  // Team tree
-  html.push('<div class="sec" style="margin-top:14px">'+t('team_structure')+'</div>');
-  html.push('<div id="pyTree">');
+  // Fetch first deposits to determine VIP status (first approved deposit >= $500)
+  var allIds=[U.id].concat(l1ids).concat(l2data.map(function(u){return u.user_id;})).concat(l3data.map(function(u){return u.user_id;}));
+  var depRes=await sb.from('deposits').select('user_id,amount').eq('status','approved').in('user_id',allIds).order('created_at',{ascending:true});
+  var firstDep={};
+  (depRes.data||[]).forEach(function(d){if(firstDep[d.user_id]===undefined)firstDep[d.user_id]=parseFloat(d.amount||0);});
+
+  // Pyramid chart
+  html.push('<div class="adm-pyramid-wrap" style="margin-top:14px">');
+  html.push('<div class="adm-pyramid-header"><span>🌳 '+t('team_structure')+'</span><span style="font-size:11px;font-weight:600;color:rgba(255,255,255,.5)">'+t('team_total_members')+': '+num(totalMem)+'</span></div>');
+
   if(!l1data.length){
     html.push('<div class="ebox"><span class="ei">👥</span><p>'+t('no_team')+'</p></div>');
   }else{
-    html.push('<div class="tree-node root"><div class="tn-avatar">👑</div><div class="tn-info"><div class="tn-name">'+t('team_you')+'</div><div class="tn-bal">$'+num(parseFloat(window.P&&window.P.balance||0).toFixed(2))+'</div></div></div>');
-    html.push('<div class="tree-children">');
-    l1data.slice(0,10).forEach(function(u){
-      var name=u.email.split("@")[0];
-      var l2kids=l2data.filter(function(x){return x.referred_by===u.user_id;});
-      html.push('<div class="tree-node"><div class="tn-avatar">👤</div><div class="tn-info"><div class="tn-name">'+name+'</div><div class="tn-bal">$'+num(parseFloat(u.balance||0).toFixed(2))+'</div></div>'+(l2kids.length?'<span style="font-size:10px;color:var(--ac);margin-right:auto">+'+num(l2kids.length)+' L2</span>':'')+'</div>');
-    });
-    if(l1data.length>10)html.push('<div style="text-align:center;font-size:11px;color:var(--text3);padding:8px">+'+num(l1data.length-10)+' more members</div>');
+    // Helper: make a pyramid node
+    function makeMemberNode(u,depth){
+      var fd=firstDep[u.user_id]||0;
+      var isVip=fd>=500;
+      var name=u.email?u.email.split('@')[0]:'---';
+      var bal=parseFloat(u.balance||0);
+      var nodeColor=isVip?'rgba(255,215,0,.18)':'rgba(16,185,129,.12)';
+      var borderColor=isVip?'rgba(255,215,0,.5)':'rgba(16,185,129,.4)';
+      var badge=isVip?'<span class="pyr-badge vip">💎 VIP</span>':'<span class="pyr-badge reg">🌿</span>';
+      // get children for this node
+      var children=[];
+      if(depth===0)children=l2data.filter(function(x){return x.referred_by===u.user_id;});
+      else if(depth===1)children=l3data.filter(function(x){return x.referred_by===u.user_id;});
+      var out='<div class="pyr-node-wrap" style="--depth:'+depth+'">';
+      out+='<div class="pyr-node" style="background:'+nodeColor+';border-color:'+borderColor+'" data-uid="'+u.user_id+'">';
+      out+='<div class="pyr-node-top">'+badge+'<span class="pyr-name">'+name+'</span></div>';
+      out+='<div class="pyr-node-bal">$'+bal.toFixed(2)+'</div>';
+      if(fd>0)out+='<div class="pyr-node-fd">1st dep: $'+fd.toFixed(0)+'</div>';
+      if(children.length)out+='<div class="pyr-node-refs">'+children.length+' sub</div>';
+      out+='</div>';
+      if(children.length){
+        out+='<div class="pyr-children">';
+        children.forEach(function(ch){out+=makeMemberNode(ch,depth+1);});
+        out+='</div>';
+      }
+      out+='</div>';
+      return out;
+    }
+
+    // Root node (you)
+    var myName=P&&P.display_name?P.display_name:(U.email?U.email.split('@')[0]:t('team_you'));
+    var myBal=parseFloat(P&&P.balance||0);
+    var myFd=firstDep[U.id]||0;
+    var myVip=myFd>=500;
+    html.push('<div style="display:flex;justify-content:center;margin-bottom:6px">');
+    html.push('<div class="pyr-node-wrap"><div class="pyr-node" style="background:linear-gradient(135deg,rgba(26,86,219,.3),rgba(0,212,170,.15));border-color:rgba(0,212,170,.6);min-width:140px">');
+    html.push('<div class="pyr-node-top">'+(myVip?'<span class="pyr-badge vip">💎 VIP</span>':'<span class="pyr-badge" style="background:rgba(26,86,219,.3);color:#60a5fa">👑</span>')+'<span class="pyr-name" style="color:#fff">'+myName+'</span></div>');
+    html.push('<div class="pyr-node-bal">$'+myBal.toFixed(2)+'</div>');
+    html.push('<div class="pyr-node-refs" style="color:var(--ac)">'+t('team_you')+'</div>');
+    html.push('</div></div></div>');
+
+    // Connector line
+    html.push('<div style="display:flex;justify-content:center"><div style="width:2px;height:18px;background:linear-gradient(180deg,rgba(0,212,170,.5),rgba(100,120,255,.3))"></div></div>');
+
+    // L1 tier label
+    html.push('<div class="pyr-tier-label">L1 — '+l1data.length+' '+t('team_direct').replace('(L1)','').trim()+'</div>');
+    html.push('<div class="pyr-tier">');
+    l1data.forEach(function(u){html.push(makeMemberNode(u,0));});
+    html.push('</div>');
+
+    // L2 tier label (if any)
+    if(l2data.length){
+      html.push('<div class="pyr-tier-label" style="margin-top:6px">L2 — '+l2data.length+' '+t('team_total_members')+'</div>');
+    }
+    // L3 tier label (if any)
+    if(l3data.length){
+      html.push('<div class="pyr-tier-label" style="margin-top:2px">L3 — '+l3data.length+' '+t('team_total_members')+'</div>');
+    }
+
+    // VIP legend
+    html.push('<div style="display:flex;gap:12px;justify-content:center;margin-top:12px;flex-wrap:wrap">');
+    html.push('<div style="display:flex;align-items:center;gap:5px;font-size:10px;color:rgba(255,255,255,.6)"><span class="pyr-badge vip">💎 VIP</span> 1st deposit ≥ $500</div>');
+    html.push('<div style="display:flex;align-items:center;gap:5px;font-size:10px;color:rgba(255,255,255,.6)"><span class="pyr-badge reg">🌿</span> Regular</div>');
     html.push('</div>');
   }
+
   html.push('</div>');
   c.innerHTML=html.join('');
+  // Animate nodes
+  setTimeout(function(){
+    var nodes=c.querySelectorAll('.pyr-node');
+    nodes.forEach(function(n,i){n.style.animationDelay=(i*40)+'ms';});
+  },50);
 }
 
 
