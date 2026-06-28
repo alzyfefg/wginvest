@@ -2444,13 +2444,18 @@ async function updateNotifBadge(){
 }
 
 // AUDIT LOG
-async function logAdminAction(action,targetUser,amount,details){
+async function logAdminAction(action,targetUser,amount,details,extraInfo){
   try{
-    await sb.from('admin_logs').insert({admin_email:U&&U.email||'admin',action:action,target_user:targetUser||null,amount:amount||null,details:details||null});
+    var detailsStr=details||null;
+    if(extraInfo&&typeof extraInfo==='object'){
+      var extra=JSON.stringify(extraInfo);
+      detailsStr=(detailsStr?detailsStr+' | ':'')+extra;
+    }
+    await sb.from('admin_logs').insert({admin_email:U&&U.email||'admin',action:action,target_user:targetUser||null,amount:amount||null,details:detailsStr});
   }catch(e){}
 }
 async function loadAdminAuditLog(c){
-  c.innerHTML='<div class="icard"><div class="ctitle">📋 گزارش فعالیت‌های ادمین</div>'
+  c.innerHTML='<div class="icard"><div class="ctitle">🔍 گزارش فعالیت‌های ادمین</div>'
     +'<input class="global-search" id="logSearch" placeholder="🔍 جستجو..." oninput="searchAuditLog(this.value)" style="width:100%;margin-bottom:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 14px;font-family:Vazirmatn,sans-serif;font-size:13px;color:var(--text);outline:none">'
     +'<div id="logList"><div class="lbox"><div class="spin"></div></div></div></div>';
   searchAuditLog('');
@@ -2458,8 +2463,8 @@ async function loadAdminAuditLog(c){
 async function searchAuditLog(q){
   var c=document.getElementById('logList');if(!c)return;
   c.innerHTML='<div class="lbox"><div class="spin"></div></div>';
-  var req=sb.from('admin_logs').select('*').order('created_at',{ascending:false}).limit(50);
-  if(q&&q.length>1)req=req.or('action.ilike.%'+q+'%,target_user.ilike.%'+q+'%,admin_email.ilike.%'+q+'%');
+  var req=sb.from('admin_logs').select('*').order('created_at',{ascending:false}).limit(100);
+  if(q&&q.length>1)req=req.or('action.ilike.%'+q+'%,target_user.ilike.%'+q+'%,admin_email.ilike.%'+q+'%,details.ilike.%'+q+'%');
   var r=await req;
   var logs=r.data||[];
   if(!logs.length){c.innerHTML='<div class="ebox"><span class="ei">📋</span><p>هیچ گزارشی وجود ندارد</p></div>';return;}
@@ -2467,13 +2472,32 @@ async function searchAuditLog(q){
     +logs.map(function(l){
       var ts=new Date(l.created_at).toLocaleString('fa-IR');
       var clr=l.action.includes('Deducted')||l.action.includes('Rejected')?'rgba(255,71,87,.12)':l.action.includes('Added')||l.action.includes('Approved')?'rgba(0,212,170,.08)':'rgba(245,158,11,.08)';
+      // Parse extra info from details if JSON present
+      var detailsDisplay='';
+      var extraDisplay='';
+      if(l.details){
+        var jsonMatch=l.details.match(/\|?\s*(\{.*\})\s*$/);
+        if(jsonMatch){
+          var rawDetail=l.details.replace(jsonMatch[0],'').trim();
+          if(rawDetail)detailsDisplay='<div style="color:var(--text3)">'+rawDetail+'</div>';
+          try{
+            var extra=JSON.parse(jsonMatch[1]);
+            if(extra.old_value!==undefined)extraDisplay+='<div style="font-size:10px;color:var(--text3)">قبلی: '+extra.old_value+'</div>';
+            if(extra.new_value!==undefined)extraDisplay+='<div style="font-size:10px;color:var(--text2)">جدید: '+extra.new_value+'</div>';
+            if(extra.reason)extraDisplay+='<div style="font-size:10px;color:#f59e0b">دلیل: '+extra.reason+'</div>';
+          }catch(e){}
+        }else{
+          detailsDisplay='<div style="color:var(--text3)">'+l.details+'</div>';
+        }
+      }
       return '<div style="background:'+clr+';border-radius:10px;padding:10px 12px;font-size:11px">'
         +'<div style="display:flex;justify-content:space-between;margin-bottom:4px">'
         +'<span style="font-weight:900;color:var(--text)">'+l.action+'</span>'
         +'<span style="color:var(--text3)">'+ts+'</span></div>'
+        +(l.admin_email?'<div style="font-size:10px;color:var(--text3)">👑 '+l.admin_email+'</div>':'')
         +(l.target_user?'<div style="color:var(--text2)">👤 '+l.target_user+'</div>':'')
         +(l.amount?'<div style="color:var(--ac)">💰 $'+parseFloat(l.amount).toFixed(2)+'</div>':'')
-        +(l.details?'<div style="color:var(--text3)">'+l.details+'</div>':'')
+        +detailsDisplay+extraDisplay
         +'</div>';
     }).join('')+'</div>';
 }
@@ -3051,6 +3075,176 @@ async function renderInvestHistory(container){
     document.querySelectorAll('.inv-hist-filter').forEach(function(b){b.classList.toggle('on',b.id==='ihf_'+f);});
     renderList(f);
   };
+}
+
+// ── BONUS MANAGER ──
+async function loadAdminBonusManager(c){
+  var nowISO=new Date().toISOString();
+  var todayStart=new Date();todayStart.setHours(0,0,0,0);
+  var todayEnd=new Date();todayEnd.setHours(23,59,59,999);
+  var [profsRes,logsRes]=await Promise.all([
+    sb.from('profiles').select('user_id,email,member_id,bonus,bonus_expires_at').gt('bonus',0),
+    sb.from('admin_logs').select('*').ilike('action','%onus%').order('created_at',{ascending:false}).limit(50)
+  ]);
+  var profs=(profsRes.data||[]).filter(function(p){return p.bonus_expires_at&&p.bonus_expires_at>nowISO;});
+  var logs=logsRes.data||[];
+  var totalActive=profs.length;
+  var totalVal=profs.reduce(function(s,p){return s+parseFloat(p.bonus||0);},0);
+  var totalEver=logs.filter(function(l){return l.action&&l.action.toLowerCase().includes('bonus given');}).reduce(function(s,l){return s+parseFloat(l.amount||0);},0);
+  var expToday=profs.filter(function(p){return p.bonus_expires_at>=todayStart.toISOString()&&p.bonus_expires_at<=todayEnd.toISOString();}).length;
+  var html=[];
+  html.push('<div class="kpi-grid">');
+  html.push('<div class="kpi-card"><span class="kpi-icon">🎁</span><div class="kpi-val" style="color:#f59e0b">'+totalActive+'</div><div class="kpi-lbl">بونوس فعال</div></div>');
+  html.push('<div class="kpi-card"><span class="kpi-icon">💵</span><div class="kpi-val" style="color:#f59e0b">$'+totalVal.toFixed(2)+'</div><div class="kpi-lbl">ارزش کل جاری</div></div>');
+  html.push('<div class="kpi-card"><span class="kpi-icon">📊</span><div class="kpi-val" style="color:var(--ac)">$'+totalEver.toFixed(2)+'</div><div class="kpi-lbl">کل بونوس داده‌شده</div></div>');
+  html.push('<div class="kpi-card"><span class="kpi-icon">⏰</span><div class="kpi-val" style="color:var(--red)">'+expToday+'</div><div class="kpi-lbl">انقضا امروز</div></div>');
+  html.push('</div>');
+  // Export CSV button
+  if(profs.length){
+    var csvRows=['ایمیل,شناسه,بونوس,انقضا,روز باقی‌مانده'];
+    profs.forEach(function(p){
+      var daysLeft=Math.max(0,Math.ceil((new Date(p.bonus_expires_at)-new Date())/86400000));
+      csvRows.push([p.email,p.member_id||'',parseFloat(p.bonus).toFixed(2),p.bonus_expires_at,daysLeft].join(','));
+    });
+    var csvData='data:text/csv;charset=utf-8,'+encodeURIComponent(csvRows.join('\n'));
+    html.push('<div style="margin-bottom:10px"><a href="'+csvData+'" download="bonuses.csv" style="display:inline-block;background:rgba(0,212,170,.1);color:var(--ac);border:1px solid rgba(0,212,170,.2);border-radius:9px;padding:7px 16px;font-size:11px;font-weight:700;text-decoration:none">⬇️ دانلود CSV</a></div>');
+  }
+  // Bonus search
+  html.push('<div class="icard"><div class="ctitle">🎁 کاربران با بونوس فعال</div>');
+  html.push('<input class="user-search" id="bonSearch" placeholder="🔍 جستجو ایمیل..." oninput="filterBonusRows(this.value)" style="margin-bottom:10px">');
+  html.push('<div id="bonusMgrList">');
+  if(!profs.length){
+    html.push('<div class="ebox"><span class="ei">🎁</span><p>هیچ بونوس فعالی وجود ندارد</p></div>');
+  }else{
+    profs.forEach(function(p){
+      var daysLeft=Math.max(0,Math.ceil((new Date(p.bonus_expires_at)-new Date())/86400000));
+      html.push('<div class="bonus-mgr-row" data-email="'+(p.email||'').toLowerCase()+'">');
+      html.push('<div><div style="font-size:12px;font-weight:700;color:var(--text)">'+(p.email||'—')+'</div>');
+      html.push('<div style="font-size:10px;color:var(--text3)">#'+(p.member_id||'—')+' · انقضا: '+new Date(p.bonus_expires_at).toLocaleDateString('fa-IR')+' ('+daysLeft+' روز)</div></div>');
+      html.push('<div style="display:flex;align-items:center;gap:8px">');
+      html.push('<span style="font-size:14px;font-weight:900;color:#f59e0b">$'+parseFloat(p.bonus).toFixed(2)+'</span>');
+      html.push('<button class="dep-btn rej" style="font-size:10px;padding:4px 10px" onclick="revokeBonusById(&quot;'+p.user_id+'&quot;,&quot;'+(p.email||'')+'&quot;)">❌ لغو</button>');
+      html.push('</div></div>');
+    });
+  }
+  html.push('</div></div>');
+  // Bonus history
+  html.push('<div class="icard" style="margin-top:12px"><div class="ctitle">📋 تاریخچه بونوس</div>');
+  if(logs.length){
+    logs.slice(0,30).forEach(function(l){
+      var ts=new Date(l.created_at).toLocaleString('fa-IR');
+      var clr=l.action&&l.action.toLowerCase().includes('revoke')?'rgba(255,71,87,.1)':'rgba(245,158,11,.08)';
+      html.push('<div style="background:'+clr+';border-radius:9px;padding:9px 12px;margin-bottom:6px;font-size:11px">');
+      html.push('<div style="display:flex;justify-content:space-between"><span style="font-weight:700">'+l.action+'</span><span style="color:var(--text3)">'+ts+'</span></div>');
+      if(l.target_user)html.push('<div style="color:var(--text2)">👤 '+l.target_user+'</div>');
+      if(l.amount)html.push('<div style="color:#f59e0b">💰 $'+parseFloat(l.amount).toFixed(2)+'</div>');
+      html.push('</div>');
+    });
+  }else{
+    html.push('<div style="font-size:11px;color:var(--text3);text-align:center;padding:16px">هیچ تاریخچه‌ای یافت نشد</div>');
+  }
+  html.push('</div>');
+  c.innerHTML=html.join('');
+}
+
+function filterBonusRows(q){
+  var rows=document.querySelectorAll('#bonusMgrList .bonus-mgr-row');
+  rows.forEach(function(r){r.style.display=(!q||r.dataset.email.includes(q.toLowerCase()))?'flex':'none';});
+}
+
+async function revokeBonusById(uid,email){
+  if(!confirm('لغو بونوس برای '+email+'؟'))return;
+  var cur=await sb.from('profiles').select('bonus').eq('user_id',uid).single();
+  var amt=cur.data?parseFloat(cur.data.bonus||0):0;
+  await sb.from('profiles').update({bonus:0,bonus_expires_at:null}).eq('user_id',uid);
+  await logAdminAction('Bonus Revoked',uid,amt,'revoked via bonus manager');
+  toast('بونوس لغو شد','red');
+  var c2=document.getElementById('adminContent');
+  if(c2)await loadAdminBonusManager(c2);
+}
+
+// ── ADMIN ANALYTICS ──
+async function loadAdminAnalytics(c){
+  c.innerHTML='<div class="lbox"><div class="spin"></div></div>';
+  // Date range buttons
+  var html=[];
+  html.push('<div style="display:flex;gap:8px;margin-bottom:14px">');
+  html.push('<button class="fp-btn on" id="arangeBtn7" onclick="loadAnalyticsRange(7,this)">۷ روز</button>');
+  html.push('<button class="fp-btn" id="arangeBtn30" onclick="loadAnalyticsRange(30,this)">۳۰ روز</button>');
+  html.push('<button class="fp-btn" id="arangeBtn90" onclick="loadAnalyticsRange(90,this)">۹۰ روز</button>');
+  html.push('</div>');
+  html.push('<div id="analyticsBody"><div class="lbox"><div class="spin"></div></div></div>');
+  c.innerHTML=html.join('');
+  await loadAnalyticsRange(7,document.getElementById('arangeBtn7'));
+}
+
+async function loadAnalyticsRange(days,btn){
+  document.querySelectorAll('[id^="arangeBtn"]').forEach(function(b){b.classList.remove('on');});
+  if(btn)btn.classList.add('on');
+  var body=document.getElementById('analyticsBody');
+  if(!body)return;
+  body.innerHTML='<div class="lbox"><div class="spin"></div></div>';
+  var since=new Date();since.setDate(since.getDate()-days);since.setHours(0,0,0,0);
+  var sinceISO=since.toISOString();
+  var [depsRes,withsRes,profsRes,invsRes]=await Promise.all([
+    sb.from('deposits').select('amount,created_at').eq('status','approved').gte('created_at',sinceISO),
+    sb.from('withdrawals').select('amount,created_at').eq('status','approved').gte('created_at',sinceISO),
+    sb.from('profiles').select('created_at').gte('created_at',sinceISO),
+    sb.from('investments').select('created_at,status').gte('created_at',sinceISO)
+  ]);
+  var deps=depsRes.data||[];
+  var withs=withsRes.data||[];
+  var newUsers=profsRes.data||[];
+  var invs=invsRes.data||[];
+  // Build day buckets
+  var buckets=[];
+  for(var i=days-1;i>=0;i--){
+    var d=new Date();d.setDate(d.getDate()-i);d.setHours(0,0,0,0);
+    buckets.push({date:d,label:d.toLocaleDateString('fa-IR',{month:'numeric',day:'numeric'}),deps:0,withs:0,users:0,invs:0});
+  }
+  deps.forEach(function(r){
+    var d=new Date(r.created_at);d.setHours(0,0,0,0);
+    var b=buckets.find(function(bk){return bk.date.getTime()===d.getTime();});
+    if(b)b.deps+=parseFloat(r.amount||0);
+  });
+  withs.forEach(function(r){
+    var d=new Date(r.created_at);d.setHours(0,0,0,0);
+    var b=buckets.find(function(bk){return bk.date.getTime()===d.getTime();});
+    if(b)b.withs+=parseFloat(r.amount||0);
+  });
+  newUsers.forEach(function(r){
+    var d=new Date(r.created_at);d.setHours(0,0,0,0);
+    var b=buckets.find(function(bk){return bk.date.getTime()===d.getTime();});
+    if(b)b.users++;
+  });
+  invs.forEach(function(r){
+    var d=new Date(r.created_at);d.setHours(0,0,0,0);
+    var b=buckets.find(function(bk){return bk.date.getTime()===d.getTime();});
+    if(b)b.invs++;
+  });
+  function renderBarChart(title,color,key,suffix){
+    var maxVal=Math.max.apply(null,buckets.map(function(b){return b[key];}));
+    if(maxVal<=0)maxVal=1;
+    var html2='<div class="icard"><div class="ctitle">'+title+'</div>';
+    html2+='<div style="display:flex;align-items:flex-end;gap:4px;height:80px;padding-bottom:4px">';
+    buckets.forEach(function(b){
+      var h=Math.max(4,Math.round(b[key]/maxVal*72));
+      html2+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">';
+      html2+='<div title="'+b.label+': '+(suffix==='$'?'$'+b[key].toFixed(0):b[key])+'" style="width:100%;height:'+h+'px;background:'+color+';border-radius:3px 3px 0 0;transition:height .6s ease"></div>';
+      if(days<=7)html2+='<div style="font-size:8px;color:var(--text3);white-space:nowrap">'+b.label+'</div>';
+      html2+='</div>';
+    });
+    html2+='</div>';
+    if(days>7)html2+='<div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);margin-top:4px"><span>'+buckets[0].label+'</span><span>'+buckets[buckets.length-1].label+'</span></div>';
+    html2+='</div>';
+    return html2;
+  }
+  var html3='';
+  html3+=renderBarChart('📈 واریز روزانه','#00d4aa','deps','$');
+  html3+=renderBarChart('📉 برداشت روزانه','#ff4757','withs','$');
+  html3+=renderBarChart('👤 کاربران جدید','#7c6ef2','users','');
+  html3+=renderBarChart('💼 سرمایه‌گذاری‌های جدید','#f59e0b','invs','');
+  body.innerHTML=html3;
 }
 
 // ADMIN PLANS MANAGEMENT
@@ -4894,29 +5088,100 @@ async function loadAdminAnnounce(c){
 
 // ── WITHDRAWAL QUEUE (Enhanced with priority) ──
 async function loadAW2(c){
-  var res=await sb.from("withdrawals").select("*,profiles(email,member_id,balance)").eq("status","pending").order("created_at",{ascending:true});
-  var data=res.data||[];
-  if(!data.length){c.innerHTML='<div class="ebox"><span class="ei">💸</span><p>هیچ برداشتی در انتظار نیست ✅</p></div>';return;}
+  var res=await sb.from("withdrawals").select("*,profiles(email,member_id,balance)").order("created_at",{ascending:false});
+  var allData=res.data||[];
   var html=[];
-  html.push('<div style="display:flex;gap:8px;margin-bottom:12px;font-size:11px">');
-  html.push('<span style="background:rgba(255,71,87,.1);color:var(--red);padding:4px 10px;border-radius:20px;border:1px solid rgba(255,71,87,.2)">🔴 بحرانی: بالای $100</span>');
-  html.push('<span style="background:rgba(255,215,0,.08);color:var(--gold);padding:4px 10px;border-radius:20px;border:1px solid rgba(255,215,0,.2)">🟡 معمولی</span>');
+  // Search + filter bar
+  html.push('<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">');
+  html.push('<input type="text" class="user-search" id="withSearch" placeholder="🔍 ایمیل یا آدرس کیف پول..." oninput="filterWithQueue()" style="flex:1;min-width:160px">');
+  html.push('<select id="withStatusFilter" class="adm-in" style="width:auto;min-width:110px" onchange="filterWithQueue()"><option value="">همه وضعیت‌ها</option><option value="pending">در انتظار</option><option value="approved">تأیید</option><option value="rejected">رد</option></select>');
+  html.push('<select id="withSortFilter" class="adm-in" style="width:auto;min-width:130px" onchange="filterWithQueue()"><option value="date">جدیدترین</option><option value="amount_desc">بیشترین مبلغ</option><option value="amount_asc">کمترین مبلغ</option></select>');
   html.push('</div>');
-  data.forEach(function(w){
-    var isCritical=parseFloat(w.amount)>=100;
-    var borderColor=isCritical?"rgba(255,71,87,.4)":"rgba(255,215,0,.25)";
-    var label=isCritical?"🔴 بحرانی":"🟡 معمولی";
-    html.push('<div class="dep-req" style="border-color:'+borderColor+'">');
-    html.push('<div class="dep-top"><span class="dep-email">'+((w.profiles&&w.profiles.email)||"—")+'</span><span class="dep-amt">$'+w.amount+'</span></div>');
-    html.push('<div class="dep-hash">آدرس: '+w.wallet_address+'</div>');
-    html.push('<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:10px;color:var(--text3)">'+new Date(w.created_at).toLocaleString("fa-IR")+'</span><span style="font-size:10px;font-weight:700">'+label+'</span></div>');
-    html.push('<div class="dep-btns">');
-    html.push('<button class="dep-btn app" onclick="appWith(&quot;'+w.id+'&quot;,&quot;'+w.user_id+'&quot;,'+w.amount+')">✅ پرداخت شد</button>');
-    html.push('<button class="dep-btn rej" onclick="rejWith(&quot;'+w.id+'&quot;)">❌ رد</button>');
-    html.push('<button class="dep-btn" style="background:rgba(26,86,219,.1);color:var(--pl);border:1px solid rgba(26,86,219,.2)" onclick="var c2=document.getElementById(&quot;adminContent&quot;);loadUser360(&quot;'+w.user_id+'&quot;,c2)">👁️ پروفایل</button>');
-    html.push('</div></div>');
+  // Bulk reject for pending
+  html.push('<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center">');
+  html.push('<button class="adm-btn" style="background:rgba(255,71,87,.1);color:var(--red);border:1px solid rgba(255,71,87,.2);font-size:11px" onclick="bulkRejectSelected()">❌ رد انتخاب‌شده‌ها</button>');
+  html.push('<span style="font-size:10px;color:var(--text3)" id="withSelCount">۰ انتخاب‌شده</span>');
+  html.push('</div>');
+  html.push('<div id="withQueueList"></div>');
+  c.innerHTML=html.join('');
+  window._withQueueData=allData;
+  filterWithQueue();
+}
+
+function filterWithQueue(){
+  var q=(document.getElementById('withSearch')||{}).value||'';
+  var st=(document.getElementById('withStatusFilter')||{}).value||'';
+  var sort=(document.getElementById('withSortFilter')||{}).value||'date';
+  var data=(window._withQueueData||[]).filter(function(w){
+    var matchQ=!q||(w.profiles&&w.profiles.email&&w.profiles.email.toLowerCase().includes(q.toLowerCase()))||(w.wallet_address&&w.wallet_address.toLowerCase().includes(q.toLowerCase()));
+    var matchSt=!st||w.status===st;
+    return matchQ&&matchSt;
   });
-  c.innerHTML=html.join("");
+  if(sort==='amount_desc')data.sort(function(a,b){return parseFloat(b.amount)-parseFloat(a.amount);});
+  else if(sort==='amount_asc')data.sort(function(a,b){return parseFloat(a.amount)-parseFloat(b.amount);});
+  var listEl=document.getElementById('withQueueList');
+  if(!listEl)return;
+  if(!data.length){listEl.innerHTML='<div class="ebox"><span class="ei">💸</span><p>هیچ برداشتی یافت نشد</p></div>';return;}
+  var html=[];
+  data.forEach(function(w){
+    var isPending=w.status==='pending';
+    var statusCls=w.status==='approved'?'wsb-approved':w.status==='rejected'?'wsb-rejected':'wsb-pending';
+    var statusLabel=w.status==='approved'?'✅ تأیید':w.status==='rejected'?'❌ رد':'⏳ در انتظار';
+    var isCritical=parseFloat(w.amount)>=100;
+    var borderColor=w.status==='approved'?'rgba(0,212,170,.2)':w.status==='rejected'?'rgba(255,71,87,.15)':isCritical?'rgba(255,71,87,.4)':'rgba(255,215,0,.25)';
+    var doneSubmit=true;
+    var doneReview=isPending||w.status==='approved';
+    var doneFinal=w.status==='approved'||w.status==='rejected';
+    html.push('<div class="dep-req" style="border-color:'+borderColor+'" id="wcard_'+w.id+'">');
+    html.push('<div class="dep-top" style="align-items:flex-start">');
+    if(isPending)html.push('<input type="checkbox" class="with-sel-cb" data-id="'+w.id+'" data-uid="'+w.user_id+'" data-amt="'+w.amount+'" onchange="updateWithSelCount()" style="width:16px;height:16px;margin-top:2px;margin-left:8px;flex-shrink:0">');
+    html.push('<div style="flex:1"><span class="dep-email">'+((w.profiles&&w.profiles.email)||"—")+'</span>');
+    if(w.profiles&&w.profiles.member_id)html.push('<span style="font-size:9px;color:var(--text3);margin-right:6px">#'+w.profiles.member_id+'</span>');
+    html.push('</div>');
+    html.push('<span class="dep-amt">$'+parseFloat(w.amount).toFixed(2)+'</span>');
+    html.push('<span class="with-status-badge '+statusCls+'" style="margin-right:8px">'+statusLabel+'</span>');
+    html.push('</div>');
+    html.push('<div class="dep-hash" style="direction:ltr;word-break:break-all">'+w.wallet_address+'</div>');
+    html.push('<div style="font-size:10px;color:var(--text3);margin-bottom:4px">شبکه: '+(w.network||'—')+'</div>');
+    html.push('<div style="font-size:10px;color:var(--text3);margin-bottom:4px">تاریخ ثبت: '+new Date(w.created_at).toLocaleString("fa-IR")+'</div>');
+    // Timeline
+    html.push('<div class="with-timeline">');
+    html.push('<div class="wt-dot'+(doneSubmit?' done':'')+'" title="ثبت"></div>');
+    html.push('<span style="font-size:9px;color:'+(doneSubmit?'var(--ac)':'rgba(255,255,255,.25)')+'">ثبت</span>');
+    html.push('<div class="wt-line'+(doneReview?' done':'')+'"></div>');
+    html.push('<div class="wt-dot'+(doneReview?' done':'')+'" title="بررسی"></div>');
+    html.push('<span style="font-size:9px;color:'+(doneReview?'var(--ac)':'rgba(255,255,255,.25)')+'">بررسی</span>');
+    html.push('<div class="wt-line'+(doneFinal?' done':'')+'"></div>');
+    html.push('<div class="wt-dot'+(doneFinal?' done':'')+'" title="نهایی"></div>');
+    html.push('<span style="font-size:9px;color:'+(doneFinal?'var(--ac)':'rgba(255,255,255,.25)')+'">نهایی</span>');
+    html.push('</div>');
+    if(isPending){
+      html.push('<div class="dep-btns">');
+      html.push('<button class="dep-btn app" onclick="appWith(&quot;'+w.id+'&quot;,&quot;'+w.user_id+'&quot;,'+w.amount+')">✅ پرداخت شد</button>');
+      html.push('<button class="dep-btn rej" onclick="rejWith(&quot;'+w.id+'&quot;)">❌ رد</button>');
+      html.push('<button class="dep-btn" style="background:rgba(26,86,219,.1);color:var(--pl);border:1px solid rgba(26,86,219,.2)" onclick="var c2=document.getElementById(&quot;adminContent&quot;);loadUser360(&quot;'+w.user_id+'&quot;,c2)">👁️ پروفایل</button>');
+      html.push('</div>');
+    }else{
+      html.push('<div style="margin-top:6px"><button class="dep-btn" style="background:rgba(26,86,219,.1);color:var(--pl);border:1px solid rgba(26,86,219,.2)" onclick="var c2=document.getElementById(&quot;adminContent&quot;);loadUser360(&quot;'+w.user_id+'&quot;,c2)">👁️ پروفایل</button></div>');
+    }
+    html.push('</div>');
+  });
+  listEl.innerHTML=html.join('');
+}
+
+function updateWithSelCount(){
+  var cbs=document.querySelectorAll('.with-sel-cb:checked');
+  var el=document.getElementById('withSelCount');
+  if(el)el.textContent=cbs.length+' انتخاب‌شده';
+}
+
+async function bulkRejectSelected(){
+  var cbs=document.querySelectorAll('.with-sel-cb:checked');
+  if(!cbs.length)return toast('هیچ موردی انتخاب نشده','red');
+  if(!confirm('رد '+cbs.length+' برداشت انتخاب‌شده؟'))return;
+  for(var i=0;i<cbs.length;i++){
+    await rejWith(cbs[i].dataset.id);
+  }
 }
 
 // ── ADMIN APPROVAL FUNCTIONS ──
