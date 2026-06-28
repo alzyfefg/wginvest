@@ -1410,6 +1410,71 @@ body.light .im-hero-sub{color:rgba(255,255,255,.85);}
 body.light .im-section{background:#fff;border-color:#e2e8f0;}
 body.light .im-feat-card{background:#f8faff;border-color:#dde3ee;}
 body.light .im-phil{background:linear-gradient(135deg,rgba(26,86,219,.06),rgba(0,212,170,.04));border-color:rgba(0,212,170,.2);}
+/* NOTIFICATION CENTER */
+.notif-bell{position:relative;cursor:pointer}
+.notif-badge{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-size:9px;font-weight:900;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 3px;line-height:1;border:2px solid var(--bg);animation:badgePop .3s cubic-bezier(.34,1.56,.64,1)}
+@keyframes badgePop{from{transform:scale(0)}to{transform:scale(1)}}
+.notif-drop{position:fixed;top:58px;right:10px;left:10px;max-width:380px;margin:0 auto;background:var(--card);border:1px solid var(--border2);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.5);z-index:500;display:none;overflow:hidden;max-height:70vh;overflow-y:auto}
+.notif-drop.open{display:flex;flex-direction:column;animation:slideDown .25s cubic-bezier(.25,.46,.45,.94)}
+@keyframes slideDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+.notif-head{padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--card);z-index:1}
+.notif-head-title{font-size:14px;font-weight:900;color:var(--text)}
+.notif-mark-all{font-size:11px;color:var(--ac);cursor:pointer;font-weight:700;background:none;border:none;font-family:Vazirmatn,sans-serif;padding:0}
+.notif-item{display:flex;align-items:flex-start;gap:10px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s;cursor:pointer;position:relative}
+.notif-item:hover{background:rgba(255,255,255,.03)}
+.notif-item.unread{background:rgba(0,212,170,.04)}
+.notif-item.unread::before{content:'';position:absolute;right:0;top:50%;transform:translateY(-50%);width:3px;height:60%;background:var(--ac);border-radius:2px}
+.notif-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.notif-body{flex:1;min-width:0}
+.notif-title{font-size:12px;font-weight:800;color:var(--text);margin-bottom:2px}
+.notif-desc{font-size:11px;color:var(--text2);line-height:1.4}
+.notif-time{font-size:10px;color:var(--text3);margin-top:3px}
+.notif-empty{padding:32px 16px;text-align:center;color:var(--text3);font-size:13px}
+/* INVESTMENT PLANS */
+.plans-grid{display:flex;flex-direction:column;gap:14px;margin-bottom:16px}
+.plan-card{border-radius:18px;padding:18px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;cursor:pointer}
+.plan-card:hover{transform:translateY(-2px)}
+.plan-card.standard{background:linear-gradient(135deg,rgba(26,86,219,.12) 0%,rgba(0,212,170,.08) 100%);border:1.5px solid rgba(0,212,170,.25)}
+.plan-card.vip{background:linear-gradient(135deg,rgba(255,200,0,.08) 0%,rgba(180,120,0,.12) 100%);border:1.5px solid rgba(255,200,0,.3)}
+.plan-card.vip::before{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;background:radial-gradient(circle,rgba(255,200,0,.12) 0%,transparent 70%);border-radius:50%;animation:goldGlow 3s ease-in-out infinite}
+@keyframes goldGlow{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.2)}}
+.plan-card.locked{opacity:.7;cursor:default}
+.plan-card.locked:hover{transform:none}
+.plan-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:900;letter-spacing:.5px;margin-bottom:10px}
+.plan-badge.standard{background:rgba(26,86,219,.2);color:#60a5fa;border:1px solid rgba(26,86,219,.3)}
+.plan-badge.vip{background:rgba(255,200,0,.15);color:#fcd34d;border:1px solid rgba(255,200,0,.3)}
+.plan-name{font-size:15px;font-weight:900;color:var(--text);margin-bottom:8px}
+.plan-roi{display:flex;align-items:baseline;gap:4px;margin-bottom:12px}
+.plan-roi-num{font-size:36px;font-weight:900;line-height:1}
+.plan-roi-pct{font-size:16px;font-weight:700}
+.plan-roi-label{font-size:11px;color:var(--text2);margin-top:4px}
+.plan-card.standard .plan-roi-num,.plan-card.standard .plan-roi-pct{color:#60a5fa}
+.plan-card.vip .plan-roi-num,.plan-card.vip .plan-roi-pct{background:linear-gradient(135deg,#fcd34d,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.plan-stats{display:flex;gap:12px;margin-bottom:14px}
+.plan-stat{flex:1;background:rgba(255,255,255,.04);border-radius:9px;padding:8px;text-align:center}
+.plan-stat-val{font-size:12px;font-weight:800;color:var(--text)}
+.plan-stat-lbl{font-size:9px;color:var(--text3);margin-top:2px}
+.plan-btn{width:100%;padding:12px;border-radius:11px;font-family:Vazirmatn,sans-serif;font-size:13px;font-weight:900;cursor:pointer;border:none;transition:all .2s;letter-spacing:.3px}
+.plan-btn.standard{background:linear-gradient(135deg,#1a56db,#00d4aa);color:#fff;box-shadow:0 4px 16px rgba(0,212,170,.2)}
+.plan-btn.standard:hover{box-shadow:0 6px 24px rgba(0,212,170,.35);transform:translateY(-1px)}
+.plan-btn.vip{background:linear-gradient(135deg,#d97706,#fcd34d);color:#1a0a00;box-shadow:0 4px 16px rgba(252,211,77,.2)}
+.plan-btn.vip:hover{box-shadow:0 6px 24px rgba(252,211,77,.35);transform:translateY(-1px)}
+.plan-btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+.plan-lock-msg{text-align:center;font-size:10px;margin-top:8px;color:rgba(255,200,0,.6);font-weight:700}
+/* EMPTY INVEST STATE */
+.empty-invest{text-align:center;padding:40px 20px}
+.empty-invest-icon{font-size:52px;margin-bottom:16px;display:block;filter:grayscale(.3)}
+.empty-invest-title{font-size:17px;font-weight:900;color:var(--text);margin-bottom:8px}
+.empty-invest-sub{font-size:12px;color:var(--text3);line-height:1.6;max-width:240px;margin:0 auto}
+/* MICRO ANIMATIONS */
+.icard{transition:transform .2s,box-shadow .2s}
+.icard:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.btn-p{transition:all .25s cubic-bezier(.25,.46,.45,.94)}
+.dep-btn,.adm-btn{transition:all .18s}
+.dep-btn:hover,.adm-btn:hover{transform:translateY(-1px)}
+@keyframes bounceIn{from{transform:scale(0);opacity:0}60%{transform:scale(1.2)}to{transform:scale(1);opacity:1}}
+@keyframes fadeInOverlay{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 </style>
 </head>
 
@@ -1471,7 +1536,7 @@ body.light .im-phil{background:linear-gradient(135deg,rgba(26,86,219,.06),rgba(0
     <span class="bal-val" id="navBal">$0.00</span>
   </div>
   <div class="topbar-r">
-
+    <div class="notif-bell icon-btn" id="notifBell" onclick="toggleNotifDrop()">🔔<span class="notif-badge" id="notifBadge" style="display:none">0</span></div>
     <div class="lang-wrap">
       <div class="icon-btn" onclick="toggleLD()">🌐</div>
       <div class="ldrop" id="ldrop">
@@ -1578,6 +1643,53 @@ body.light .im-phil{background:linear-gradient(135deg,rgba(26,86,219,.06),rgba(0
 </div>
 
 <script>
+/*
+SUPABASE SQL TO RUN:
+CREATE TABLE IF NOT EXISTS notifications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  type TEXT NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT,
+  icon TEXT DEFAULT '🔔',
+  is_read BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users see own notifications" ON notifications FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users update own notifications" ON notifications USING (auth.uid() = user_id);
+
+CREATE TABLE IF NOT EXISTS admin_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  admin_email TEXT NOT NULL,
+  action TEXT NOT NULL,
+  target_user TEXT,
+  amount NUMERIC,
+  details TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+ALTER TABLE admin_logs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Admin only logs" ON admin_logs FOR ALL USING (auth.email() = 'alikatakiamiri@gmail.com');
+
+CREATE TABLE IF NOT EXISTS invest_plans (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  roi NUMERIC NOT NULL DEFAULT 2.5,
+  min_amount NUMERIC NOT NULL DEFAULT 20,
+  min_balance NUMERIC NOT NULL DEFAULT 0,
+  lock_minutes INTEGER NOT NULL DEFAULT 5,
+  theme TEXT DEFAULT 'standard',
+  is_active BOOLEAN DEFAULT TRUE,
+  sort_order INTEGER DEFAULT 0
+);
+ALTER TABLE invest_plans ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Everyone reads plans" ON invest_plans FOR SELECT TO authenticated USING (TRUE);
+CREATE POLICY "Admin manages plans" ON invest_plans FOR ALL USING (auth.email() = 'alikatakiamiri@gmail.com');
+INSERT INTO invest_plans (name, roi, min_amount, min_balance, lock_minutes, theme, sort_order) VALUES
+  ('Smart Invest Standard', 1, 20, 0, 5, 'standard', 1),
+  ('Smart Invest VIP', 2, 20, 1000, 5, 'vip', 2)
+ON CONFLICT DO NOTHING;
+*/
 var SBU="https://xlhxavcuiligklyklojd.supabase.co";
 var SBK="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhsaHhhdmN1aWxpZ2tseWtsb2pkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxNjkwOTQsImV4cCI6MjA5NTc0NTA5NH0.Ax4axC_P87XdGFNZuVTMfg14w5pU2K0La4lFGFI-_o8";
 var ADMIN="alikatakiamiri@gmail.com";
@@ -1969,6 +2081,7 @@ async function enterApp(){
   goTab("matches");
   setTimeout(applyTheme,100);
   try{loadStats();}catch(e){}
+  try{updateNotifBadge();}catch(e){}
   // Build admin button dynamically; remove stale one first
   var existing=document.getElementById("adminBtn");
   if(existing)existing.remove();
@@ -2020,6 +2133,294 @@ function goTab(tab){
 // ══════════════════════════════════════
 var _siSettings={enabled:true,profit_pct:2.5,lock_minutes:5,min_amount:20};
 var _siTimer=null;
+var _investPlans=[];
+
+// NOTIFICATION CENTER
+var _notifOpen=false;
+function toggleNotifDrop(){
+  _notifOpen=!_notifOpen;
+  var d=document.getElementById('notifDrop');
+  if(d)d.classList.toggle('open',_notifOpen);
+  if(_notifOpen)loadNotificationsNew();
+}
+document.addEventListener('click',function(e){
+  if(_notifOpen&&!e.target.closest('#notifDrop')&&!e.target.closest('#notifBell')){
+    _notifOpen=false;
+    var d=document.getElementById('notifDrop');if(d)d.classList.remove('open');
+  }
+});
+async function loadNotificationsNew(){
+  if(!U)return;
+  var r=await sb.from('notifications').select('*').eq('user_id',U.id).order('created_at',{ascending:false}).limit(30);
+  var items=r.data||[];
+  var unread=items.filter(function(n){return!n.is_read;}).length;
+  var badge=document.getElementById('notifBadge');
+  if(badge){badge.textContent=unread>9?'9+':unread;badge.style.display=unread>0?'flex':'none';}
+  var list=document.getElementById('notifList');
+  if(!list)return;
+  if(!items.length){list.innerHTML='<div class="notif-empty">📭 اعلانی وجود ندارد</div>';return;}
+  var iconMap={invest_start:'💎',invest_complete:'✅',profit_ready:'💰',deposit_approved:'📥',withdrawal_approved:'📤',bonus_received:'🎁',balance_added:'➕',balance_deducted:'➖'};
+  var bgMap={invest_start:'rgba(26,86,219,.15)',invest_complete:'rgba(0,212,170,.15)',profit_ready:'rgba(0,212,170,.15)',deposit_approved:'rgba(0,212,170,.15)',withdrawal_approved:'rgba(245,158,11,.15)',bonus_received:'rgba(245,158,11,.15)',balance_added:'rgba(0,212,170,.15)',balance_deducted:'rgba(255,71,87,.15)'};
+  list.innerHTML=items.map(function(n){
+    var ts=new Date(n.created_at);
+    var now=new Date();
+    var diff=Math.floor((now-ts)/60000);
+    var timeStr=diff<1?'همین الان':diff<60?diff+' دقیقه پیش':diff<1440?Math.floor(diff/60)+' ساعت پیش':ts.toLocaleDateString('fa-IR');
+    return '<div class="notif-item'+(n.is_read?'':' unread')+'" onclick="readNotif(\''+n.id+'\')">'
+      +'<div class="notif-icon" style="background:'+(bgMap[n.type]||'rgba(255,255,255,.08)')+'">'+(iconMap[n.type]||n.icon||'🔔')+'</div>'
+      +'<div class="notif-body"><div class="notif-title">'+n.title+'</div>'
+      +(n.description?'<div class="notif-desc">'+n.description+'</div>':'')
+      +'<div class="notif-time">'+timeStr+'</div></div></div>';
+  }).join('');
+}
+async function readNotif(id){
+  await sb.from('notifications').update({is_read:true}).eq('id',id);
+  loadNotificationsNew();
+}
+async function markAllNotifRead(){
+  if(!U)return;
+  await sb.from('notifications').update({is_read:true}).eq('user_id',U.id).eq('is_read',false);
+  loadNotificationsNew();
+}
+async function pushNotif(type,title,desc,targetUserId){
+  var uid=targetUserId||(U&&U.id);
+  if(!uid)return;
+  var iconMap={invest_start:'💎',invest_complete:'✅',profit_ready:'💰',deposit_approved:'📥',withdrawal_approved:'📤',bonus_received:'🎁',balance_added:'➕',balance_deducted:'➖'};
+  await sb.from('notifications').insert({user_id:uid,type:type,title:title,description:desc||null,icon:iconMap[type]||'🔔',is_read:false});
+  if(!targetUserId||targetUserId===U.id)updateNotifBadge();
+}
+async function updateNotifBadge(){
+  if(!U)return;
+  var r=await sb.from('notifications').select('id',{count:'exact'}).eq('user_id',U.id).eq('is_read',false);
+  var count=r.count||0;
+  var badge=document.getElementById('notifBadge');
+  if(badge){badge.textContent=count>9?'9+':count;badge.style.display=count>0?'flex':'none';}
+}
+
+// AUDIT LOG
+async function logAdminAction(action,targetUser,amount,details){
+  try{
+    await sb.from('admin_logs').insert({admin_email:U&&U.email||'admin',action:action,target_user:targetUser||null,amount:amount||null,details:details||null});
+  }catch(e){}
+}
+async function loadAdminAuditLog(c){
+  c.innerHTML='<div class="icard"><div class="ctitle">📋 گزارش فعالیت‌های ادمین</div>'
+    +'<input class="global-search" id="logSearch" placeholder="🔍 جستجو..." oninput="searchAuditLog(this.value)" style="width:100%;margin-bottom:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 14px;font-family:Vazirmatn,sans-serif;font-size:13px;color:var(--text);outline:none">'
+    +'<div id="logList"><div class="lbox"><div class="spin"></div></div></div></div>';
+  searchAuditLog('');
+}
+async function searchAuditLog(q){
+  var c=document.getElementById('logList');if(!c)return;
+  c.innerHTML='<div class="lbox"><div class="spin"></div></div>';
+  var req=sb.from('admin_logs').select('*').order('created_at',{ascending:false}).limit(50);
+  if(q&&q.length>1)req=req.or('action.ilike.%'+q+'%,target_user.ilike.%'+q+'%,admin_email.ilike.%'+q+'%');
+  var r=await req;
+  var logs=r.data||[];
+  if(!logs.length){c.innerHTML='<div class="ebox"><span class="ei">📋</span><p>هیچ گزارشی وجود ندارد</p></div>';return;}
+  c.innerHTML='<div style="display:flex;flex-direction:column;gap:6px;margin-top:10px">'
+    +logs.map(function(l){
+      var ts=new Date(l.created_at).toLocaleString('fa-IR');
+      var clr=l.action.includes('Deducted')||l.action.includes('Rejected')?'rgba(255,71,87,.12)':l.action.includes('Added')||l.action.includes('Approved')?'rgba(0,212,170,.08)':'rgba(245,158,11,.08)';
+      return '<div style="background:'+clr+';border-radius:10px;padding:10px 12px;font-size:11px">'
+        +'<div style="display:flex;justify-content:space-between;margin-bottom:4px">'
+        +'<span style="font-weight:900;color:var(--text)">'+l.action+'</span>'
+        +'<span style="color:var(--text3)">'+ts+'</span></div>'
+        +(l.target_user?'<div style="color:var(--text2)">👤 '+l.target_user+'</div>':'')
+        +(l.amount?'<div style="color:var(--ac)">💰 $'+parseFloat(l.amount).toFixed(2)+'</div>':'')
+        +(l.details?'<div style="color:var(--text3)">'+l.details+'</div>':'')
+        +'</div>';
+    }).join('')+'</div>';
+}
+
+// INVEST PLANS
+async function loadInvestPlans(){
+  var r=await sb.from('invest_plans').select('*').eq('is_active',true).order('sort_order',{ascending:true});
+  if(r.data&&r.data.length){
+    _investPlans=r.data;
+    _siSettings.profit_pct=r.data[0].roi;
+    _siSettings.lock_minutes=r.data[0].lock_minutes;
+    _siSettings.min_amount=r.data[0].min_amount;
+  }else{
+    _investPlans=[
+      {id:1,name:'Smart Invest Standard',roi:1,min_amount:20,min_balance:0,lock_minutes:5,theme:'standard'},
+      {id:2,name:'Smart Invest VIP',roi:2,min_amount:20,min_balance:1000,lock_minutes:5,theme:'vip'}
+    ];
+  }
+}
+
+function renderInvestPlans(c,inv){
+  if(!_investPlans||!_investPlans.length){renderSmartInvest(c,inv);return;}
+  var userBal=getTotalBal();
+  var h=[];
+  h.push('<div class="plans-grid">');
+  _investPlans.forEach(function(plan){
+    var isVip=plan.theme==='vip';
+    var isLocked=userBal<parseFloat(plan.min_balance||0)&&parseFloat(plan.min_balance||0)>0;
+    var lockPeriod=fmtLockLabel(plan.lock_minutes||5);
+    h.push('<div class="plan-card '+(isVip?'vip':'standard')+(isLocked?' locked':'')+'">'
+      +'<div class="plan-badge '+(isVip?'vip':'standard')+'">'+(isVip?'👑 VIP':'⚡ STANDARD')+'</div>'
+      +'<div class="plan-name">'+plan.name+'</div>'
+      +'<div class="plan-roi">'
+      +'<div><div style="display:flex;align-items:baseline;gap:2px"><span class="plan-roi-num">'+plan.roi+'</span><span class="plan-roi-pct">%</span></div><div class="plan-roi-label">سود ثابت هر دوره</div></div>'
+      +'</div>'
+      +'<div class="plan-stats">'
+      +'<div class="plan-stat"><div class="plan-stat-val">$'+siFmt(plan.min_amount)+'</div><div class="plan-stat-lbl">حداقل</div></div>'
+      +'<div class="plan-stat"><div class="plan-stat-val">'+lockPeriod+'</div><div class="plan-stat-lbl">مدت قفل</div></div>'
+      +'<div class="plan-stat"><div class="plan-stat-val">'+plan.roi+'%</div><div class="plan-stat-lbl">بازدهی</div></div>'
+      +'</div>');
+    if(isLocked){
+      h.push('<button class="plan-btn '+(isVip?'vip':'standard')+'" disabled>🔒 حداقل موجودی $'+siFmt(plan.min_balance)+' لازم است</button>');
+      h.push('<div class="plan-lock-msg">موجودی شما $'+siFmt(userBal)+' است</div>');
+    }else if(inv){
+      h.push('<button class="plan-btn '+(isVip?'vip':'standard')+'" disabled>سرمایه‌گذاری فعال موجود است</button>');
+    }else if(!_siSettings.enabled){
+      h.push('<button class="plan-btn '+(isVip?'vip':'standard')+'" disabled>⏸ غیرفعال</button>');
+    }else{
+      h.push('<button class="plan-btn '+(isVip?'vip':'standard')+'" onclick="openInvestModalWithPlan('+JSON.stringify(plan)+')">🚀 شروع سرمایه‌گذاری</button>');
+    }
+    h.push('</div>');
+  });
+  h.push('</div>');
+  var planHtml=h.join('');
+  // Render the plans HTML + the existing tracker below
+  var origC=document.createElement('div');
+  renderSmartInvest(origC,inv);
+  c.innerHTML=planHtml+origC.innerHTML;
+  // Re-wire buttons since renderSmartInvest sets innerHTML on origC not c
+  var startBtn=c.querySelector('#siStartBtn');
+  if(startBtn)startBtn.addEventListener('click',openInvestModal);
+  var wBtn=c.querySelector('#siWithdrawBtn');
+  if(wBtn)wBtn.onclick=function(){withdrawInvestment(this.dataset.invid,parseFloat(this.dataset.final));};
+  var w=c.querySelector('#siWrap');
+  if(w)setTimeout(function(){w.classList.add('in');},30);
+}
+
+function openInvestModalWithPlan(plan){
+  _siSettings.profit_pct=plan.roi;
+  _siSettings.lock_minutes=plan.lock_minutes;
+  _siSettings.min_amount=plan.min_amount;
+  _siSettings._selectedPlanId=plan.id;
+  _siSettings._selectedPlanName=plan.name;
+  openInvestModal();
+}
+
+// INVEST SUMMARY MODAL
+function showInvestSummary(amount,profit_pct,lock_minutes){
+  var profit=amount*profit_pct/100;
+  var finalAmt=amount+profit;
+  var unlockTime=new Date(Date.now()+lock_minutes*60000);
+  var unlockStr=unlockTime.toLocaleString('fa-IR',{hour:'2-digit',minute:'2-digit',month:'short',day:'numeric'});
+  var old=document.getElementById('investSummaryModal');if(old)old.remove();
+  var overlay=document.createElement('div');
+  overlay.id='investSummaryModal';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:flex-end;justify-content:center;z-index:1100;animation:fadeInOverlay .2s ease';
+  overlay.innerHTML='<div style="background:var(--card);border-radius:22px 22px 0 0;padding:24px 20px 32px;width:100%;max-width:460px;animation:slideUp .3s cubic-bezier(.25,.46,.45,.94)">'
+    +'<div style="text-align:center;margin-bottom:20px">'
+    +'<div style="font-size:28px;margin-bottom:6px">💎</div>'
+    +'<div style="font-size:16px;font-weight:900;color:var(--text)">تأیید سرمایه‌گذاری</div>'
+    +'<div style="font-size:12px;color:var(--text3);margin-top:4px">جزئیات را بررسی کنید</div>'
+    +'</div>'
+    +'<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">'
+    +summaryRow('💵','مبلغ سرمایه‌گذاری','$'+siFmt(amount))
+    +summaryRow('📈','سود مورد انتظار','<span style="color:var(--ac)">+$'+siFmt(profit)+'</span>')
+    +summaryRow('📊','بازدهی (ROI)','<span style="color:var(--ac)">'+profit_pct+'%</span>')
+    +summaryRow('⏱','مدت قفل',fmtLockLabel(lock_minutes))
+    +summaryRow('🔓','زمان بازگشایی',unlockStr)
+    +summaryRow('💰','مبلغ نهایی','<span style="font-weight:900;color:var(--text)">$'+siFmt(finalAmt)+'</span>')
+    +'</div>'
+    +'<button onclick="confirmAndInvest('+amount+','+profit_pct+','+lock_minutes+')" style="width:100%;background:linear-gradient(135deg,#1a56db,#00d4aa);color:#fff;border:none;border-radius:12px;padding:14px;font-family:Vazirmatn,sans-serif;font-size:15px;font-weight:900;cursor:pointer;margin-bottom:10px;box-shadow:0 4px 20px rgba(0,212,170,.3)">✅ تأیید و شروع سرمایه‌گذاری</button>'
+    +'<button onclick="document.getElementById(\'investSummaryModal\').remove()" style="width:100%;background:rgba(255,255,255,.05);color:var(--text2);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;font-family:Vazirmatn,sans-serif;font-size:14px;font-weight:700;cursor:pointer">انصراف</button>'
+    +'</div>';
+  document.body.appendChild(overlay);
+}
+function summaryRow(icon,label,val){
+  return '<div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.04);border-radius:10px;padding:10px 14px">'
+    +'<div style="display:flex;align-items:center;gap:8px"><span>'+icon+'</span><span style="font-size:12px;color:var(--text2)">'+label+'</span></div>'
+    +'<span style="font-size:13px;font-weight:800;color:var(--text)">'+val+'</span></div>';
+}
+async function confirmAndInvest(amount,profit_pct,lock_minutes){
+  var sm=document.getElementById('investSummaryModal');if(sm)sm.remove();
+  var invModal=document.getElementById('investModal');if(invModal)invModal.remove();
+  await doStartInvestment(amount);
+}
+
+// CLAIM SUCCESS ANIMATION
+function showClaimSuccess(profit){
+  var overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:1200;animation:fadeInOverlay .3s ease';
+  overlay.innerHTML='<div style="text-align:center;padding:32px 24px;background:var(--card);border-radius:24px;max-width:300px;width:90%;border:1px solid rgba(0,212,170,.2);box-shadow:0 0 60px rgba(0,212,170,.15)">'
+    +'<div style="font-size:48px;margin-bottom:12px;animation:bounceIn .5s cubic-bezier(.34,1.56,.64,1)">✅</div>'
+    +'<div style="font-size:18px;font-weight:900;color:var(--text);margin-bottom:6px">سود دریافت شد</div>'
+    +'<div id="claimCountUp" style="font-size:32px;font-weight:900;color:var(--ac);margin:12px 0">+$0.00</div>'
+    +'<div style="font-size:12px;color:var(--text2);margin-bottom:20px">به موجودی شما اضافه شد</div>'
+    +'<button onclick="this.closest(\'[style*=fixed]\').remove()" style="background:linear-gradient(135deg,#1a56db,#00d4aa);color:#fff;border:none;border-radius:11px;padding:12px 32px;font-family:Vazirmatn,sans-serif;font-size:14px;font-weight:900;cursor:pointer">عالیه! 🎉</button>'
+    +'</div>';
+  document.body.appendChild(overlay);
+  var start=0,end=profit,duration=1500,startTime=null;
+  function step(ts){
+    if(!startTime)startTime=ts;
+    var progress=Math.min((ts-startTime)/duration,1);
+    var ease=1-Math.pow(1-progress,3);
+    var cur=start+(end-start)*ease;
+    var el=document.getElementById('claimCountUp');
+    if(el)el.textContent='+$'+cur.toFixed(2);
+    if(progress<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+  setTimeout(function(){if(overlay.parentNode)overlay.remove();},5000);
+}
+
+// ADMIN PLANS MANAGEMENT
+async function loadAdminPlans(c){
+  var r=await sb.from('invest_plans').select('*').order('sort_order',{ascending:true});
+  var plans=r.data||[];
+  var html=['<div class="ctitle">💎 مدیریت پلن‌های سرمایه‌گذاری</div>'];
+  if(!plans.length){html.push('<div class="ebox"><span class="ei">💎</span><p>پلنی وجود ندارد</p></div>');c.innerHTML=html.join('');return;}
+  plans.forEach(function(plan){
+    var isVip=plan.theme==='vip';
+    html.push('<div class="icard" style="margin-bottom:12px;border:1px solid '+(isVip?'rgba(255,200,0,.2)':'rgba(0,212,170,.15)')+'">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">'
+      +'<div style="font-weight:900;color:var(--text)">'+plan.name+'</div>'
+      +'<span style="font-size:10px;padding:2px 8px;border-radius:20px;background:'+(plan.is_active?'rgba(0,212,170,.15)':'rgba(255,71,87,.1)')+';color:'+(plan.is_active?'var(--ac)':'var(--red)')+';">'+(plan.is_active?'✅ فعال':'⏸ غیرفعال')+'</span>'
+      +'</div>'
+      +'<div class="adm-row">'
+      +'<input class="adm-in" id="pn_'+plan.id+'" value="'+plan.name+'" placeholder="نام پلن">'
+      +'<input class="adm-in" id="pr_'+plan.id+'" type="number" value="'+plan.roi+'" placeholder="ROI (%)">'
+      +'</div>'
+      +'<div class="adm-row">'
+      +'<input class="adm-in" id="pma_'+plan.id+'" type="number" value="'+plan.min_amount+'" placeholder="حداقل سرمایه">'
+      +'<input class="adm-in" id="pmb_'+plan.id+'" type="number" value="'+plan.min_balance+'" placeholder="حداقل موجودی برای دسترسی">'
+      +'</div>'
+      +'<div class="adm-row">'
+      +'<input class="adm-in" id="plm_'+plan.id+'" type="number" value="'+plan.lock_minutes+'" placeholder="مدت قفل (دقیقه)">'
+      +'</div>'
+      +'<div class="adm-row">'
+      +'<button class="adm-btn" onclick="savePlan('+plan.id+')">💾 ذخیره</button>'
+      +'<button class="adm-btn" style="background:rgba(255,71,87,.1);color:var(--red);border:1px solid rgba(255,71,87,.2)" onclick="togglePlan('+plan.id+','+(!plan.is_active)+')">'+(plan.is_active?'⏸ غیرفعال':'✅ فعال')+'</button>'
+      +'</div>'
+      +'</div>');
+  });
+  c.innerHTML=html.join('');
+}
+async function savePlan(id){
+  var name=document.getElementById('pn_'+id)&&document.getElementById('pn_'+id).value;
+  var roi=parseFloat(document.getElementById('pr_'+id)&&document.getElementById('pr_'+id).value);
+  var min_amount=parseFloat(document.getElementById('pma_'+id)&&document.getElementById('pma_'+id).value);
+  var min_balance=parseFloat((document.getElementById('pmb_'+id)&&document.getElementById('pmb_'+id).value)||0);
+  var lock_minutes=parseInt((document.getElementById('plm_'+id)&&document.getElementById('plm_'+id).value)||5);
+  if(!name||isNaN(roi)||isNaN(min_amount))return toast('مقادیر را کامل کنید','red');
+  var r=await sb.from('invest_plans').update({name:name,roi:roi,min_amount:min_amount,min_balance:min_balance,lock_minutes:lock_minutes}).eq('id',id);
+  if(r.error)return toast('خطا: '+r.error.message,'red');
+  await logAdminAction('Investment Plan Updated','Plan #'+id,null,'ROI: '+roi+'%, Min: $'+min_amount);
+  toast('✅ پلن ذخیره شد','green');
+  loadInvestPlans();
+}
+async function togglePlan(id,active){
+  await sb.from('invest_plans').update({is_active:active}).eq('id',id);
+  await logAdminAction('Investment Plan '+(active?'Enabled':'Disabled'),'Plan #'+id);
+  toast((active?'✅ فعال شد':'⏸ غیرفعال شد'),'green');
+  var c=document.getElementById('adminContent');if(c)loadAdminPlans(c);
+}
 
 async function loadInvestSettings(){
   try{
@@ -2035,6 +2436,7 @@ async function loadInvestSettings(){
     // If table doesn't exist or no row, keep defaults (enabled=true)
     if(r.error)console.log("invest_settings:",r.error.message);
   }catch(e){console.log("invest_settings catch:",e.message);}
+  await loadInvestPlans();
 }
 
 async function loadMatches(){
@@ -2050,7 +2452,7 @@ async function loadMatches(){
     }catch(e){}
   }
   updateHeroDashboard(inv);
-  renderSmartInvest(c,inv);
+  renderInvestPlans(c,inv);
 }
 
 function siFmt(n){return parseFloat(n||0).toFixed(2);}
@@ -2312,7 +2714,7 @@ function openInvestModal(){
   inp.addEventListener('input',updateSummary);
   cb.addEventListener('click',function(){
     if(currentAmount>=_siSettings.min_amount&&currentAmount<=bal){
-      doStartInvestment(currentAmount);
+      showInvestSummary(currentAmount,_siSettings.profit_pct,_siSettings.lock_minutes);
     }
   });
   cancel.addEventListener('click',function(){modal.remove();});
@@ -2336,6 +2738,7 @@ async function doStartInvestment(amount){
   P.balance=newBal;
   updateBal();
   toast(t("ok_inv_recorded"),"green");
+  pushNotif('invest_start','سرمایه‌گذاری شروع شد','$'+siFmt(amount)+' قفل شد');
   loadMatches();
 }
 
@@ -2350,6 +2753,8 @@ async function withdrawInvestment(invId,finalAmt){
   P.balance=newBal;
   updateBal();
   toast("🎉 $"+siFmt(finalAmt)+" "+t("profit_claimed"),"green");
+  showClaimSuccess(finalAmt);
+  pushNotif('profit_ready','سود دریافت شد','$'+siFmt(finalAmt)+' به موجودی شما افزوده شد');
   fireConfetti();
   loadMatches();
 }
@@ -2936,6 +3341,8 @@ async function loadAdmin(){
     +'<button class="adm-tab" id="at_tickets" onclick="showAdminTab(&quot;tickets&quot;)">🎧 تیکت‌ها</button>'
     +'<button class="adm-tab" id="at_announce" onclick="showAdminTab(&quot;announce&quot;)">📢 اعلان</button>'
     +'<button class="adm-tab" id="at_logs" onclick="showAdminTab(&quot;logs&quot;)">📋 لاگ</button>'
+    +'<button class="adm-tab" id="at_auditlog" onclick="showAdminTab(&quot;auditlog&quot;)">🔍 لاگ ادمین</button>'
+    +'<button class="adm-tab" id="at_plans" onclick="showAdminTab(&quot;plans&quot;)">💎 پلن‌ها</button>'
     +'<button class="adm-tab" id="at_notes" onclick="showAdminTab(&quot;notes&quot;)">📝 یادداشت</button>'
     +'<button class="adm-tab" id="at_settings" onclick="showAdminTab(&quot;settings&quot;)">⚙️ تنظیمات</button>'
     +'</div>'
@@ -2944,7 +3351,7 @@ async function loadAdmin(){
 }
 
 async function showAdminTab(tab){
-  var allTabs=["overview","users","finance","matches","deposits","withdrawals","kyc","tickets","announce","logs","notes","settings"];
+  var allTabs=["overview","users","finance","matches","deposits","withdrawals","kyc","tickets","announce","logs","auditlog","plans","notes","settings"];
   allTabs.forEach(function(t){var el=document.getElementById("at_"+t);if(el)el.classList.remove("on");});
   var el=document.getElementById("at_"+tab);if(el)el.classList.add("on");
   var c=document.getElementById("adminContent");if(!c)return;
@@ -2959,6 +3366,8 @@ async function showAdminTab(tab){
   else if(tab==="tickets")await loadAdminTickets2(c);
   else if(tab==="announce")await loadAdminAnnounce(c);
   else if(tab==="logs")await loadAdminLogs(c);
+  else if(tab==="auditlog")await loadAdminAuditLog(c);
+  else if(tab==="plans")await loadAdminPlans(c);
   else if(tab==="notes")loadAdminNotes(c);
   else if(tab==="settings")loadAdminSettings(c);
 }
@@ -3118,6 +3527,7 @@ async function giveBonus(){
   var upd=await sb.from('profiles').update({bonus:amt,bonus_expires_at:expires}).eq('user_id',res.data.user_id);
   if(upd.error){if(st)st.textContent='❌ خطا: '+upd.error.message;return;}
   if(st){st.style.color='#4ade80';st.textContent='✅ بونوس $'+amt+' برای '+days+' روز اعطا شد → '+email;}
+  await logAdminAction('Bonus Given',email,amt,'Days: '+days);
   document.getElementById('bon_email').value='';
   document.getElementById('bon_amt').value='';
   document.getElementById('bon_days').value='';
@@ -3132,6 +3542,7 @@ async function revokeBonus(){
   var upd=await sb.from('profiles').update({bonus:0,bonus_expires_at:null}).eq('user_id',res.data.user_id);
   if(upd.error){if(st)st.textContent='❌ خطا: '+upd.error.message;return;}
   if(st){st.style.color='#ef4444';st.textContent='🚫 بونوس کاربر '+email+' لغو شد';}
+  await logAdminAction('Bonus Revoked',email);
 }
 
 async function viewUserInfo(uid){
@@ -3847,6 +4258,7 @@ async function adjustBalance(type){
     type:type,reason:reason,admin_id:U.email,created_at:new Date().toISOString()
   });
   toast('✅ موجودی '+(type==='increase'?'افزایش':'کاهش')+' یافت','green');
+  await logAdminAction('Balance '+(type==='increase'?'Added':'Deducted'),email,amount,reason);
   document.getElementById('baAmount').value='';
   document.getElementById('baReason').value='';
   loadBAHistory();
@@ -4065,5 +4477,12 @@ async function closeTicket(ticketId){
 // Init runs after Supabase and Chart.js are loaded (scripts in <head> are blocking)
 init();
 </script>
+<div class="notif-drop" id="notifDrop">
+  <div class="notif-head">
+    <span class="notif-head-title">🔔 اعلان‌ها</span>
+    <button class="notif-mark-all" onclick="markAllNotifRead()">همه خوانده شد</button>
+  </div>
+  <div id="notifList"><div class="notif-empty">📭 اعلانی وجود ندارد</div></div>
+</div>
 </body>
 </html>
