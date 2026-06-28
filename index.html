@@ -574,6 +574,39 @@ body.light .adm-sec{background:#fff;border:1px solid var(--border);box-shadow:va
 .user-search{width:100%;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:11px;padding:12px 14px;font-family:"Vazirmatn",sans-serif;font-size:13px;color:var(--text);outline:none;margin-bottom:12px;transition:all .2s}
 .user-search:focus{border-color:var(--ac);background:rgba(0,212,170,.05)}
 .user-search::placeholder{color:var(--text3)}
+/* Admin user stats cards */
+.adm-stat-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px 10px;text-align:center;transition:all .25s}
+.adm-stat-card.gold{border-color:rgba(255,215,0,.2);background:rgba(255,215,0,.06)}
+.adm-stat-card.green{border-color:rgba(16,185,129,.2);background:rgba(16,185,129,.06)}
+.adm-stat-card.blue{border-color:rgba(26,86,219,.2);background:rgba(26,86,219,.06)}
+.adm-stat-card:hover{transform:translateY(-2px)}
+.asc-icon{font-size:18px;margin-bottom:4px}
+.asc-val{font-size:18px;font-weight:900;color:var(--text)}
+.asc-lbl{font-size:9px;color:var(--text3);letter-spacing:.5px;margin-top:2px}
+/* Admin pyramid */
+.adm-pyramid-wrap{background:linear-gradient(160deg,#1a1f3a 0%,#2d3561 50%,#1a1f3a 100%);border:1px solid rgba(100,120,255,.2);border-radius:18px;padding:16px;box-shadow:0 8px 32px rgba(0,0,0,.35)}
+.adm-pyramid-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-size:14px;font-weight:800;color:#fff}
+.pyr-root{width:100%;overflow-x:auto}
+.pyr-tier-label{font-size:10px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;padding:6px 10px;background:rgba(255,255,255,.05);border-radius:8px;text-align:center}
+.pyr-tier{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:8px}
+.pyr-node-wrap{display:flex;flex-direction:column;align-items:center;gap:4px}
+.pyr-node{border:1.5px solid;border-radius:12px;padding:10px 12px;cursor:pointer;min-width:120px;transition:all .22s;animation:pyrSlideUp .4s ease both}
+.pyr-node:hover{transform:scale(1.06);box-shadow:0 6px 20px rgba(0,0,0,.4)}
+.pyr-node:active{transform:scale(.97)}
+.pyr-node-top{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:4px}
+.pyr-name{font-size:11px;font-weight:700;color:#fff;flex:1}
+.pyr-id{font-size:9px;color:rgba(255,255,255,.4);font-weight:600}
+.pyr-node-bal{font-size:13px;font-weight:900;color:#4ade80}
+.pyr-node-refs{font-size:9px;color:rgba(255,255,255,.35);margin-top:2px}
+.pyr-children{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:8px 4px;border-right:2px dashed rgba(255,255,255,.08);margin-right:8px}
+.pyr-badge{font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px}
+.pyr-badge.vip{background:rgba(255,215,0,.2);color:#ffd700;border:1px solid rgba(255,215,0,.3)}
+.pyr-badge.reg{background:rgba(16,185,129,.15);color:#10b981}
+.pyr-badge.blk{background:rgba(239,68,68,.15);color:#ef4444}
+@keyframes pyrSlideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+/* Member management modal */
+.pyr-modal{animation:slideUpModal .3s ease}
+/* User row */
 .user-row{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:12px;margin-bottom:8px;transition:all .2s}
 .user-row:hover{border-color:rgba(0,212,170,.15)}
 .user-row-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
@@ -4174,46 +4207,262 @@ function filterAdminTx(type){
 
 async function loadAdminUsers(c){
   var html=[];
-  html.push('<input type="text" class="global-search" id="userSearchInput" placeholder="🔍 جستجو با ایمیل، نام یا ID..." oninput="searchUsers(this.value)">');
-  html.push('<div id="usersList"><div class="lbox"><div class="spin"></div></div></div>');
-  html.push('<div class="icard" style="margin-top:12px"><div class="ctitle">💰 مدیریت موجودی سریع</div>');
-  html.push('<div class="adm-row"><input class="adm-in" id="ue" placeholder="ایمیل یا ID"><input class="adm-in" id="ua" type="number" placeholder="مبلغ ($)"></div>');
-  html.push('<div class="adm-row"><button class="adm-btn" onclick="abal(&quot;add&quot;)">➕ اضافه</button><button class="adm-btn" onclick="abal(&quot;set&quot;)">📝 تنظیم</button><button class="adm-btn gold" onclick="arestore()">🔄 بازگردانی</button></div>');
+
+  // ── STATS PANEL ──
+  html.push('<div id="admUserStats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">');
+  html.push('<div class="adm-stat-card" id="asc_total"><div class="asc-icon">👥</div><div class="asc-val" id="asc_total_v">—</div><div class="asc-lbl">کل اعضا</div></div>');
+  html.push('<div class="adm-stat-card gold" id="asc_vip"><div class="asc-icon">💎</div><div class="asc-val" id="asc_vip_v">—</div><div class="asc-lbl">VIP</div></div>');
+  html.push('<div class="adm-stat-card green" id="asc_reg"><div class="asc-icon">🌿</div><div class="asc-val" id="asc_reg_v">—</div><div class="asc-lbl">عادی</div></div>');
+  html.push('<div class="adm-stat-card blue" id="asc_bal"><div class="asc-icon">💰</div><div class="asc-val" id="asc_bal_v">—</div><div class="asc-lbl">کل موجودی</div></div>');
   html.push('</div>');
+
+  // ── SEARCH + FILTER BAR ──
+  html.push('<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">');
+  html.push('<input type="text" class="global-search" id="userSearchInput" placeholder="🔍 جستجو با ایمیل، نام یا ID..." oninput="searchUsers(this.value)" style="flex:1;min-width:180px">');
+  html.push('<select id="uFilterStatus" class="adm-in" style="width:auto;min-width:110px" onchange="searchUsers(document.getElementById(\'userSearchInput\').value)"><option value="">همه وضعیت‌ها</option><option value="active">فعال</option><option value="blocked">مسدود</option></select>');
+  html.push('<select id="uSortBy" class="adm-in" style="width:auto;min-width:120px" onchange="searchUsers(document.getElementById(\'userSearchInput\').value)"><option value="date">جدیدترین</option><option value="balance">بالاترین موجودی</option><option value="name">نام</option></select>');
+  html.push('</div>');
+
+  // ── USERS LIST ──
+  html.push('<div id="usersList"><div class="lbox"><div class="spin"></div></div></div>');
+
+  // ── PYRAMID SECTION ──
+  html.push('<div class="adm-pyramid-wrap" style="margin-top:16px">');
+  html.push('<div class="adm-pyramid-header"><span>🏔️ هرم سازمانی اعضا</span><button class="adm-btn" style="font-size:11px;padding:6px 12px" onclick="loadPyramidAdmin()">🔄 بارگذاری هرم</button></div>');
+  html.push('<div id="admPyramidContent"><div style="text-align:center;color:rgba(255,255,255,.3);font-size:12px;padding:24px">برای مشاهده هرم سازمانی، دکمه بارگذاری را بزنید</div></div>');
+  html.push('</div>');
+
+  // ── BALANCE MANAGEMENT ──
+  html.push('<div class="icard" style="margin-top:12px"><div class="ctitle">💰 مدیریت موجودی سریع</div>');
+  html.push('<div class="adm-row"><input class="adm-in" id="ue" placeholder="ایمیل یا ID عضو"><input class="adm-in" id="ua" type="number" placeholder="مبلغ ($)"></div>');
+  html.push('<div class="adm-row" style="flex-wrap:wrap">');
+  html.push('<button class="adm-btn" onclick="abal(&quot;add&quot;)">➕ اضافه</button>');
+  html.push('<button class="adm-btn" style="background:linear-gradient(135deg,#c0392b,#e74c3c)" onclick="abal(&quot;sub&quot;)">➖ کاهش موجودی</button>');
+  html.push('<button class="adm-btn" onclick="abal(&quot;set&quot;)">📝 تنظیم</button>');
+  html.push('<button class="adm-btn gold" onclick="arestore()">🔄 بازگردانی</button>');
+  html.push('</div>');
+  html.push('<div id="abal_status" style="font-size:12px;margin-top:6px;color:rgba(255,255,255,.5)"></div>');
+  html.push('</div>');
+
+  // ── BONUS MANAGEMENT ──
   html.push('<div class="icard" style="margin-top:12px;border:1px solid rgba(245,158,11,.25)"><div class="ctitle">🎁 مدیریت بونوس</div>');
   html.push('<div class="adm-row"><input class="adm-in" id="bon_email" placeholder="ایمیل کاربر" oninput="if(this.value)document.getElementById(\'bon_mid\').value=\'\'"><input class="adm-in" id="bon_mid" placeholder="یا ID عضو (۴ رقمی)" oninput="if(this.value)document.getElementById(\'bon_email\').value=\'\'"></div>');
   html.push('<div class="adm-row"><input class="adm-in" id="bon_amt" type="number" min="1" placeholder="مبلغ بونوس ($)"><input class="adm-in" id="bon_days" type="number" min="1" placeholder="مدت (روز)"></div>');
   html.push('<div class="adm-row"><button class="adm-btn" style="background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3)" onclick="giveBonus()">🎁 اعطای بونوس</button><button class="adm-btn" style="background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.2)" onclick="revokeBonus()">❌ لغو بونوس</button></div>');
   html.push('<div id="bon_status" style="font-size:12px;margin-top:6px;color:rgba(255,255,255,.5)"></div>');
   html.push('</div>');
+
   c.innerHTML=html.join('');
   searchUsers('');
+  loadAdminUserStats();
+}
+
+async function loadAdminUserStats(){
+  var r=await sb.from('profiles').select('balance,is_vip,is_blocked');
+  var all=r.data||[];
+  var total=all.length;
+  var vip=all.filter(function(u){return u.is_vip;}).length;
+  var reg=total-vip;
+  var bal=all.reduce(function(s,u){return s+parseFloat(u.balance||0);},0);
+  var sv=document.getElementById('asc_total_v');if(sv)sv.textContent=total;
+  var vv=document.getElementById('asc_vip_v');if(vv)vv.textContent=vip;
+  var rv=document.getElementById('asc_reg_v');if(rv)rv.textContent=reg;
+  var bv=document.getElementById('asc_bal_v');if(bv)bv.textContent='$'+bal.toFixed(0);
+}
+
+async function loadPyramidAdmin(){
+  var c=document.getElementById('admPyramidContent');
+  if(!c)return;
+  c.innerHTML='<div class="lbox"><div class="spin"></div></div>';
+  // Load all profiles
+  var r=await sb.from('profiles').select('*').order('created_at',{ascending:true});
+  var all=r.data||[];
+  if(!all.length){c.innerHTML='<div class="ebox"><p>هیچ کاربری یافت نشد</p></div>';return;}
+  // Build referral map
+  var byId={};
+  all.forEach(function(u){byId[u.user_id]=u;});
+  // Group by level: roots = no referred_by or referred_by not in system
+  var roots=all.filter(function(u){return !u.referred_by||!byId[u.referred_by];});
+  var byRef={};
+  all.forEach(function(u){if(u.referred_by&&byId[u.referred_by]){if(!byRef[u.referred_by])byRef[u.referred_by]=[];byRef[u.referred_by].push(u);}});
+
+  function makeNode(u,depth){
+    var isVip=u.is_vip;
+    var isBlocked=u.is_blocked;
+    var name=u.display_name||(u.email?u.email.split('@')[0]:'---');
+    var bal=parseFloat(u.balance||0);
+    var children=byRef[u.user_id]||[];
+    var nodeColor=isVip?'rgba(255,215,0,.18)':'rgba(16,185,129,.12)';
+    var borderColor=isVip?'rgba(255,215,0,.5)':'rgba(16,185,129,.4)';
+    var badge=isVip?'<span class="pyr-badge vip">💎 VIP</span>':'<span class="pyr-badge reg">🌿</span>';
+    var blockedBadge=isBlocked?'<span class="pyr-badge blk">🚫</span>':'';
+    var html='<div class="pyr-node-wrap" style="--depth:'+depth+'">';
+    html+='<div class="pyr-node" style="background:'+nodeColor+';border-color:'+borderColor+'" onclick="openMemberModal(\''+u.user_id+'\')" data-uid="'+u.user_id+'">';
+    html+='<div class="pyr-node-top">'+badge+blockedBadge+'<span class="pyr-name">'+name+'</span><span class="pyr-id">#'+(u.member_id||'----')+'</span></div>';
+    html+='<div class="pyr-node-bal">$'+bal.toFixed(2)+'</div>';
+    if(children.length)html+='<div class="pyr-node-refs">'+children.length+' زیرمجموعه</div>';
+    html+='</div>';
+    if(children.length){
+      html+='<div class="pyr-children">';
+      children.forEach(function(ch){html+=makeNode(ch,depth+1);});
+      html+='</div>';
+    }
+    html+='</div>';
+    return html;
+  }
+
+  var out='<div class="pyr-root">';
+  // Tier labels
+  var tierBal=roots.reduce(function(s,u){return s+parseFloat(u.balance||0);},0);
+  out+='<div class="pyr-tier-label">👑 سطح ۱ — '+roots.length+' نفر · $'+tierBal.toFixed(0)+'</div>';
+  out+='<div class="pyr-tier">';
+  roots.forEach(function(u){out+=makeNode(u,0);});
+  out+='</div></div>';
+  c.innerHTML=out;
+  // Stagger animation
+  var nodes=c.querySelectorAll('.pyr-node');
+  nodes.forEach(function(n,i){n.style.animationDelay=(i*50)+'ms';n.classList.add('pyr-enter');});
+}
+
+async function openMemberModal(uid){
+  var r=await sb.from('profiles').select('*').eq('user_id',uid).single();
+  if(!r.data)return toast('کاربر پیدا نشد','red');
+  var u=r.data;
+  var name=u.display_name||(u.email?u.email.split('@')[0]:'');
+  var isVip=u.is_vip;
+  var isBlocked=u.is_blocked;
+  var bal=parseFloat(u.balance||0);
+  var m=document.createElement('div');
+  m.className='modal-overlay';
+  m.id='memberMgmtModal';
+  m.onclick=function(e){if(e.target===m)m.remove();};
+  m.innerHTML='<div class="modal-box pyr-modal" style="max-width:440px;width:95%">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+    +'<div style="font-size:16px;font-weight:900;color:var(--text)">👤 '+name+'</div>'
+    +'<button onclick="document.getElementById(\'memberMgmtModal\').remove()" style="background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer">✕</button>'
+    +'</div>'
+    // Info
+    +'<div style="background:rgba(255,255,255,.04);border-radius:12px;padding:12px;margin-bottom:12px;font-size:12px;color:var(--text2);line-height:2">'
+    +'<div><b>ایمیل:</b> '+u.email+'</div>'
+    +'<div><b>ID:</b> #'+(u.member_id||'----')+'</div>'
+    +'<div><b>موجودی:</b> <span style="color:var(--gold);font-weight:700">$'+bal.toFixed(2)+'</span></div>'
+    +'<div><b>وضعیت:</b> '+(isBlocked?'<span style="color:#ef4444">🚫 مسدود</span>':'<span style="color:#4ade80">✅ فعال</span>')+'</div>'
+    +'<div><b>سطح:</b> '+(isVip?'<span style="color:#ffd700">💎 VIP</span>':'<span style="color:#10b981">🌿 عادی</span>')+'</div>'
+    +'<div><b>تاریخ ثبت:</b> '+new Date(u.created_at).toLocaleDateString('fa-IR')+'</div>'
+    +'</div>'
+    // Balance management
+    +'<div style="background:rgba(0,212,170,.06);border:1px solid rgba(0,212,170,.15);border-radius:12px;padding:12px;margin-bottom:12px">'
+    +'<div style="font-size:12px;font-weight:700;color:var(--ac);margin-bottom:8px">💰 مدیریت موجودی</div>'
+    +'<div style="display:flex;gap:8px;margin-bottom:8px"><input class="adm-in" id="mm_amt" type="number" min="0" placeholder="مبلغ ($)" style="flex:1"></div>'
+    +'<div style="display:flex;gap:6px;flex-wrap:wrap">'
+    +'<button class="adm-btn" style="flex:1;font-size:11px" onclick="mmBal(\''+uid+'\',\'add\')">➕ اضافه</button>'
+    +'<button class="adm-btn" style="flex:1;font-size:11px;background:linear-gradient(135deg,#c0392b,#e74c3c)" onclick="mmBal(\''+uid+'\',\'sub\')">➖ کاهش</button>'
+    +'<button class="adm-btn" style="flex:1;font-size:11px;background:rgba(255,255,255,.1);color:var(--text)" onclick="mmBal(\''+uid+'\',\'set\')">📝 تنظیم</button>'
+    +'</div></div>'
+    // Display name edit
+    +'<div style="background:rgba(255,255,255,.04);border-radius:12px;padding:12px;margin-bottom:12px">'
+    +'<div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px">✏️ ویرایش نام نمایشی</div>'
+    +'<div style="display:flex;gap:8px"><input class="adm-in" id="mm_name" value="'+(u.display_name||'')+'" placeholder="نام نمایشی" style="flex:1"><button class="adm-btn" style="font-size:11px" onclick="mmSaveName(\''+uid+'\')">💾</button></div>'
+    +'</div>'
+    // Actions
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
+    +(isVip
+      ?'<button class="adm-btn" style="flex:1;background:rgba(255,255,255,.07);color:var(--text);font-size:11px" onclick="mmVip(\''+uid+'\',false)">⬇️ تنزل به عادی</button>'
+      :'<button class="adm-btn" style="flex:1;background:linear-gradient(135deg,rgba(255,215,0,.2),rgba(255,215,0,.1));color:#ffd700;border:1px solid rgba(255,215,0,.3);font-size:11px" onclick="mmVip(\''+uid+'\',true)">💎 ارتقا به VIP</button>')
+    +(isBlocked
+      ?'<button class="adm-btn" style="flex:1;background:rgba(16,185,129,.12);color:#4ade80;border:1px solid rgba(16,185,129,.3);font-size:11px" onclick="mmBlock(\''+uid+'\',false)">✅ رفع انسداد</button>'
+      :'<button class="adm-btn" style="flex:1;background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.3);font-size:11px" onclick="mmBlock(\''+uid+'\',true)">🚫 مسدود کردن</button>')
+    +'</div>'
+    +'<div id="mm_status" style="font-size:11px;margin-top:10px;color:rgba(255,255,255,.5);text-align:center"></div>'
+    +'</div>';
+  document.body.appendChild(m);
+}
+
+async function mmBal(uid,type){
+  var amt=parseFloat((document.getElementById('mm_amt')||{}).value||0);
+  var st=document.getElementById('mm_status');
+  if(!amt||isNaN(amt)){if(st)st.textContent='⚠️ مبلغ را وارد کنید';return;}
+  var r=await sb.from('profiles').select('balance').eq('user_id',uid).single();
+  if(!r.data){if(st)st.textContent='❌ کاربر پیدا نشد';return;}
+  var cur=parseFloat(r.data.balance||0);
+  var nb=type==='add'?cur+amt:type==='sub'?Math.max(0,cur-amt):amt;
+  var upd=await sb.from('profiles').update({balance:nb}).eq('user_id',uid);
+  if(upd.error){if(st)st.textContent='❌ '+upd.error.message;return;}
+  await logAdminAction('Balance '+type,uid,amt,'New: '+nb.toFixed(2));
+  if(st){st.style.color='#4ade80';st.textContent='✅ موجودی جدید: $'+nb.toFixed(2);}
+  document.getElementById('mm_amt').value='';
+}
+
+async function mmSaveName(uid){
+  var name=(document.getElementById('mm_name')||{}).value||'';
+  var st=document.getElementById('mm_status');
+  if(!name){if(st)st.textContent='⚠️ نام را وارد کنید';return;}
+  var upd=await sb.from('profiles').update({display_name:name}).eq('user_id',uid);
+  if(upd.error){if(st)st.textContent='❌ '+upd.error.message;return;}
+  await logAdminAction('Name Changed',uid,null,name);
+  if(st){st.style.color='#4ade80';st.textContent='✅ نام ذخیره شد';}
+}
+
+async function mmVip(uid,isVip){
+  var st=document.getElementById('mm_status');
+  var upd=await sb.from('profiles').update({is_vip:isVip}).eq('user_id',uid);
+  if(upd.error){if(st)st.textContent='❌ '+upd.error.message;return;}
+  await logAdminAction(isVip?'VIP Granted':'VIP Revoked',uid);
+  document.getElementById('memberMgmtModal').remove();
+  toast(isVip?'💎 ارتقا به VIP انجام شد':'⬇️ تنزل به عادی انجام شد','green');
+  if(document.getElementById('admPyramidContent'))loadPyramidAdmin();
+}
+
+async function mmBlock(uid,block){
+  var st=document.getElementById('mm_status');
+  if(block&&!confirm('آیا مطمئنید که می‌خواهید این حساب را مسدود کنید؟'))return;
+  var upd=await sb.from('profiles').update({is_blocked:block}).eq('user_id',uid);
+  if(upd.error){if(st)st.textContent='❌ '+upd.error.message;return;}
+  await logAdminAction(block?'Account Blocked':'Account Unblocked',uid);
+  document.getElementById('memberMgmtModal').remove();
+  toast(block?'🚫 حساب مسدود شد':'✅ انسداد رفع شد',block?'red':'green');
+  searchUsers(document.getElementById('userSearchInput')&&document.getElementById('userSearchInput').value||'');
+  if(document.getElementById('admPyramidContent'))loadPyramidAdmin();
 }
 
 async function searchUsers(query){
   var c=document.getElementById('usersList');if(!c)return;
   c.innerHTML='<div class="lbox"><div class="spin"></div></div>';
+  var filterStatus=(document.getElementById('uFilterStatus')||{}).value||'';
+  var sortBy=(document.getElementById('uSortBy')||{}).value||'date';
   var res;
   if(query&&query.length>2){
-    var r1=await sb.from('profiles').select('*').ilike('email','%'+query+'%').limit(20);
+    var r1=await sb.from('profiles').select('*').ilike('email','%'+query+'%').limit(30);
     var r2=await sb.from('profiles').select('*').ilike('member_id','%'+query+'%').limit(10);
+    var r3=await sb.from('profiles').select('*').ilike('display_name','%'+query+'%').limit(10);
     var combined={};
-    (r1.data||[]).concat(r2.data||[]).forEach(function(u){combined[u.user_id]=u;});
+    (r1.data||[]).concat(r2.data||[]).concat(r3.data||[]).forEach(function(u){combined[u.user_id]=u;});
     res=Object.values(combined);
   }else{
-    var r=await sb.from('profiles').select('*').order('created_at',{ascending:false}).limit(20);
+    var r=await sb.from('profiles').select('*').order('created_at',{ascending:false}).limit(50);
     res=r.data||[];
   }
+  // Apply status filter
+  if(filterStatus==='blocked')res=res.filter(function(u){return u.is_blocked;});
+  else if(filterStatus==='active')res=res.filter(function(u){return !u.is_blocked;});
+  // Apply sort
+  if(sortBy==='balance')res.sort(function(a,b){return parseFloat(b.balance||0)-parseFloat(a.balance||0);});
+  else if(sortBy==='name')res.sort(function(a,b){return (a.display_name||a.email).localeCompare(b.display_name||b.email);});
+
   if(!res.length){c.innerHTML='<div class="ebox"><span class="ei">👥</span><p>کاربری پیدا نشد</p></div>';return;}
   c.innerHTML=res.map(function(u){
-    var dt=u.created_at?new Date(u.created_at).toLocaleDateString(['fa','ar','ur'].indexOf(lang)>=0?'fa-IR':'en-US'):'---';
-    return '<div class="user-row">'
-      +'<div class="user-row-top"><span class="user-name">'+(u.display_name||u.email.split('@')[0])+'</span><span class="user-bal">$'+parseFloat(u.balance||0).toFixed(2)+'</span></div>'
+    var dt=u.created_at?new Date(u.created_at).toLocaleDateString('fa-IR'):'---';
+    var isVip=u.is_vip;var isBlocked=u.is_blocked;
+    var vipBadge=isVip?'<span class="pyr-badge vip" style="font-size:9px">💎 VIP</span>':'';
+    var blkBadge=isBlocked?'<span class="pyr-badge blk" style="font-size:9px">🚫</span>':'';
+    return '<div class="user-row" style="'+(isBlocked?'opacity:.6':'')+'">'
+      +'<div class="user-row-top"><span class="user-name">'+(u.display_name||u.email.split('@')[0])+'</span>'+vipBadge+blkBadge+'<span class="user-bal">$'+parseFloat(u.balance||0).toFixed(2)+'</span></div>'
       +'<div class="user-meta"><span>'+u.email+'</span><span>#'+(u.member_id||'----')+'</span><span>'+dt+'</span></div>'
       +'<div class="user-actions">'
       +'<button class="ua-btn add" onclick="quickBal(&quot;add&quot;,&quot;'+u.email+'&quot;)">➕</button>'
       +'<button class="ua-btn rem" onclick="quickBal(&quot;rem&quot;,&quot;'+u.email+'&quot;)">➖</button>'
-      +'<button class="ua-btn info" onclick="var c2=document.getElementById(&quot;adminContent&quot;);loadUser360(&quot;'+u.user_id+'&quot;,c2)">👁️ پروفایل ۳۶۰</button>'
+      +'<button class="ua-btn info" onclick="openMemberModal(&quot;'+u.user_id+'&quot;)">⚙️ مدیریت</button>'
+      +'<button class="ua-btn info" style="background:rgba(26,86,219,.12);border-color:rgba(26,86,219,.3)" onclick="var c2=document.getElementById(&quot;adminContent&quot;);loadUser360(&quot;'+u.user_id+'&quot;,c2)">👁️</button>'
       +'</div></div>';
   }).join('');
 }
@@ -4226,8 +4475,57 @@ async function quickBal(type,email){
   var cur=parseFloat(res.data.balance||0);
   var nb=type==='add'?cur+parseFloat(amt):Math.max(0,cur-parseFloat(amt));
   await sb.from('profiles').update({balance:nb}).eq('user_id',res.data.user_id);
+  await logAdminAction('Balance '+type,email,parseFloat(amt),'New: '+nb.toFixed(2));
   toast('✅ موجودی: $'+nb.toFixed(2),'green');
   searchUsers(document.getElementById('userSearchInput')&&document.getElementById('userSearchInput').value||'');
+}
+
+async function _abalLookup(){
+  var q=(document.getElementById('ue')||{}).value||'';
+  var st=document.getElementById('abal_status');
+  if(!q){if(st)st.textContent='⚠️ ایمیل یا ID را وارد کنید';return null;}
+  var res;
+  if(q.match(/^\d+$/)){res=await sb.from('profiles').select('*').eq('member_id',q).single();}
+  else{res=await sb.from('profiles').select('*').eq('email',q).single();}
+  if(!res.data){if(st)st.textContent='❌ کاربر پیدا نشد';return null;}
+  return res.data;
+}
+
+async function abal(type){
+  var amt=parseFloat((document.getElementById('ua')||{}).value||0);
+  var st=document.getElementById('abal_status');
+  if(type!=='restore'&&(!amt||isNaN(amt))){if(st)st.textContent='⚠️ مبلغ را وارد کنید';return;}
+  var u=await _abalLookup();if(!u)return;
+  var cur=parseFloat(u.balance||0);
+  var nb;
+  if(type==='add')nb=cur+amt;
+  else if(type==='sub')nb=Math.max(0,cur-amt);
+  else if(type==='set')nb=amt;
+  else nb=cur;
+  var upd=await sb.from('profiles').update({balance:nb}).eq('user_id',u.user_id);
+  if(upd.error){if(st)st.textContent='❌ '+upd.error.message;return;}
+  await logAdminAction('Balance '+type,u.email,amt,'New: '+nb.toFixed(2));
+  if(st){st.style.color='#4ade80';st.textContent='✅ '+u.email+' | موجودی جدید: $'+nb.toFixed(2);}
+  document.getElementById('ua').value='';
+  searchUsers(document.getElementById('userSearchInput')&&document.getElementById('userSearchInput').value||'');
+}
+
+async function arestore(){
+  var st=document.getElementById('abal_status');
+  var u=await _abalLookup();if(!u)return;
+  if(!confirm('بازگردانی موجودی '+u.email+'؟'))return;
+  // Restore = sum of approved deposits minus approved withdrawals
+  var [dep,wit]=await Promise.all([
+    sb.from('deposits').select('amount').eq('user_id',u.user_id).eq('status','approved'),
+    sb.from('withdrawals').select('amount').eq('user_id',u.user_id).eq('status','approved')
+  ]);
+  var totalDep=(dep.data||[]).reduce(function(s,d){return s+parseFloat(d.amount||0);},0);
+  var totalWit=(wit.data||[]).reduce(function(s,w){return s+parseFloat(w.amount||0);},0);
+  var restored=Math.max(0,totalDep-totalWit);
+  var upd=await sb.from('profiles').update({balance:restored}).eq('user_id',u.user_id);
+  if(upd.error){if(st)st.textContent='❌ '+upd.error.message;return;}
+  await logAdminAction('Balance Restored',u.email,null,'Restored: $'+restored.toFixed(2));
+  if(st){st.style.color='#f59e0b';st.textContent='🔄 بازگردانی: $'+restored.toFixed(2)+' (واریز: $'+totalDep.toFixed(2)+' - برداشت: $'+totalWit.toFixed(2)+')';}
 }
 
 async function _bonusLookup(st){
