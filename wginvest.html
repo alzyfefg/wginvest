@@ -574,6 +574,22 @@ body.light .adm-sec{background:#fff;border:1px solid var(--border);box-shadow:va
 .user-search{width:100%;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:11px;padding:12px 14px;font-family:"Vazirmatn",sans-serif;font-size:13px;color:var(--text);outline:none;margin-bottom:12px;transition:all .2s}
 .user-search:focus{border-color:var(--ac);background:rgba(0,212,170,.05)}
 .user-search::placeholder{color:var(--text3)}
+.with-info-banner{display:flex;gap:12px;background:rgba(245,158,11,.08);border:1.5px solid rgba(245,158,11,.25);border-radius:14px;padding:14px;margin-bottom:14px}
+.wib-icon{font-size:24px;flex-shrink:0;margin-top:2px}
+.wib-title{font-size:12px;font-weight:800;color:#f59e0b;margin-bottom:6px}
+.wib-pt{font-size:11px;color:rgba(255,255,255,.65);margin-bottom:4px;line-height:1.5}
+.kpi-countup{animation:countUp .8s ease forwards}
+@keyframes countUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.with-status-badge{display:inline-block;padding:3px 9px;border-radius:10px;font-size:10px;font-weight:700}
+.wsb-pending{background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3)}
+.wsb-approved{background:rgba(0,212,170,.12);color:#00d4aa;border:1px solid rgba(0,212,170,.25)}
+.wsb-rejected{background:rgba(255,71,87,.1);color:#ff4757;border:1px solid rgba(255,71,87,.2)}
+.with-timeline{display:flex;align-items:center;gap:4px;margin:8px 0;font-size:9px;color:rgba(255,255,255,.4)}
+.wt-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.15);flex-shrink:0}
+.wt-dot.done{background:var(--ac)}
+.wt-line{flex:1;height:1px;background:rgba(255,255,255,.1)}
+.wt-line.done{background:var(--ac)}
+.bonus-mgr-row{display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;margin-bottom:6px;font-size:11px}
 /* Admin user stats cards */
 .adm-stat-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px 10px;text-align:center;transition:all .25s}
 .adm-stat-card.gold{border-color:rgba(255,215,0,.2);background:rgba(255,215,0,.06)}
@@ -3782,6 +3798,16 @@ function renderWithStep(c,step){
     if(activeBonus>0){
       html.push('<div class="bonus-warn-banner"><div class="bonus-warn-icon">⚠️</div><div class="bonus-warn-body"><div class="bonus-warn-title">Active Bonus Detected</div><div class="bonus-warn-text">Submitting a withdrawal request will permanently cancel your Active Bonus ($'+siFmt(activeBonus)+') and all remaining Bonus Balance. This action cannot be undone.</div></div></div>');
     }
+    // Info banner
+    html.push('<div class="with-info-banner">');
+    html.push('<div class="wib-icon">ℹ️</div>');
+    html.push('<div class="wib-body">');
+    html.push('<div class="wib-title">'+t('w_info_t')+'</div>');
+    html.push('<div class="wib-points">');
+    html.push('<div class="wib-pt">⏰ '+t('w_info')+'</div>');
+    html.push('<div class="wib-pt">🎁 '+t('bonus_warn_withdraw')+'</div>');
+    html.push('<div class="wib-pt">🔒 Submitted funds are temporarily locked until completed or rejected.</div>');
+    html.push('</div></div></div>');
     html.push('<div class="icard"><div class="ctitle">📤 '+t('step_withdrawal')+' '+(window._flowNetwork==="trc20"?"TRC20":"BEP20")+'</div>');
     html.push('<div style="background:rgba(0,212,170,.06);border:1px solid rgba(0,212,170,.15);border-radius:11px;padding:12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center">');
     html.push('<span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.5px;text-transform:uppercase">Withdrawable Balance</span>');
@@ -3998,8 +4024,18 @@ async function subWith(){
   if(!confirmed)return;
   // Withdrawal validation: only real balance, not bonus
   if(parseFloat(P.balance||0)<amt)return toast(t("err_insuf_bal"),"red");
+  // Deduct balance immediately and lock funds
+  var newBal=Math.max(0,parseFloat(P.balance)-amt);
+  var balUpd=await sb.from('profiles').update({balance:newBal}).eq('user_id',U.id);
+  if(balUpd.error)return toast("Error: "+balUpd.error.message,"red");
+  P.balance=newBal;
   var res=await sb.from("withdrawals").insert({user_id:U.id,amount:amt,wallet_address:wa,status:"pending",network:net.toUpperCase()});
-  if(res.error)return toast("Error: "+res.error.message,"red");
+  if(res.error){
+    // Rollback balance if insert failed
+    await sb.from('profiles').update({balance:parseFloat(P.balance)+amt}).eq('user_id',U.id);
+    P.balance=parseFloat(P.balance)+amt;
+    return toast("Error: "+res.error.message,"red");
+  }
   // Cancel any active bonus on withdrawal
   if(getActiveBonus()>0){
     await sb.from("profiles").update({bonus:0,bonus_expires_at:null}).eq("user_id",U.id);
@@ -4091,6 +4127,8 @@ async function loadAdmin(){
     +'<button class="adm-tab" id="at_logs" onclick="showAdminTab(&quot;logs&quot;)">📋 لاگ</button>'
     +'<button class="adm-tab" id="at_auditlog" onclick="showAdminTab(&quot;auditlog&quot;)">🔍 لاگ ادمین</button>'
     +'<button class="adm-tab" id="at_plans" onclick="showAdminTab(&quot;plans&quot;)">💎 پلن‌ها</button>'
+    +'<button class="adm-tab" id="at_bonus" onclick="showAdminTab(&quot;bonus&quot;)">🎁 بونوس</button>'
+    +'<button class="adm-tab" id="at_analytics" onclick="showAdminTab(&quot;analytics&quot;)">📈 آنالیز</button>'
     +'<button class="adm-tab" id="at_notes" onclick="showAdminTab(&quot;notes&quot;)">📝 یادداشت</button>'
     +'<button class="adm-tab" id="at_settings" onclick="showAdminTab(&quot;settings&quot;)">⚙️ تنظیمات</button>'
     +'</div>'
@@ -4099,7 +4137,7 @@ async function loadAdmin(){
 }
 
 async function showAdminTab(tab){
-  var allTabs=["overview","users","finance","matches","deposits","withdrawals","kyc","tickets","announce","logs","auditlog","plans","notes","settings"];
+  var allTabs=["overview","users","finance","matches","deposits","withdrawals","kyc","tickets","announce","logs","auditlog","plans","bonus","analytics","notes","settings"];
   allTabs.forEach(function(t){var el=document.getElementById("at_"+t);if(el)el.classList.remove("on");});
   var el=document.getElementById("at_"+tab);if(el)el.classList.add("on");
   var c=document.getElementById("adminContent");if(!c)return;
@@ -4116,6 +4154,8 @@ async function showAdminTab(tab){
   else if(tab==="logs")await loadAdminLogs(c);
   else if(tab==="auditlog")await loadAdminAuditLog(c);
   else if(tab==="plans")await loadAdminPlans(c);
+  else if(tab==="bonus")await loadAdminBonusManager(c);
+  else if(tab==="analytics")await loadAdminAnalytics(c);
   else if(tab==="notes")loadAdminNotes(c);
   else if(tab==="settings")loadAdminSettings(c);
 }
@@ -4174,24 +4214,63 @@ async function loadAdminOverview(c){
 }
 
 async function loadAdminFinance(c){
-  var deps=await sb.from('deposits').select('amount,status');
-  var withs=await sb.from('withdrawals').select('amount,status');
-  var apDeps=(deps.data||[]).filter(function(d){return d.status==='approved';});
-  var apWiths=(withs.data||[]).filter(function(w){return w.status==='approved';});
-  var totalDep=apDeps.reduce(function(s,d){return s+parseFloat(d.amount);},0);
-  var totalWith=apWiths.reduce(function(s,w){return s+parseFloat(w.amount);},0);
+  var todayStart=new Date();todayStart.setHours(0,0,0,0);
+  var todayISO=todayStart.toISOString();
+  var nowISO=new Date().toISOString();
+  var [depsAll,withsAll,invAll,profsAll,bonusLogs]=await Promise.all([
+    sb.from('deposits').select('amount,status,created_at'),
+    sb.from('withdrawals').select('amount,status,created_at,user_id'),
+    sb.from('investments').select('amount,status,withdrawn_at,created_at'),
+    sb.from('profiles').select('balance,bonus,bonus_expires_at,created_at'),
+    sb.from('admin_logs').select('amount,created_at').ilike('action','%Bonus%')
+  ]);
+  var deps=depsAll.data||[];
+  var withs=withsAll.data||[];
+  var invs=invAll.data||[];
+  var profs=profsAll.data||[];
+  var bLogs=bonusLogs.data||[];
+  // Today's data
+  var depToday=deps.filter(function(d){return d.status==='approved'&&d.created_at>=todayISO;});
+  var withToday=withs.filter(function(w){return w.status==='approved'&&w.created_at>=todayISO;});
+  var pendWiths=withs.filter(function(w){return w.status==='pending';});
+  var activeInvs=invs.filter(function(i){return i.status==='active'||i.status==='locked';});
+  var profitToday=invs.filter(function(i){return i.status==='withdrawn'&&i.withdrawn_at&&i.withdrawn_at>=todayISO;});
+  var newUsersToday=profs.filter(function(p){return p.created_at>=todayISO;});
+  var now=new Date();
+  var outstandingBonus=profs.filter(function(p){return parseFloat(p.bonus||0)>0&&p.bonus_expires_at&&p.bonus_expires_at>nowISO;});
+  var totalOutBonus=outstandingBonus.reduce(function(s,p){return s+parseFloat(p.bonus||0);},0);
+  var totalLockedCap=activeInvs.reduce(function(s,i){return s+parseFloat(i.amount||0);},0);
+  var platformBal=profs.reduce(function(s,p){return s+parseFloat(p.balance||0);},0);
+  var depTodayAmt=depToday.reduce(function(s,d){return s+parseFloat(d.amount||0);},0);
+  var withTodayAmt=withToday.reduce(function(s,w){return s+parseFloat(w.amount||0);},0);
+  var pendWithAmt=pendWiths.reduce(function(s,w){return s+parseFloat(w.amount||0);},0);
+  var profitTodayAmt=profitToday.reduce(function(s,i){return s+parseFloat(i.amount||0);},0);
   var html=[];
+  html.push('<div class="ctitle" style="margin-bottom:12px">💰 داشبورد مالی پیشرفته <span style="font-size:10px;color:var(--text3);font-weight:400">امروز: '+new Date().toLocaleDateString('fa-IR')+'</span></div>');
+  // KPI Grid
+  var kpis=[
+    {icon:'💳',val:'$'+depTodayAmt.toFixed(0),lbl:'واریز امروز',clr:'var(--ac)'},
+    {icon:'💸',val:'$'+withTodayAmt.toFixed(0),lbl:'برداشت امروز',clr:'var(--red)'},
+    {icon:'⏳',val:pendWiths.length+' ($'+pendWithAmt.toFixed(0)+')',lbl:'برداشت در انتظار',clr:'#f59e0b'},
+    {icon:'📈',val:activeInvs.length,lbl:'سرمایه‌گذاری فعال',clr:'var(--pl)'},
+    {icon:'🔒',val:'$'+totalLockedCap.toFixed(0),lbl:'سرمایه قفل‌شده',clr:'var(--gold)'},
+    {icon:'🎁',val:'$'+totalOutBonus.toFixed(0),lbl:'بونوس جاری',clr:'#f59e0b'},
+    {icon:'👤',val:newUsersToday.length,lbl:'کاربر جدید امروز',clr:'var(--ac)'},
+    {icon:'🏦',val:'$'+platformBal.toFixed(0),lbl:'موجودی پلتفرم',clr:'var(--gold)'}
+  ];
   html.push('<div class="kpi-grid">');
-  html.push('<div class="kpi-card"><span class="kpi-icon">💳</span><div class="kpi-val" style="color:var(--ac)">$'+totalDep.toFixed(2)+'</div><div class="kpi-lbl">کل واریز تأیید</div></div>');
-  html.push('<div class="kpi-card"><span class="kpi-icon">💸</span><div class="kpi-val" style="color:var(--red)">$'+totalWith.toFixed(2)+'</div><div class="kpi-lbl">کل برداشت تأیید</div></div>');
-  html.push('<div class="kpi-card"><span class="kpi-icon">📊</span><div class="kpi-val" style="color:var(--gold)">$'+(totalDep-totalWith).toFixed(2)+'</div><div class="kpi-lbl">خالص جریان نقدی</div></div>');
-  html.push('<div class="kpi-card"><span class="kpi-icon">⏳</span><div class="kpi-val">'+(deps.data||[]).filter(function(d){return d.status==='pending';}).length+'</div><div class="kpi-lbl">واریز در انتظار</div></div>');
+  kpis.forEach(function(k){
+    html.push('<div class="kpi-card kpi-countup"><span class="kpi-icon">'+k.icon+'</span><div class="kpi-val" style="color:'+k.clr+'">'+k.val+'</div><div class="kpi-lbl">'+k.lbl+'</div></div>');
+  });
   html.push('</div>');
-  var maxV=Math.max(totalDep,totalWith,0.01);
-  html.push('<div class="icard"><div class="ctitle">📊 نمودار مالی</div>');
-  [{l:'واریز',v:totalDep,c:'#00d4aa'},{l:'برداشت',v:totalWith,c:'#ff4757'},{l:'سود',v:totalDep-totalWith,c:'#ffd700'}].forEach(function(b){
+  // Summary bar chart
+  var totalDepAll=deps.filter(function(d){return d.status==='approved';}).reduce(function(s,d){return s+parseFloat(d.amount||0);},0);
+  var totalWithAll=withs.filter(function(w){return w.status==='approved';}).reduce(function(s,w){return s+parseFloat(w.amount||0);},0);
+  var maxV=Math.max(totalDepAll,totalWithAll,0.01);
+  html.push('<div class="icard"><div class="ctitle">📊 جریان نقدی کلی</div>');
+  [{l:'کل واریز تأیید',v:totalDepAll,c:'#00d4aa'},{l:'کل برداشت تأیید',v:totalWithAll,c:'#ff4757'},{l:'خالص سود',v:totalDepAll-totalWithAll,c:'#ffd700'}].forEach(function(b){
     var w=Math.round(Math.max(0,b.v)/maxV*100);
-    html.push('<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;color:var(--text2)">'+b.l+'</span><span style="font-size:11px;font-weight:700;color:'+b.c+'">$'+b.v.toFixed(2)+'</span></div><div style="height:7px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+w+'%;background:'+b.c+';border-radius:4px"></div></div></div>');
+    html.push('<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;color:var(--text2)">'+b.l+'</span><span style="font-size:11px;font-weight:700;color:'+b.c+'">$'+b.v.toFixed(2)+'</span></div><div style="height:7px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+w+'%;background:'+b.c+';border-radius:4px;transition:width 1s ease"></div></div></div>');
   });
   html.push('</div>');
   c.innerHTML=html.join('');
@@ -4867,16 +4946,12 @@ async function rejDep(id){
 }
 
 async function appWith(id, userId, amount){
-  var cur=await sb.from('profiles').select('balance').eq('user_id',userId).single();
-  if(cur.error||!cur.data){toast('کاربر پیدا نشد','red');return;}
-  var newBal=Math.max(0,parseFloat(cur.data.balance||0)-parseFloat(amount));
-  var upd=await sb.from('profiles').update({balance:newBal}).eq('user_id',userId);
-  if(upd.error){toast('خطا در کسر موجودی: '+upd.error.message,'red');return;}
+  // Balance was already deducted at submission — only update status
   var w=await sb.from('withdrawals').update({status:'approved'}).eq('id',id);
   if(w.error){toast('خطا: '+w.error.message,'red');return;}
   await sb.from('notifications').insert({user_id:userId,type:'withdrawal_approved',message:'برداشت $'+amount+' شما تأیید و پردازش شد.',is_read:false});
   await logAdminAction('Withdrawal Approved',userId,amount,'ID:'+id);
-  toast('✅ برداشت تأیید و موجودی کسر شد','green');
+  toast('✅ برداشت تأیید شد','green');
   var c=document.getElementById('adminContent');
   if(c)await loadAW2(c);
 }
@@ -4884,9 +4959,17 @@ async function appWith(id, userId, amount){
 async function rejWith(id){
   var w=await sb.from('withdrawals').update({status:'rejected'}).eq('id',id).select('user_id,amount').single();
   if(w.error){toast('خطا: '+w.error.message,'red');return;}
-  if(w.data)await sb.from('notifications').insert({user_id:w.data.user_id,type:'withdrawal_rejected',message:'درخواست برداشت $'+w.data.amount+' شما رد شد.',is_read:false});
-  await logAdminAction('Withdrawal Rejected',null,null,'ID:'+id);
-  toast('❌ برداشت رد شد','red');
+  if(w.data){
+    // Refund balance back to user
+    var cur=await sb.from('profiles').select('balance').eq('user_id',w.data.user_id).single();
+    if(cur.data){
+      var refundBal=parseFloat(cur.data.balance||0)+parseFloat(w.data.amount);
+      await sb.from('profiles').update({balance:refundBal}).eq('user_id',w.data.user_id);
+    }
+    await sb.from('notifications').insert({user_id:w.data.user_id,type:'withdrawal_rejected',message:'درخواست برداشت $'+w.data.amount+' شما رد شد و مبلغ به موجودی شما برگشت داده شد.',is_read:false});
+    await logAdminAction('Withdrawal Rejected',w.data.user_id,w.data.amount,'ID:'+id+' — refunded to balance');
+  }
+  toast('❌ برداشت رد شد و مبلغ بازگردانی شد','red');
   var c=document.getElementById('adminContent');
   if(c)await loadAW2(c);
 }
