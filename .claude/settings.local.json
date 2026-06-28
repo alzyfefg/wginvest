@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp /root/.claude/uploads/0d98639b-2760-553f-af57-54b2b2f2f3cd/28b6ff3a-wginvest1.html /home/user/wginvest/wginvest.html)"
+    ]
+  }
+}
