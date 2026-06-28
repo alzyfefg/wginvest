@@ -1435,30 +1435,33 @@ body.light .im-phil{background:linear-gradient(135deg,rgba(26,86,219,.06),rgba(0
 .plan-card{border-radius:18px;padding:18px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;cursor:pointer}
 .plan-card:hover{transform:translateY(-2px)}
 .plan-card.standard{background:linear-gradient(135deg,rgba(26,86,219,.12) 0%,rgba(0,212,170,.08) 100%);border:1.5px solid rgba(0,212,170,.25)}
-.plan-card.vip{background:linear-gradient(135deg,rgba(255,200,0,.08) 0%,rgba(180,120,0,.12) 100%);border:1.5px solid rgba(255,200,0,.3)}
-.plan-card.vip::before{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;background:radial-gradient(circle,rgba(255,200,0,.12) 0%,transparent 70%);border-radius:50%;animation:goldGlow 3s ease-in-out infinite}
-@keyframes goldGlow{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.2)}}
+.plan-card.vip{background:linear-gradient(145deg,rgba(120,40,200,.18) 0%,rgba(90,20,160,.12) 30%,rgba(180,110,0,.14) 65%,rgba(255,180,0,.08) 100%);border:1.5px solid rgba(255,190,50,.4);box-shadow:0 4px 32px rgba(180,100,0,.18),inset 0 1px 0 rgba(255,220,100,.08)}
+.plan-card.vip::before{content:'';position:absolute;top:-50px;right:-50px;width:160px;height:160px;background:radial-gradient(circle,rgba(255,180,0,.18) 0%,rgba(160,80,220,.08) 40%,transparent 70%);border-radius:50%;animation:vipGlow 4s ease-in-out infinite;pointer-events:none}
+.plan-card.vip::after{content:'';position:absolute;bottom:-30px;left:-30px;width:100px;height:100px;background:radial-gradient(circle,rgba(160,80,220,.12) 0%,transparent 70%);border-radius:50%;animation:vipGlow 4s ease-in-out infinite .8s;pointer-events:none}
+.plan-card.vip:hover{transform:translateY(-4px);box-shadow:0 12px 48px rgba(180,100,0,.28),0 0 0 1px rgba(255,190,50,.35),inset 0 1px 0 rgba(255,220,100,.1)}
+@keyframes vipGlow{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.15)}}
 .plan-card.locked{opacity:.7;cursor:default}
 .plan-card.locked:hover{transform:none}
 .plan-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:900;letter-spacing:.5px;margin-bottom:10px}
 .plan-badge.standard{background:rgba(26,86,219,.2);color:#60a5fa;border:1px solid rgba(26,86,219,.3)}
-.plan-badge.vip{background:rgba(255,200,0,.15);color:#fcd34d;border:1px solid rgba(255,200,0,.3)}
+.plan-badge.vip{background:linear-gradient(135deg,rgba(160,80,220,.25),rgba(255,180,0,.2));color:#fcd34d;border:1px solid rgba(255,190,50,.4);box-shadow:0 0 12px rgba(255,180,0,.2)}
 .plan-name{font-size:15px;font-weight:900;color:var(--text);margin-bottom:8px}
 .plan-roi{display:flex;align-items:baseline;gap:4px;margin-bottom:12px}
 .plan-roi-num{font-size:36px;font-weight:900;line-height:1}
 .plan-roi-pct{font-size:16px;font-weight:700}
 .plan-roi-label{font-size:11px;color:var(--text2);margin-top:4px}
 .plan-card.standard .plan-roi-num,.plan-card.standard .plan-roi-pct{color:#60a5fa}
-.plan-card.vip .plan-roi-num,.plan-card.vip .plan-roi-pct{background:linear-gradient(135deg,#fcd34d,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.plan-card.vip .plan-roi-num,.plan-card.vip .plan-roi-pct{background:linear-gradient(135deg,#e879f9,#fcd34d,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 8px rgba(255,180,0,.35))}
 .plan-stats{display:flex;gap:12px;margin-bottom:14px}
-.plan-stat{flex:1;background:rgba(255,255,255,.04);border-radius:9px;padding:8px;text-align:center}
+.plan-stat{flex:1;background:rgba(255,255,255,.04);border-radius:9px;padding:8px;text-align:center;transition:background .2s}
+.plan-card.vip .plan-stat{background:rgba(255,180,0,.07);border:1px solid rgba(255,180,0,.1)}
 .plan-stat-val{font-size:12px;font-weight:800;color:var(--text)}
 .plan-stat-lbl{font-size:9px;color:var(--text3);margin-top:2px}
 .plan-btn{width:100%;padding:12px;border-radius:11px;font-family:Vazirmatn,sans-serif;font-size:13px;font-weight:900;cursor:pointer;border:none;transition:all .2s;letter-spacing:.3px}
 .plan-btn.standard{background:linear-gradient(135deg,#1a56db,#00d4aa);color:#fff;box-shadow:0 4px 16px rgba(0,212,170,.2)}
 .plan-btn.standard:hover{box-shadow:0 6px 24px rgba(0,212,170,.35);transform:translateY(-1px)}
-.plan-btn.vip{background:linear-gradient(135deg,#d97706,#fcd34d);color:#1a0a00;box-shadow:0 4px 16px rgba(252,211,77,.2)}
-.plan-btn.vip:hover{box-shadow:0 6px 24px rgba(252,211,77,.35);transform:translateY(-1px)}
+.plan-btn.vip{background:linear-gradient(135deg,#7c3aed,#d97706,#fcd34d);color:#fff;box-shadow:0 4px 20px rgba(124,58,237,.3),0 0 0 1px rgba(255,190,50,.2);text-shadow:0 1px 3px rgba(0,0,0,.4);letter-spacing:.5px}
+.plan-btn.vip:hover{box-shadow:0 8px 32px rgba(124,58,237,.45),0 0 20px rgba(252,211,77,.25);transform:translateY(-2px)}
 .plan-btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important;box-shadow:none!important}
 .plan-lock-msg{text-align:center;font-size:10px;margin-top:8px;color:rgba(255,200,0,.6);font-weight:700}
 /* EMPTY INVEST STATE */
@@ -1467,12 +1470,25 @@ body.light .im-phil{background:linear-gradient(135deg,rgba(26,86,219,.06),rgba(0
 .empty-invest-title{font-size:17px;font-weight:900;color:var(--text);margin-bottom:8px}
 .empty-invest-sub{font-size:12px;color:var(--text3);line-height:1.6;max-width:240px;margin:0 auto}
 /* MICRO ANIMATIONS */
-.icard{transition:transform .2s,box-shadow .2s}
-.icard:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.3)}
-.btn-p{transition:all .25s cubic-bezier(.25,.46,.45,.94)}
-.dep-btn,.adm-btn{transition:all .18s}
+.icard{transition:transform .22s cubic-bezier(.25,.46,.45,.94),box-shadow .22s}
+.icard:hover{transform:translateY(-3px);box-shadow:0 10px 36px rgba(0,0,0,.35)}
+.icard:active{transform:translateY(-1px)}
+.btn-p{transition:all .22s cubic-bezier(.25,.46,.45,.94)}
+.btn-p:active{transform:scale(.97)!important}
+.dep-btn,.adm-btn{transition:transform .18s,box-shadow .18s,background .18s}
 .dep-btn:hover,.adm-btn:hover{transform:translateY(-1px)}
+.dep-btn:active,.adm-btn:active{transform:scale(.96)}
+.plan-card{transition:transform .22s cubic-bezier(.25,.46,.45,.94),box-shadow .22s}
+.plan-card.standard:hover{transform:translateY(-3px);box-shadow:0 10px 40px rgba(0,212,170,.12)}
+.plan-btn{transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s,background .2s}
+.plan-btn:active{transform:scale(.96)!important}
+.icon-btn{transition:transform .18s,border-color .18s,background .18s}
+.icon-btn:active{transform:scale(.9)}
+.tab-anim{animation:tabIn .32s cubic-bezier(.25,.46,.45,.94) both}
+@keyframes tabIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 @keyframes bounceIn{from{transform:scale(0);opacity:0}60%{transform:scale(1.2)}to{transform:scale(1);opacity:1}}
+@keyframes softPulse{0%,100%{box-shadow:0 0 0 0 rgba(0,212,170,.2)}50%{box-shadow:0 0 0 6px rgba(0,212,170,0)}}
+.topbar-bal{animation:softPulse 3s ease-in-out infinite}
 @keyframes fadeInOverlay{from{opacity:0}to{opacity:1}}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 </style>
@@ -2258,7 +2274,7 @@ function renderInvestPlans(c,inv){
     var isLocked=userBal<parseFloat(plan.min_balance||0)&&parseFloat(plan.min_balance||0)>0;
     var lockPeriod=fmtLockLabel(plan.lock_minutes||5);
     h.push('<div class="plan-card '+(isVip?'vip':'standard')+(isLocked?' locked':'')+'">'
-      +'<div class="plan-badge '+(isVip?'vip':'standard')+'">'+(isVip?'👑 VIP':'⚡ STANDARD')+'</div>'
+      +'<div class="plan-badge '+(isVip?'vip':'standard')+'">'+(isVip?'💎 VIP EXCLUSIVE':'⚡ STANDARD')+'</div>'
       +'<div class="plan-name">'+plan.name+'</div>'
       +'<div class="plan-roi">'
       +'<div><div style="display:flex;align-items:baseline;gap:2px"><span class="plan-roi-num">'+plan.roi+'</span><span class="plan-roi-pct">%</span></div><div class="plan-roi-label">سود ثابت هر دوره</div></div>'
@@ -2683,7 +2699,7 @@ function openInvestModal(){
     '<div style="font-size:15px;font-weight:900;color:var(--text);margin-bottom:16px;text-align:center">'+t('modal_invest_title')+'</div>'
     +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
     +'<span style="font-size:11px;color:var(--text3)">'+t('lbl_avail_bal')+'</span>'
-    +'<button id="siFillBalBtn" onclick="document.getElementById(\'siAmtInp\').value=\''+siFmt(bal)+'\';document.getElementById(\'siAmtInp\').dispatchEvent(new Event(\'input\'))" style="background:rgba(0,212,170,.12);border:1px solid rgba(0,212,170,.3);border-radius:20px;padding:3px 10px;font-family:Vazirmatn,sans-serif;font-size:12px;font-weight:800;color:var(--ac);cursor:pointer;transition:all .18s;letter-spacing:.2px" onmouseover="this.style.background=\'rgba(0,212,170,.25)\'" onmouseout="this.style.background=\'rgba(0,212,170,.12)\'">$'+siFmt(bal)+' ↙</button>'
+    +'<button id="siFillBalBtn" onclick="(function(btn){var inp=document.getElementById(\'siAmtInp\');inp.value=\''+siFmt(bal)+'\';inp.dispatchEvent(new Event(\'input\'));btn.style.transform=\'scale(.92)\';btn.style.boxShadow=\'0 0 16px rgba(0,212,170,.55)\';setTimeout(function(){btn.style.transform=\'\';btn.style.boxShadow=\'0 0 10px rgba(0,212,170,.25)\';},180);})(this)" style="background:rgba(0,212,170,.13);border:1px solid rgba(0,212,170,.35);border-radius:20px;padding:4px 12px;font-family:Vazirmatn,sans-serif;font-size:12px;font-weight:900;color:var(--ac);cursor:pointer;transition:transform .15s,box-shadow .15s,background .15s;letter-spacing:.2px;box-shadow:0 0 10px rgba(0,212,170,.15)" onmouseover="this.style.background=\'rgba(0,212,170,.22)\';this.style.boxShadow=\'0 0 14px rgba(0,212,170,.35)\'" onmouseout="this.style.background=\'rgba(0,212,170,.13)\';this.style.boxShadow=\'0 0 10px rgba(0,212,170,.15)\'">💰 $'+siFmt(bal)+'</button>'
     +'</div>'
     +'<input id="siAmtInp" type="number" inputmode="decimal" min="'+_siSettings.min_amount+'" max="'+bal+'" placeholder="'+t('lbl_inv_amount_min')+_siSettings.min_amount+')" style="width:100%;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);border-radius:10px;padding:13px;font-family:Vazirmatn,sans-serif;font-size:14px;color:var(--text);box-sizing:border-box;margin-bottom:12px;outline:none">'
     +'<div style="background:rgba(0,212,170,.07);border:1px solid rgba(0,212,170,.18);border-radius:12px;padding:13px;margin-bottom:14px">'
