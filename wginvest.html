@@ -598,6 +598,7 @@ body.light .adm-sec{background:#fff;border:1px solid var(--border);box-shadow:va
 .pyr-id{font-size:9px;color:rgba(255,255,255,.4);font-weight:600}
 .pyr-node-bal{font-size:13px;font-weight:900;color:#4ade80}
 .pyr-node-refs{font-size:9px;color:rgba(255,255,255,.35);margin-top:2px}
+.pyr-node-fd{font-size:9px;color:rgba(255,255,255,.4);margin-top:2px}
 .pyr-children{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:8px 4px;border-right:2px dashed rgba(255,255,255,.08);margin-right:8px}
 .pyr-badge{font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px}
 .pyr-badge.vip{background:rgba(255,215,0,.2);color:#ffd700;border:1px solid rgba(255,215,0,.3)}
@@ -4274,20 +4275,31 @@ async function loadPyramidAdmin(){
   var c=document.getElementById('admPyramidContent');
   if(!c)return;
   c.innerHTML='<div class="lbox"><div class="spin"></div></div>';
-  // Load all profiles
-  var r=await sb.from('profiles').select('*').order('created_at',{ascending:true});
-  var all=r.data||[];
+  // Load all profiles + first deposit per user
+  var [pr, dr] = await Promise.all([
+    sb.from('profiles').select('*').order('created_at',{ascending:true}),
+    sb.from('deposits').select('user_id,amount').eq('status','approved').order('created_at',{ascending:true})
+  ]);
+  var all=pr.data||[];
   if(!all.length){c.innerHTML='<div class="ebox"><p>هیچ کاربری یافت نشد</p></div>';return;}
+
+  // Build first-deposit map per user
+  var firstDep={};
+  (dr.data||[]).forEach(function(d){
+    if(firstDep[d.user_id]===undefined)firstDep[d.user_id]=parseFloat(d.amount||0);
+  });
+
   // Build referral map
   var byId={};
   all.forEach(function(u){byId[u.user_id]=u;});
-  // Group by level: roots = no referred_by or referred_by not in system
   var roots=all.filter(function(u){return !u.referred_by||!byId[u.referred_by];});
   var byRef={};
   all.forEach(function(u){if(u.referred_by&&byId[u.referred_by]){if(!byRef[u.referred_by])byRef[u.referred_by]=[];byRef[u.referred_by].push(u);}});
 
   function makeNode(u,depth){
-    var isVip=u.is_vip;
+    // VIP = first deposit >= $500
+    var fd=firstDep[u.user_id]||0;
+    var isVip=fd>=500;
     var isBlocked=u.is_blocked;
     var name=u.display_name||(u.email?u.email.split('@')[0]:'---');
     var bal=parseFloat(u.balance||0);
@@ -4296,10 +4308,13 @@ async function loadPyramidAdmin(){
     var borderColor=isVip?'rgba(255,215,0,.5)':'rgba(16,185,129,.4)';
     var badge=isVip?'<span class="pyr-badge vip">💎 VIP</span>':'<span class="pyr-badge reg">🌿</span>';
     var blockedBadge=isBlocked?'<span class="pyr-badge blk">🚫</span>':'';
+    var fdLabel=fd>0?'<div class="pyr-node-fd">اولین واریز: $'+fd.toFixed(0)+'</div>':'';
     var html='<div class="pyr-node-wrap" style="--depth:'+depth+'">';
-    html+='<div class="pyr-node" style="background:'+nodeColor+';border-color:'+borderColor+'" onclick="openMemberModal(\''+u.user_id+'\')" data-uid="'+u.user_id+'">';
+    // Click → go to 360 profile
+    html+='<div class="pyr-node" style="background:'+nodeColor+';border-color:'+borderColor+'" onclick="var c2=document.getElementById(\'adminContent\');loadUser360(\''+u.user_id+'\',c2)" data-uid="'+u.user_id+'">';
     html+='<div class="pyr-node-top">'+badge+blockedBadge+'<span class="pyr-name">'+name+'</span><span class="pyr-id">#'+(u.member_id||'----')+'</span></div>';
     html+='<div class="pyr-node-bal">$'+bal.toFixed(2)+'</div>';
+    html+=fdLabel;
     if(children.length)html+='<div class="pyr-node-refs">'+children.length+' زیرمجموعه</div>';
     html+='</div>';
     if(children.length){
@@ -4312,14 +4327,12 @@ async function loadPyramidAdmin(){
   }
 
   var out='<div class="pyr-root">';
-  // Tier labels
   var tierBal=roots.reduce(function(s,u){return s+parseFloat(u.balance||0);},0);
   out+='<div class="pyr-tier-label">👑 سطح ۱ — '+roots.length+' نفر · $'+tierBal.toFixed(0)+'</div>';
   out+='<div class="pyr-tier">';
   roots.forEach(function(u){out+=makeNode(u,0);});
   out+='</div></div>';
   c.innerHTML=out;
-  // Stagger animation
   var nodes=c.querySelectorAll('.pyr-node');
   nodes.forEach(function(n,i){n.style.animationDelay=(i*50)+'ms';n.classList.add('pyr-enter');});
 }
