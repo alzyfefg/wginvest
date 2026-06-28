@@ -3378,7 +3378,7 @@ async function doStartInvestment(amount){
   if(ex.data&&ex.data.length){toast(t("err_active_inv"),"red");loadMatches();return;}
   var newBal=Math.max(0,bal-amount);
   var insPayload={user_id:U.id,amount:amount,profit_pct:_siSettings.profit_pct,lock_minutes:_siSettings.lock_minutes,status:"active"};
-  if(_siSettings._selectedPlanName)insPayload.plan_name=_siSettings._selectedPlanName;
+  // plan_name column does not exist in investments table
   var insRes=await sb.from("investments").insert(insPayload);
   if(insRes.error){toast("Error: "+insRes.error.message,"red");return;}
   await sb.from("profiles").update({balance:newBal}).eq("user_id",U.id);
