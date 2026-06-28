@@ -3379,7 +3379,6 @@ async function doStartInvestment(amount){
   var newBal=Math.max(0,bal-amount);
   var insPayload={user_id:U.id,amount:amount,profit_pct:_siSettings.profit_pct,lock_minutes:_siSettings.lock_minutes,status:"active"};
   if(_siSettings._selectedPlanName)insPayload.plan_name=_siSettings._selectedPlanName;
-  if(_siSettings._selectedPlanId)insPayload.plan_id=_siSettings._selectedPlanId;
   var insRes=await sb.from("investments").insert(insPayload);
   if(insRes.error){toast("Error: "+insRes.error.message,"red");return;}
   await sb.from("profiles").update({balance:newBal}).eq("user_id",U.id);
