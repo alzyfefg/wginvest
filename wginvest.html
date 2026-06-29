@@ -2207,6 +2207,9 @@ function toast(msg,type){
   },3000);
 }
 function toggleEye(id,btn){var i=document.getElementById(id);i.type=i.type==="password"?"text":"password";btn.textContent=i.type==="password"?"👁️":"🙈";}
+function copyText(txt){if(navigator&&navigator.clipboard){navigator.clipboard.writeText(txt).then(function(){toast('📋 کپی شد','green');}).catch(function(){toast('📋 Copied','green');});}else{var ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('📋 کپی شد','green');}catch(e){}document.body.removeChild(ta);}}
+function countUpAdmin(el,target,duration){if(!el)return;var start=0,step=target/((duration||800)/16);var timer=setInterval(function(){start=Math.min(start+step,target);el.textContent=target>=1000?siFmt(Math.round(start)):Math.round(start*100)/100;if(start>=target)clearInterval(timer);},16);}
+async function checkBonusExpiry(){if(!U)return;if(P&&P.bonus>0&&P.bonus_expires_at&&P.bonus_expires_at<new Date().toISOString()){await sb.from('profiles').update({bonus:0,bonus_expires_at:null}).eq('user_id',U.id);P.bonus=0;P.bonus_expires_at=null;}}
 function showAuthTab(tab){
   document.getElementById("atab_in").classList.toggle("on",tab==="login");
   document.getElementById("atab_up").classList.toggle("on",tab==="register");
@@ -4682,9 +4685,11 @@ async function loadAdminOverview(c){
   var actInvCnt=cmdRes[4].count||0;
   var html=[];
   html.push('<div class="icard anim-fadeup" style="background:linear-gradient(135deg,rgba(0,212,170,.08),rgba(26,86,219,.08));border-color:rgba(0,212,170,.2);margin-bottom:14px"><div class="ctitle">🎛️ فرماندهی امروز</div>');
-  html.push('<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px">');
+  html.push('<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px;margin-top:10px">');
   html.push('<div style="text-align:center;padding:10px 4px;background:rgba(0,212,170,.08);border-radius:10px"><div style="font-size:16px;font-weight:900;color:#00d4aa">$'+todayDep.toFixed(0)+'</div><div style="font-size:9px;color:var(--text3);margin-top:3px">واریز امروز</div></div>');
   html.push('<div style="text-align:center;padding:10px 4px;background:rgba(255,71,87,.08);border-radius:10px"><div style="font-size:16px;font-weight:900;color:#ff4757">$'+todayWit.toFixed(0)+'</div><div style="font-size:9px;color:var(--text3);margin-top:3px">برداشت امروز</div></div>');
+  var todayFees=todayWit*0.08;
+  html.push('<div style="text-align:center;padding:10px 4px;background:rgba(255,215,0,.08);border-radius:10px"><div id="kpi_today_fees" style="font-size:16px;font-weight:900;color:var(--gold)">$'+todayFees.toFixed(0)+'</div><div style="font-size:9px;color:var(--text3);margin-top:3px">کارمزد امروز</div></div>');
   html.push('<div style="text-align:center;padding:10px 4px;background:rgba(245,158,11,.08);border-radius:10px;cursor:pointer" onclick="showAdminTab(&quot;deposits&quot;)"><div style="font-size:16px;font-weight:900;color:#f59e0b">'+pDepCnt+'</div><div style="font-size:9px;color:var(--text3);margin-top:3px">واریز معلق</div></div>');
   html.push('<div style="text-align:center;padding:10px 4px;background:rgba(245,158,11,.08);border-radius:10px;cursor:pointer" onclick="showAdminTab(&quot;withdrawals&quot;)"><div style="font-size:16px;font-weight:900;color:#f59e0b">'+pWitCnt+'</div><div style="font-size:9px;color:var(--text3);margin-top:3px">برداشت معلق</div></div>');
   html.push('<div style="text-align:center;padding:10px 4px;background:rgba(26,86,219,.08);border-radius:10px"><div style="font-size:16px;font-weight:900;color:#3b82f6">'+actInvCnt+'</div><div style="font-size:9px;color:var(--text3);margin-top:3px">سرمایه‌گذاری فعال</div></div>');
@@ -5256,8 +5261,15 @@ async function loadAD2(c){
   }
   if(!data.length){c.innerHTML='<div class="ebox"><span class="ei">💳</span><p>هیچ واریزی در انتظار نیست ✅</p></div>';return;}
   c.innerHTML=data.map(function(d){
-    return '<div class="dep-req"><div class="dep-top"><span class="dep-email">'+((d.profiles&&d.profiles.email)||'—')+'</span><span class="dep-amt">$'+d.amount+'</span></div>'
-      +'<div class="dep-hash">TX: '+(d.tx_hash||'—')+'</div>'
+    var txHash=d.tx_hash||'—';
+    var screenshotLink=d.screenshot_url?'<a href="'+d.screenshot_url+'" target="_blank" style="color:var(--ac);font-size:11px;text-decoration:none;margin-right:8px">📷 رسید</a>':'';
+    var memberBadge=d.profiles&&d.profiles.member_id?'<span style="font-size:9px;color:var(--text3);margin-right:6px">#'+d.profiles.member_id+'</span>':'';
+    var dt=new Date(d.created_at).toLocaleString('fa-IR');
+    return '<div class="dep-req"><div class="dep-top"><span class="dep-email">'+((d.profiles&&d.profiles.email)||'—')+'</span>'+memberBadge+'<span class="dep-amt">$'+d.amount+'</span></div>'
+      +'<div style="font-size:9px;color:var(--text3);margin-bottom:4px">'+dt+'</div>'
+      +'<div class="dep-hash" style="display:flex;align-items:center;gap:6px"><span style="flex:1;overflow:hidden;text-overflow:ellipsis">TX: '+txHash+'</span>'
+      +(txHash!=='—'?'<button onclick="copyText(\''+txHash+'\')" style="background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.2);border-radius:6px;padding:2px 7px;font-size:9px;color:var(--ac);cursor:pointer;white-space:nowrap;font-family:Vazirmatn,sans-serif">📋 کپی</button>':'')
+      +screenshotLink+'</div>'
       +'<div class="dep-btns"><button class="dep-btn app" onclick="appDep(&quot;'+d.id+'&quot;,&quot;'+d.user_id+'&quot;,'+d.amount+')">✅ تأیید</button><button class="dep-btn rej" onclick="rejDep(&quot;'+d.id+'&quot;)">❌ رد</button></div>'
       +'</div>';
   }).join('');
@@ -5528,10 +5540,19 @@ function filterWithQueue(){
     html.push('<div style="flex:1"><span class="dep-email">'+((w.profiles&&w.profiles.email)||"—")+'</span>');
     if(w.profiles&&w.profiles.member_id)html.push('<span style="font-size:9px;color:var(--text3);margin-right:6px">#'+w.profiles.member_id+'</span>');
     html.push('</div>');
-    html.push('<span class="dep-amt">$'+parseFloat(w.amount).toFixed(2)+'</span>');
+    var rawAmt=parseFloat(w.amount||0);var feeAmt=rawAmt*0.08;var netAmt=rawAmt*0.92;
+    html.push('<span class="dep-amt">$'+rawAmt.toFixed(2)+'</span>');
     html.push('<span class="with-status-badge '+statusCls+'" style="margin-right:8px">'+statusLabel+'</span>');
     html.push('</div>');
-    html.push('<div class="dep-hash" style="direction:ltr;word-break:break-all">'+w.wallet_address+'</div>');
+    html.push('<div style="display:flex;gap:8px;font-size:10px;margin-bottom:6px;flex-wrap:wrap">');
+    html.push('<span style="color:var(--red)">کارمزد ۸٪: -$'+feeAmt.toFixed(2)+'</span>');
+    html.push('<span style="color:var(--ac)">خالص دریافتی: $'+netAmt.toFixed(2)+'</span>');
+    if(w.txid)html.push('<span style="color:var(--gold)">TXID: <a style="color:var(--gold)" href="javascript:void(0)" onclick="copyText(\''+w.txid+'\')">'+w.txid.slice(0,16)+'...</a></span>');
+    html.push('</div>');
+    html.push('<div class="dep-hash" style="direction:ltr;word-break:break-all;display:flex;align-items:center;gap:6px">');
+    html.push('<span style="flex:1;overflow:hidden;text-overflow:ellipsis">'+w.wallet_address+'</span>');
+    html.push('<button onclick="copyText(\''+w.wallet_address+'\')" style="background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.2);border-radius:6px;padding:2px 7px;font-size:9px;color:var(--ac);cursor:pointer;white-space:nowrap;font-family:Vazirmatn,sans-serif">📋</button>');
+    html.push('</div>');
     html.push('<div style="font-size:10px;color:var(--text3);margin-bottom:4px">شبکه: '+(w.network||'—')+'</div>');
     html.push('<div style="font-size:10px;color:var(--text3);margin-bottom:4px">تاریخ ثبت: '+new Date(w.created_at).toLocaleString("fa-IR")+'</div>');
     // Timeline
@@ -5601,8 +5622,11 @@ async function rejDep(id){
 }
 
 async function appWith(id, userId, amount){
+  var txid=prompt('TXID پرداخت (اختیاری):')||'';
   // Balance was already deducted at submission — only update status
-  var w=await sb.from('withdrawals').update({status:'approved'}).eq('id',id);
+  var updateData={status:'approved',reviewed_at:new Date().toISOString(),reviewed_by:U.email};
+  if(txid)updateData.txid=txid;
+  var w=await sb.from('withdrawals').update(updateData).eq('id',id);
   if(w.error){toast('خطا: '+w.error.message,'red');return;}
   await sb.from('notifications').insert({user_id:userId,type:'withdrawal_approved',message:'برداشت $'+amount+' شما تأیید و پردازش شد.',is_read:false});
   await logAdminAction('Withdrawal Approved',userId,amount,'ID:'+id);
@@ -6251,8 +6275,10 @@ async function loadSIActiveList(){
   c.innerHTML=rows.map(function(inv){
     var profit=parseFloat(inv.amount)*parseFloat(inv.profit_pct)/100;
     var remain=Math.max(0,(inv.lock_minutes*60000)-(Date.now()-new Date(inv.started_at).getTime()));
-    return '<div class="dep-req"><div class="dep-top"><span class="dep-email">'+(emails[inv.user_id]||inv.user_id)+'</span><span style="font-size:10px;color:var(--text3)">'+fmtRemain(remain)+'</span></div>'
-      +'<div style="font-size:12px;color:var(--text2)">مقدار: $'+siFmt(inv.amount)+' | سود: +$'+siFmt(profit)+'</div></div>';
+    var planLbl=inv.plan_name||'Standard';
+    return '<div class="dep-req"><div class="dep-top"><span class="dep-email">'+(emails[inv.user_id]||inv.user_id)+'</span><span style="font-size:10px;color:var(--ac)">'+(t('inv_status_active')||'فعال')+'</span></div>'
+      +'<div style="font-size:12px;color:var(--text2)">مقدار: $'+siFmt(inv.amount)+' | سود: +$'+siFmt(profit)+' | زمان باقی: '+fmtRemain(remain)+'</div>'
+      +'<div style="font-size:10px;color:var(--text3)">'+planLbl+'</div></div>';
   }).join('');
 }
 
@@ -6268,7 +6294,7 @@ async function loadSICompletedList(){
   if(pr.data)pr.data.forEach(function(p){emails[p.user_id]=p.email;});
   c.innerHTML=rows.map(function(inv){
     var profit=parseFloat(inv.amount)*parseFloat(inv.profit_pct)/100;
-    var statusLabel=inv.status==='withdrawn'?'✅ برداشت شده':'⏳ منتظر برداشت';
+    var statusLabel=inv.status==='withdrawn'?(t('inv_status_claimed')||'✅ برداشت شده'):inv.status==='completed'?(t('inv_status_done')||'⏳ منتظر برداشت'):(t('inv_status_'+inv.status)||inv.status);
     return '<div class="dep-req"><div class="dep-top"><span class="dep-email">'+(emails[inv.user_id]||inv.user_id)+'</span><span style="font-size:10px;color:var(--text3)">'+statusLabel+'</span></div>'
       +'<div style="font-size:12px;color:var(--text2)">مقدار: $'+siFmt(inv.amount)+' | سود: +$'+siFmt(profit)+'</div></div>';
   }).join('');
