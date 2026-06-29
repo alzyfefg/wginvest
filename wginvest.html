@@ -8,6 +8,14 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 <style>
+@keyframes fadeInUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+@keyframes countUpPulse{0%{transform:scale(1)}50%{transform:scale(1.04)}100%{transform:scale(1)}}
+.anim-fadeup{animation:fadeInUp .4s ease both}
+.anim-scalein{animation:scaleIn .25s ease both}
+.skeleton{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.09) 50%,rgba(255,255,255,.04) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:8px;height:14px;margin:4px 0}
 :root{
   --p:#1a56db;--pd:#1e40af;--pl:#3b82f6;
   --ac:#00d4aa;--ac2:#00b894;
@@ -1979,7 +1987,7 @@ im_tl_title:"چگونه کار می‌کند",im_tl1_title:"واریز وجه",i
 im_s5_title:"چرا اعضا WGInvest را انتخاب می‌کنند",im_f1_title:"ساختار بازدهی ثابت",im_f1_sub:"سود قابل پیش‌بینی بدون وابستگی به نوسانات بازار",im_f2_title:"استراتژی سرمایه‌گذاری مبتنی بر خزانه‌داری",im_f2_sub:"الهام گرفته از اوراق قرضه دولتی ایالات متحده",im_f3_title:"دوره‌های قفل شفاف",im_f3_sub:"شرایط روشن، بدون هزینه‌های پنهان",im_f4_title:"تخصیص ساختاریافته سرمایه",im_f4_sub:"رویکرد منضبط برای مدیریت دارایی",im_f5_title:"تمرکز سرمایه‌گذاری بلندمدت",im_f5_sub:"ساخته شده برای رشد پایدار در طول زمان",im_f6_title:"بدون نیاز به معاملات فعال",im_f6_sub:"سرمایه‌گذاری کنید، قفل کنید، سود دریافت کنید",
 im_s6_title:"فلسفه سرمایه‌گذاری ما",im_s6_quote:"\"ثروت پایدار از طریق تخصیص منضبط سرمایه ساخته می‌شود.\"",im_s6_text:"ما بر این باوریم که خلق ثروت پایدار از طریق تخصیص منضبط سرمایه، سرمایه‌گذاری با درآمد ثابت و استراتژی‌های مدیریت ریسک ساخته می‌شود نه از طریق سفته‌بازی کوتاه‌مدت.\n\nتمرکز ما بر ثبات، ساختار و رشد بلندمدت سرمایه باقی می‌ماند.",
 dh_greeting:"خوش برگشتی",dh_avail_bal:"موجودی",dh_active_inv:"سرمایه‌گذاری",dh_cycle_profit:"سود دوره",dh_time_left:"زمان باقی",dh_progress:"پیشرفت",dh_no_inv:"فعال نیست",dh_live:"زنده",dh_cycle_prog:"پیشرفت دوره",dh_no_active:"سرمایه‌گذاری فعالی ندارید",
-bonus_lbl:"بونوس",bonus_expires:"انقضا:",bonus_days:"روز",bonus_active:"بونوس فعال",bonus_expired:"بونوس منقضی شد",bonus_cancelled:"بونوس لغو شد",bonus_warn_withdraw:"⚠️ برداشت از حساب باعث لغو بونوس می‌شود.",adm_give_bonus:"اعطای بونوس",adm_bonus_amt:"مبلغ بونوس ($)",adm_bonus_days:"مدت اعتبار (روز)",adm_bonus_submit:"ثبت بونوس 🎁",adm_bonus_done:"✅ بونوس اعطا شد",adm_bonus_section:"🎁 مدیریت بونوس",inv_no_active:"سرمایه‌گذاری فعال ندارید",inv_choose_plan:"یک پلن انتخاب کنید",inv_choose_desc:"یکی از پلن‌های زیر را انتخاب کنید تا سود ثابت کسب کنید.",inv_accrued:"سود تجمیع‌شده",inv_completion:"زمان تکمیل",inv_details_title:"جزئیات سرمایه‌گذاری",inv_complete_invest:"سرمایه‌گذاری کامل",inv_std_selected:"Standard انتخاب شد",inv_vip_selected:"VIP انتخاب شد",inv_hist_date:"تاریخ سرمایه‌گذاری",inv_hist_end:"تاریخ پایان",inv_hist_all:"همه",inv_hist_active:"فعال",inv_hist_claimed:"دریافت شده",inv_hist_done:"تکمیل‌شده",inv_hist_empty:"سابقه سرمایه‌گذاری وجود ندارد",inv_hist_none:"موردی یافت نشد",inv_hist_title:"سابقه سرمایه‌گذاری",inv_days:"روز",inv_locked_amt:"مبلغ قفل‌شده",inv_exp_profit:"سود انتظاری",inv_exp_final:"مبلغ نهایی",inv_prog_pct:"پیشرفت",
+bonus_lbl:"بونوس",bonus_expires:"انقضا:",bonus_days:"روز",bonus_active:"بونوس فعال",bonus_expired:"بونوس منقضی شد",bonus_cancelled:"بونوس لغو شد",bonus_warn_withdraw:"⚠️ برداشت از حساب باعث لغو بونوس می‌شود.",adm_give_bonus:"اعطای بونوس",adm_bonus_amt:"مبلغ بونوس ($)",adm_bonus_days:"مدت اعتبار (روز)",adm_bonus_submit:"ثبت بونوس 🎁",adm_bonus_done:"✅ بونوس اعطا شد",adm_bonus_section:"🎁 مدیریت بونوس",inv_no_active:"سرمایه‌گذاری فعال ندارید",inv_choose_plan:"یک پلن انتخاب کنید",inv_choose_desc:"یکی از پلن‌های زیر را انتخاب کنید تا سود ثابت کسب کنید.",inv_accrued:"سود تجمیع‌شده",inv_completion:"زمان تکمیل",inv_details_title:"جزئیات سرمایه‌گذاری",inv_complete_invest:"سرمایه‌گذاری کامل",inv_std_selected:"Standard انتخاب شد",inv_vip_selected:"VIP انتخاب شد",inv_hist_date:"تاریخ سرمایه‌گذاری",inv_hist_end:"تاریخ پایان",inv_hist_all:"همه",inv_hist_active:"فعال",inv_hist_claimed:"دریافت شده",inv_hist_done:"تکمیل‌شده",inv_hist_empty:"سابقه سرمایه‌گذاری وجود ندارد",inv_hist_none:"موردی یافت نشد",inv_hist_title:"سابقه سرمایه‌گذاری",inv_days:"روز",inv_locked_amt:"مبلغ قفل‌شده",inv_exp_profit:"سود انتظاری",inv_exp_final:"مبلغ نهایی",inv_prog_pct:"پیشرفت",inv_status_active:"فعال",inv_status_done:"تکمیل شده",inv_status_claimed:"دریافت شد",inv_status_cancelled:"لغو شده",inv_status_pending:"در انتظار",inv_started:"شروع",inv_completed:"تکمیل",with_fee:"کارمزد (۸٪)",with_net:"مبلغ خالص دریافتی",wallet_locked:"کیف پول قفل شده است",req_wallet_change:"درخواست تغییر کیف پول",wallet_change_reason:"دلیل تغییر",wallet_change_submitted:"✅ درخواست تغییر کیف پول ارسال شد",wallet_change_blocked:"تغییر کیف پول در طول سرمایه‌گذاری فعال یا برداشت در انتظار امکان‌پذیر نیست",
 with_lock_note:"🔒 وجوه ارسال‌شده تا تکمیل یا رد شدن موقتاً قفل می‌شوند.",active_bonus_detected:"بونوس فعال شناسایی شد",active_bonus_warn_text:"ارسال درخواست برداشت باعث لغو دائمی بونوس فعال و موجودی بونوس باقی‌مانده می‌شود. این عمل قابل بازگشت نیست.",
 with_conf_title:"تأیید درخواست برداشت",with_conf_sub:"جزئیات را بررسی کنید",with_conf_amt:"💵 مبلغ برداشت",with_conf_net:"🌐 شبکه",with_conf_addr:"📍 آدرس مقصد",with_conf_time:"⏱ زمان پردازش",with_conf_time_val:"۱–۲۴ ساعت",with_conf_btn:"✅ تأیید و ارسال درخواست",with_conf_cancel:"انصراف",
 bonus_conf_title:"⚠️ هشدار بونوس",bonus_conf_body1:"شما در حال حاضر بونوس فعال",bonus_conf_body2:"دارید. ارسال این درخواست برداشت، بونوس و موجودی بونوس باقی‌مانده را به طور دائمی حذف خواهد کرد.",bonus_conf_irreversible:"این عمل قابل بازگشت نیست.",bonus_conf_btn:"ادامه برداشت",bonus_conf_cancel:"انصراف"},
@@ -2008,7 +2016,7 @@ im_tl_title:"How It Works",im_tl1_title:"Deposit Funds",im_tl1_desc:"Deposit USD
 im_s5_title:"Why Members Choose WGInvest",im_f1_title:"Fixed Yield Structure",im_f1_sub:"Predictable returns not tied to market volatility",im_f2_title:"Treasury-Based Investment Strategy",im_f2_sub:"Inspired by U.S. government bond principles",im_f3_title:"Transparent Lock Periods",im_f3_sub:"Clear terms, no hidden conditions",im_f4_title:"Structured Capital Allocation",im_f4_sub:"Disciplined approach to asset management",im_f5_title:"Long-Term Investment Focus",im_f5_sub:"Built for sustainable growth over time",im_f6_title:"No Active Trading Required",im_f6_sub:"Deposit, lock, and claim — it's that simple",
 im_s6_title:"Our Investment Philosophy",im_s6_quote:"\"Sustainable wealth is built through disciplined capital allocation.\"",im_s6_text:"We believe sustainable wealth creation is built through disciplined capital allocation, fixed-income investing, and risk-managed strategies rather than short-term speculation.\n\nOur focus remains on consistency, structure, and long-term capital growth.",
 dh_greeting:"Welcome back",dh_avail_bal:"Available",dh_active_inv:"Active Invest",dh_cycle_profit:"Cycle Profit",dh_time_left:"Time Left",dh_progress:"Progress",dh_no_inv:"No Investment",dh_live:"LIVE",dh_cycle_prog:"Cycle Progress",dh_no_active:"No active investment",
-bonus_lbl:"Bonus",bonus_expires:"Expires in:",bonus_days:"days",bonus_active:"Active Bonus",bonus_expired:"Bonus expired",bonus_cancelled:"Bonus cancelled",bonus_warn_withdraw:"⚠️ Withdrawing will cancel your active bonus.",adm_give_bonus:"Give Bonus",adm_bonus_amt:"Bonus Amount ($)",adm_bonus_days:"Valid (days)",adm_bonus_submit:"Give Bonus 🎁",adm_bonus_done:"✅ Bonus granted",adm_bonus_section:"🎁 Bonus Management",inv_no_active:"No Active Investment",inv_choose_plan:"Choose a Plan",inv_choose_desc:"Select one of the plans below to start earning fixed returns.",inv_accrued:"Accrued Profit",inv_completion:"Completion",inv_details_title:"Investment Details",inv_complete_invest:"Complete Investment",inv_std_selected:"Standard Selected",inv_vip_selected:"VIP Selected",inv_hist_date:"Invested",inv_hist_end:"Completed",inv_hist_all:"All",inv_hist_active:"Active",inv_hist_claimed:"Claimed",inv_hist_done:"Completed",inv_hist_empty:"No investment history found",inv_hist_none:"No records found",inv_hist_title:"Investment History",inv_days:"d",inv_locked_amt:"Locked Amount",inv_exp_profit:"Expected Profit",inv_exp_final:"Final Amount",inv_prog_pct:"Progress",
+bonus_lbl:"Bonus",bonus_expires:"Expires in:",bonus_days:"days",bonus_active:"Active Bonus",bonus_expired:"Bonus expired",bonus_cancelled:"Bonus cancelled",bonus_warn_withdraw:"⚠️ Withdrawing will cancel your active bonus.",adm_give_bonus:"Give Bonus",adm_bonus_amt:"Bonus Amount ($)",adm_bonus_days:"Valid (days)",adm_bonus_submit:"Give Bonus 🎁",adm_bonus_done:"✅ Bonus granted",adm_bonus_section:"🎁 Bonus Management",inv_no_active:"No Active Investment",inv_choose_plan:"Choose a Plan",inv_choose_desc:"Select one of the plans below to start earning fixed returns.",inv_accrued:"Accrued Profit",inv_completion:"Completion",inv_details_title:"Investment Details",inv_complete_invest:"Complete Investment",inv_std_selected:"Standard Selected",inv_vip_selected:"VIP Selected",inv_hist_date:"Invested",inv_hist_end:"Completed",inv_hist_all:"All",inv_hist_active:"Active",inv_hist_claimed:"Claimed",inv_hist_done:"Completed",inv_hist_empty:"No investment history found",inv_hist_none:"No records found",inv_hist_title:"Investment History",inv_days:"d",inv_locked_amt:"Locked Amount",inv_exp_profit:"Expected Profit",inv_exp_final:"Final Amount",inv_prog_pct:"Progress",inv_status_active:"Active",inv_status_done:"Completed",inv_status_claimed:"Claimed",inv_status_cancelled:"Cancelled",inv_status_pending:"Pending",inv_started:"Started",inv_completed:"Completed",with_fee:"Fee (8%)",with_net:"Net Amount",wallet_locked:"Wallet is locked",req_wallet_change:"Request Wallet Change",wallet_change_reason:"Reason for change",wallet_change_submitted:"✅ Wallet change request submitted",wallet_change_blocked:"Wallet change not allowed during active investment or pending withdrawal",
 with_lock_note:"🔒 Submitted funds are temporarily locked until completed or rejected.",active_bonus_detected:"Active Bonus Detected",active_bonus_warn_text:"Submitting a withdrawal request will permanently cancel your Active Bonus and all remaining Bonus Balance. This action cannot be undone.",
 with_conf_title:"Withdrawal Confirmation",with_conf_sub:"Review details below",with_conf_amt:"💵 Withdrawal Amount",with_conf_net:"🌐 Network",with_conf_addr:"📍 Destination Address",with_conf_time:"⏱ Processing Time",with_conf_time_val:"1–24 hours",with_conf_btn:"✅ Confirm & Submit",with_conf_cancel:"Cancel",
 bonus_conf_title:"⚠️ Bonus Warning",bonus_conf_body1:"You currently have an active bonus of",bonus_conf_body2:"Submitting this withdrawal will permanently remove your Active Bonus and any unused Bonus Balance.",bonus_conf_irreversible:"This action cannot be reversed.",bonus_conf_btn:"Continue Withdrawal",bonus_conf_cancel:"Cancel"},
@@ -3865,6 +3873,18 @@ async function loadWallet(){
   html.push('<div class="wbal-amount">$'+bal.toFixed(2)+'</div>');
   html.push('<div class="wbal-currency">USDT</div>');
   html.push('</div>');
+  // Balance breakdown cards
+  var bonus=parseFloat(P&&P.bonus||0);
+  var pendWithRes=await sb.from('withdrawals').select('amount').eq('user_id',U.id).eq('status','pending');
+  var actInvRes=await sb.from('investments').select('amount').eq('user_id',U.id).eq('status','active');
+  var pendWithSum=(pendWithRes.data||[]).reduce(function(s,r){return s+parseFloat(r.amount||0);},0);
+  var actInvSum=(actInvRes.data||[]).reduce(function(s,r){return s+parseFloat(r.amount||0);},0);
+  html.push('<div style="display:flex;gap:8px;overflow-x:auto;margin-bottom:14px;padding-bottom:4px;-webkit-overflow-scrolling:touch">');
+  html.push('<div style="flex-shrink:0;min-width:130px;background:linear-gradient(135deg,rgba(0,212,170,.15),rgba(0,212,170,.05));border:1px solid rgba(0,212,170,.25);border-radius:14px;padding:14px;text-align:center"><div style="font-size:11px;color:var(--text3);margin-bottom:6px">💚 موجودی آزاد</div><div style="font-size:18px;font-weight:900;color:#00d4aa">$'+bal.toFixed(2)+'</div></div>');
+  html.push('<div style="flex-shrink:0;min-width:130px;background:linear-gradient(135deg,rgba(255,215,0,.12),rgba(255,215,0,.04));border:1px solid rgba(255,215,0,.2);border-radius:14px;padding:14px;text-align:center"><div style="font-size:11px;color:var(--text3);margin-bottom:6px">⭐ بونوس</div><div style="font-size:18px;font-weight:900;color:#ffd700">$'+bonus.toFixed(2)+'</div></div>');
+  html.push('<div style="flex-shrink:0;min-width:130px;background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(245,158,11,.04));border:1px solid rgba(245,158,11,.2);border-radius:14px;padding:14px;text-align:center"><div style="font-size:11px;color:var(--text3);margin-bottom:6px">⏳ برداشت معلق</div><div style="font-size:18px;font-weight:900;color:#f59e0b">$'+pendWithSum.toFixed(2)+'</div></div>');
+  html.push('<div style="flex-shrink:0;min-width:130px;background:linear-gradient(135deg,rgba(59,130,246,.12),rgba(59,130,246,.04));border:1px solid rgba(59,130,246,.2);border-radius:14px;padding:14px;text-align:center"><div style="font-size:11px;color:var(--text3);margin-bottom:6px">🔒 سرمایه‌گذاری</div><div style="font-size:18px;font-weight:900;color:#3b82f6">$'+actInvSum.toFixed(2)+'</div></div>');
+  html.push('</div>');
   // Choice cards
   html.push('<div class="finance-choice">');
   html.push('<div class="fc-card dep"><span class="fc-card-icon">📥</span><div class="fc-card-title">'+t('w_dep_title')+'</div><div class="fc-card-desc">'+t('w_dep_desc')+'</div><button class="fc-card-btn" onclick="startDepFlow()">'+t('w_dep_btn')+'</button></div>');
@@ -4193,6 +4213,8 @@ function showWithConfirmModal(amt,net,wa,saveCheck){
       +'<div class="with-sum-row"><span class="with-sum-lbl">'+t('with_conf_net')+'</span><span class="with-sum-val">USDT '+(net==="trc20"?"TRC20":"BEP20")+'</span></div>'
       +'<div class="with-sum-row"><span class="with-sum-lbl">'+t('with_conf_addr')+'</span><span class="with-sum-val" style="font-size:10px;font-family:monospace;direction:ltr;word-break:break-all">'+wa+'</span></div>'
       +'<div class="with-sum-row"><span class="with-sum-lbl">'+t('with_conf_time')+'</span><span class="with-sum-val">'+t('with_conf_time_val')+'</span></div>'
+      +'<div class="with-sum-row"><span class="with-sum-lbl">💸 '+t('with_fee')+'</span><span class="with-sum-val" style="color:#f87171">-$'+siFmt(amt*0.08)+'</span></div>'
+      +'<div class="with-sum-row"><span class="with-sum-lbl">✅ '+t('with_net')+'</span><span class="with-sum-val" style="color:#00d4aa">$'+siFmt(amt*0.92)+'</span></div>'
       +'</div>'
       +'<button id="withConfirmYes" style="width:100%;background:linear-gradient(135deg,#1a56db,#00d4aa);color:#fff;border:none;border-radius:12px;padding:13px;font-family:Vazirmatn,sans-serif;font-size:14px;font-weight:900;cursor:pointer;margin-bottom:8px">'+t('with_conf_btn')+'</button>'
       +'<button id="withConfirmNo" style="width:100%;background:rgba(255,255,255,.05);color:var(--text2);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;font-family:Vazirmatn,sans-serif;font-size:13px;font-weight:700;cursor:pointer">'+t('with_conf_cancel')+'</button>'
@@ -4288,6 +4310,46 @@ function showWithdrawInfo(){
   document.body.appendChild(bg);
 }
 
+async function requestWalletChange(){
+  // Check for active investment or pending withdrawal
+  var activeInv=await sb.from('investments').select('id',{count:'exact'}).eq('user_id',U.id).eq('status','active');
+  var pendWith=await sb.from('withdrawals').select('id',{count:'exact'}).eq('user_id',U.id).eq('status','pending');
+  if((activeInv.count||0)>0||(pendWith.count||0)>0){
+    return toast(t('wallet_change_blocked'),'red');
+  }
+  var overlay=document.createElement('div');
+  overlay.className='with-conf-overlay';
+  overlay.innerHTML='<div class="with-conf-box">'
+    +'<div style="text-align:center;margin-bottom:16px"><div style="font-size:28px;margin-bottom:6px">🔐</div>'
+    +'<div style="font-size:15px;font-weight:900;color:var(--text)">'+t('req_wallet_change')+'</div></div>'
+    +'<div style="margin-bottom:14px">'
+    +'<div style="font-size:11px;color:var(--text3);margin-bottom:4px">TRC20</div>'
+    +'<input id="wcNewTrc" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px;font-family:Vazirmatn,sans-serif;font-size:12px;color:var(--text);outline:none;margin-bottom:10px;direction:ltr" placeholder="T...">'
+    +'<div style="font-size:11px;color:var(--text3);margin-bottom:4px">BEP20</div>'
+    +'<input id="wcNewBep" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px;font-family:Vazirmatn,sans-serif;font-size:12px;color:var(--text);outline:none;margin-bottom:10px;direction:ltr" placeholder="0x...">'
+    +'<div style="font-size:11px;color:var(--text3);margin-bottom:4px">'+t('wallet_change_reason')+'</div>'
+    +'<textarea id="wcReason" rows="2" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px;font-family:Vazirmatn,sans-serif;font-size:12px;color:var(--text);outline:none;resize:none"></textarea>'
+    +'</div>'
+    +'<button id="wcSubmit" style="width:100%;background:linear-gradient(135deg,#1a56db,#00d4aa);color:#fff;border:none;border-radius:12px;padding:13px;font-family:Vazirmatn,sans-serif;font-size:14px;font-weight:900;cursor:pointer;margin-bottom:8px">ارسال درخواست</button>'
+    +'<button id="wcCancel" style="width:100%;background:rgba(255,255,255,.05);color:var(--text2);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;font-family:Vazirmatn,sans-serif;font-size:13px;font-weight:700;cursor:pointer">انصراف</button>'
+    +'</div>';
+  document.body.appendChild(overlay);
+  overlay.querySelector('#wcCancel').onclick=function(){overlay.remove();};
+  overlay.onclick=function(e){if(e.target===overlay)overlay.remove();};
+  overlay.querySelector('#wcSubmit').onclick=async function(){
+    var newTrc=(overlay.querySelector('#wcNewTrc').value||'').trim();
+    var newBep=(overlay.querySelector('#wcNewBep').value||'').trim();
+    var reason=(overlay.querySelector('#wcReason').value||'').trim();
+    if(!newTrc&&!newBep)return toast(t('err_fill_all'),'red');
+    if(newTrc&&!newTrc.startsWith('T'))return toast(t('err_trc20_T'),'red');
+    if(newBep&&!newBep.startsWith('0x'))return toast(t('err_bep20_0x'),'red');
+    var ins=await sb.from('wallet_change_requests').insert({user_id:U.id,old_wallet_trc20:P.wallet_address_trc20||null,old_wallet_bep20:P.wallet_address_bep20||null,new_wallet_trc20:newTrc||null,new_wallet_bep20:newBep||null,reason:reason||null,status:'pending'});
+    overlay.remove();
+    if(ins.error)return toast('خطا: '+ins.error.message,'red');
+    toast(t('wallet_change_submitted'),'green');
+  };
+}
+
 function prevDep(input){
   if(!input.files||!input.files[0])return;
   document.getElementById('dimg').src=URL.createObjectURL(input.files[0]);
@@ -4354,8 +4416,58 @@ async function loadAdmin(){
     +'<button class="adm-tab" id="at_notes" onclick="showAdminTab(&quot;notes&quot;)">📝 یادداشت</button>'
     +'<button class="adm-tab" id="at_settings" onclick="showAdminTab(&quot;settings&quot;)">⚙️ تنظیمات</button>'
     +'</div>'
+    +'<input class="global-search" id="adminGlobalSearch" placeholder="🔍 جستجو: ایمیل، شناسه، TX Hash، آدرس کیف پول..." oninput="adminSearchDebounce(this.value)" style="margin-bottom:8px">'
+    +'<div id="adminSearchResults" style="display:none;background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;margin-bottom:10px;max-height:300px;overflow-y:auto"></div>'
     +'<div id="adminContent"><div class="lbox"><div class="spin"></div></div></div>';
   showAdminTab("overview");
+}
+
+var _adminSearchTimer=null;
+function adminSearchDebounce(q){
+  clearTimeout(_adminSearchTimer);
+  var res=document.getElementById('adminSearchResults');
+  if(!q||q.length<2){if(res)res.style.display='none';return;}
+  _adminSearchTimer=setTimeout(function(){adminSearch(q);},400);
+}
+async function adminSearch(q){
+  var res=document.getElementById('adminSearchResults');
+  if(!res)return;
+  res.style.display='block';
+  res.innerHTML='<div style="color:var(--text3);font-size:12px">در حال جستجو...</div>';
+  var users=await sb.from('profiles').select('*').or('email.ilike.%'+q+'%,member_id.ilike.%'+q+'%,display_name.ilike.%'+q+'%').limit(10);
+  var deps=await sb.from('deposits').select('*').ilike('tx_hash','%'+q+'%').limit(5);
+  var withs=await sb.from('withdrawals').select('*').ilike('wallet_address','%'+q+'%').limit(5);
+  // Enrich deposits with profiles
+  var dUids=[...new Set((deps.data||[]).map(function(d){return d.user_id;}))];
+  var dProfs=dUids.length?await sb.from('profiles').select('user_id,email,member_id').in('user_id',dUids):{data:[]};
+  var dProfMap={};(dProfs.data||[]).forEach(function(p){dProfMap[p.user_id]=p;});
+  var wUids=[...new Set((withs.data||[]).map(function(w){return w.user_id;}))];
+  var wProfs=wUids.length?await sb.from('profiles').select('user_id,email,member_id').in('user_id',wUids):{data:[]};
+  var wProfMap={};(wProfs.data||[]).forEach(function(p){wProfMap[p.user_id]=p;});
+  var html=[];
+  var total=(users.data||[]).length+(deps.data||[]).length+(withs.data||[]).length;
+  if(!total){res.innerHTML='<div style="color:var(--text3);font-size:12px;text-align:center">نتیجه‌ای یافت نشد</div>';return;}
+  if((users.data||[]).length){
+    html.push('<div style="font-size:10px;font-weight:700;color:var(--text3);margin-bottom:6px">👥 کاربران</div>');
+    (users.data||[]).forEach(function(u){
+      html.push('<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 8px;background:rgba(255,255,255,.04);border-radius:8px;margin-bottom:4px;cursor:pointer" onclick="showAdminTab(\'users\')"><span style="font-size:12px;color:var(--text)">'+u.email+'</span><span style="font-size:10px;color:var(--text3)">$'+(u.balance||0)+'</span></div>');
+    });
+  }
+  if((deps.data||[]).length){
+    html.push('<div style="font-size:10px;font-weight:700;color:var(--text3);margin:8px 0 6px">💳 واریزها</div>');
+    (deps.data||[]).forEach(function(d){
+      var pr=dProfMap[d.user_id]||{};
+      html.push('<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 8px;background:rgba(0,212,170,.04);border-radius:8px;margin-bottom:4px;cursor:pointer" onclick="showAdminTab(\'deposits\')"><span style="font-size:11px;color:var(--text)">'+(pr.email||d.user_id.slice(0,8))+'</span><span style="font-size:11px;color:#00d4aa">$'+d.amount+' <span style="font-size:9px;color:var(--text3)">'+d.status+'</span></span></div>');
+    });
+  }
+  if((withs.data||[]).length){
+    html.push('<div style="font-size:10px;font-weight:700;color:var(--text3);margin:8px 0 6px">💸 برداشت‌ها</div>');
+    (withs.data||[]).forEach(function(w){
+      var pr=wProfMap[w.user_id]||{};
+      html.push('<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 8px;background:rgba(255,71,87,.04);border-radius:8px;margin-bottom:4px;cursor:pointer" onclick="showAdminTab(\'withdrawals\')"><span style="font-size:11px;color:var(--text)">'+(pr.email||w.user_id.slice(0,8))+'</span><span style="font-size:11px;color:#ff4757">$'+w.amount+' <span style="font-size:9px;color:var(--text3)">'+w.status+'</span></span></div>');
+    });
+  }
+  res.innerHTML=html.join('');
 }
 
 async function showAdminTab(tab){
@@ -4394,7 +4506,30 @@ async function loadAdminOverview(c){
   var totalWith=(withs.data||[]).reduce(function(s,w){return s+parseFloat(w.amount||0);},0);
   var profit=totalDep-totalWith;
   var pending=(pendDeps.count||0)+(pendWiths.count||0)+(pendKyc.count||0);
+  // Today's command center stats
+  var today=new Date();today.setHours(0,0,0,0);
+  var todayISO=today.toISOString();
+  var cmdRes=await Promise.all([
+    sb.from('deposits').select('amount').eq('status','approved').gte('created_at',todayISO),
+    sb.from('withdrawals').select('amount').eq('status','approved').gte('created_at',todayISO),
+    sb.from('deposits').select('id',{count:'exact'}).eq('status','pending'),
+    sb.from('withdrawals').select('id',{count:'exact'}).eq('status','pending'),
+    sb.from('investments').select('id',{count:'exact'}).eq('status','active')
+  ]);
+  var todayDep=(cmdRes[0].data||[]).reduce(function(s,r){return s+parseFloat(r.amount||0);},0);
+  var todayWit=(cmdRes[1].data||[]).reduce(function(s,r){return s+parseFloat(r.amount||0);},0);
+  var pDepCnt=cmdRes[2].count||0;
+  var pWitCnt=cmdRes[3].count||0;
+  var actInvCnt=cmdRes[4].count||0;
   var html=[];
+  html.push('<div class="icard anim-fadeup" style="background:linear-gradient(135deg,rgba(0,212,170,.08),rgba(26,86,219,.08));border-color:rgba(0,212,170,.2);margin-bottom:14px"><div class="ctitle">🎛️ فرماندهی امروز</div>');
+  html.push('<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px">');
+  html.push('<div style="text-align:center;padding:10px 4px;background:rgba(0,212,170,.08);border-radius:10px"><div style="font-size:16px;font-weight:900;color:#00d4aa">$'+todayDep.toFixed(0)+'</div><div style="font-size:9px;color:var(--text3);margin-top:3px">واریز امروز</div></div>');
+  html.push('<div style="text-align:center;padding:10px 4px;background:rgba(255,71,87,.08);border-radius:10px"><div style="font-size:16px;font-weight:900;color:#ff4757">$'+todayWit.toFixed(0)+'</div><div style="font-size:9px;color:var(--text3);margin-top:3px">برداشت امروز</div></div>');
+  html.push('<div style="text-align:center;padding:10px 4px;background:rgba(245,158,11,.08);border-radius:10px;cursor:pointer" onclick="showAdminTab(&quot;deposits&quot;)"><div style="font-size:16px;font-weight:900;color:#f59e0b">'+pDepCnt+'</div><div style="font-size:9px;color:var(--text3);margin-top:3px">واریز معلق</div></div>');
+  html.push('<div style="text-align:center;padding:10px 4px;background:rgba(245,158,11,.08);border-radius:10px;cursor:pointer" onclick="showAdminTab(&quot;withdrawals&quot;)"><div style="font-size:16px;font-weight:900;color:#f59e0b">'+pWitCnt+'</div><div style="font-size:9px;color:var(--text3);margin-top:3px">برداشت معلق</div></div>');
+  html.push('<div style="text-align:center;padding:10px 4px;background:rgba(26,86,219,.08);border-radius:10px"><div style="font-size:16px;font-weight:900;color:#3b82f6">'+actInvCnt+'</div><div style="font-size:9px;color:var(--text3);margin-top:3px">سرمایه‌گذاری فعال</div></div>');
+  html.push('</div></div>');
   html.push('<div class="icard"><div class="ctitle">⚡ دسترسی سریع</div>');
   html.push('<div class="quick-actions">');
   ['matches','deposits','withdrawals','users','announce','tickets'].forEach(function(t,i){
