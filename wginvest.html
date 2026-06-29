@@ -3052,6 +3052,7 @@ function confirmPlanInvest(roi,lock_minutes){
   _siSettings.profit_pct=roi;
   _siSettings.lock_minutes=lock_minutes;
   _siSettings.min_amount=_selectedPlanData.min_amount;
+  _siSettings.min_balance=_selectedPlanData.min_balance||0;
   _siSettings._selectedPlanId=_selectedPlanData.id;
   _siSettings._selectedPlanName=_selectedPlanData.name;
   showInvestSummary(amount,roi,lock_minutes);
@@ -3061,6 +3062,7 @@ function openInvestModalWithPlan(plan){
   _siSettings.profit_pct=plan.roi;
   _siSettings.lock_minutes=plan.lock_minutes;
   _siSettings.min_amount=plan.min_amount;
+  _siSettings.min_balance=plan.min_balance||0;
   _siSettings._selectedPlanId=plan.id;
   _siSettings._selectedPlanName=plan.name;
   openInvestModal();
@@ -3789,6 +3791,7 @@ async function doStartInvestment(amount){
   if(!U||!P)return;
   var bal=parseFloat(P.balance||0);
   if(amount<(_siSettings.min_amount||0)){toast(t("err_min_invest")+': $'+(_siSettings.min_amount||0),"red");return;}
+  if((_siSettings.min_balance||0)>0&&bal<(_siSettings.min_balance||0)){toast(t("err_min_invest")+': حداقل موجودی $'+(_siSettings.min_balance||0),"red");return;}
   if(amount>bal+0.01){toast(t("err_bal_low"),"red");return;}
   // Clamp to actual balance to avoid float precision issues
   amount=Math.min(amount,bal);
@@ -3798,8 +3801,7 @@ async function doStartInvestment(amount){
   var ex=await sb.from("investments").select("id").eq("user_id",U.id).eq("status","active").limit(1);
   if(ex.data&&ex.data.length){toast(t("err_active_inv"),"red");loadMatches();return;}
   var newBal=Math.max(0,bal-amount);
-  var insPayload={user_id:U.id,amount:amount,profit_pct:_siSettings.profit_pct,lock_minutes:_siSettings.lock_minutes,status:"active"};
-  // plan_name column does not exist in investments table
+  var insPayload={user_id:U.id,amount:amount,profit_pct:_siSettings.profit_pct,lock_minutes:_siSettings.lock_minutes,status:"active",plan_name:_siSettings._selectedPlanName||null};
   var insRes=await sb.from("investments").insert(insPayload);
   if(insRes.error){toast("Error: "+insRes.error.message,"red");return;}
   await sb.from("profiles").update({balance:newBal}).eq("user_id",U.id);
@@ -5787,15 +5789,52 @@ async function bulkRejectSelected(){
 
 // ── ADMIN APPROVAL FUNCTIONS ──
 async function appDep(id, userId, amount){
-  var cur=await sb.from('profiles').select('balance').eq('user_id',userId).single();
+  var cur=await sb.from('profiles').select('balance,referred_by').eq('user_id',userId).single();
   if(cur.error||!cur.data){toast('کاربر پیدا نشد','red');return;}
-  var newBal=parseFloat(cur.data.balance||0)+parseFloat(amount);
+  var depAmount=parseFloat(amount);
+  var newBal=parseFloat(cur.data.balance||0)+depAmount;
   var upd=await sb.from('profiles').update({balance:newBal}).eq('user_id',userId);
   if(upd.error){toast('خطا در بروزرسانی موجودی: '+upd.error.message,'red');return;}
   var dep=await sb.from('deposits').update({status:'approved'}).eq('id',id);
   if(dep.error){toast('خطا: '+dep.error.message,'red');return;}
   await sb.from('notifications').insert({user_id:userId,type:'deposit_approved',message:'واریز $'+amount+' شما تأیید شد و به موجودی اضافه گردید.',is_read:false});
   await logAdminAction('Deposit Approved',userId,amount,'ID:'+id);
+  // Global deposit bonus
+  var {data:sRows}=await sb.from('system_settings').select('key,value').in('key',['deposit_bonus_pct','deposit_bonus_min']);
+  var sMap={};if(sRows)sRows.forEach(function(r){sMap[r.key]=parseFloat(r.value)||0;});
+  var bonusPct=sMap.deposit_bonus_pct||0;
+  var bonusMin=sMap.deposit_bonus_min||0;
+  if(bonusPct>0&&depAmount>=bonusMin){
+    var bonusAmt=Math.round(depAmount*bonusPct/100*100)/100;
+    var freshBal=await sb.from('profiles').select('balance').eq('user_id',userId).single();
+    if(freshBal.data){
+      var bonusBal=parseFloat(freshBal.data.balance||0)+bonusAmt;
+      await sb.from('profiles').update({balance:bonusBal}).eq('user_id',userId);
+      await sb.from('notifications').insert({user_id:userId,type:'bonus',message:'🎁 بونوس واریز '+bonusPct+'٪ = $'+bonusAmt+' به موجودی شما اضافه شد.',is_read:false});
+    }
+  }
+  // Referral bonus: on user's first deposit, check if they have completed their first investment
+  var referrerId=cur.data.referred_by;
+  if(referrerId){
+    var prevDeps=await sb.from('deposits').select('id',{count:'exact',head:true}).eq('user_id',userId).eq('status','approved');
+    var depCount=prevDeps.count||0;
+    if(depCount<=1){
+      // This is (or was) their first deposit — check if they have an investment
+      var invCheck=await sb.from('investments').select('amount').eq('user_id',userId).order('started_at',{ascending:true}).limit(1);
+      if(invCheck.data&&invCheck.data.length){
+        var invAmt=parseFloat(invCheck.data[0].amount||0);
+        var refBonus=Math.round(invAmt*0.1*100)/100;
+        if(refBonus>0){
+          var refPr=await sb.from('profiles').select('balance').eq('user_id',referrerId).single();
+          if(refPr.data){
+            var refNewBal=parseFloat(refPr.data.balance||0)+refBonus;
+            await sb.from('profiles').update({balance:refNewBal}).eq('user_id',referrerId);
+            await sb.from('notifications').insert({user_id:referrerId,type:'referral_bonus',message:'🎉 بونوس معرفی $'+refBonus+' (۱۰٪ سرمایه‌گذاری کاربر دعوت‌شده) به موجودی شما اضافه شد.',is_read:false});
+          }
+        }
+      }
+    }
+  }
   toast('✅ واریز تأیید و موجودی اضافه شد','green');
   var c=document.getElementById('adminContent');
   if(c)await loadAD2(c);
@@ -5863,6 +5902,11 @@ async function loadAdminSettings(c){
   +'<div style="display:flex;align-items:center;gap:10px">'
   +'<input id="ss-maintenance" type="checkbox" '+(S.maintenance_mode==='true'?'checked':'')+'>'
   +'<label>'+t('adm_setting_maintenance')+'</label></div>'
+  +'<div style="border-top:1px solid var(--border);margin:8px 0;padding-top:12px"><div style="font-size:13px;font-weight:700;color:var(--p);margin-bottom:10px">🎁 بونوس همگانی واریز</div>'
+  +'<div><label style="font-size:12px;color:var(--text2)">درصد بونوس واریز (% — صفر = غیرفعال)</label>'
+  +'<input id="ss-bonus-pct" type="number" min="0" max="100" step="0.1" value="'+(S.deposit_bonus_pct||0)+'" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);margin-top:4px;box-sizing:border-box"></div>'
+  +'<div style="margin-top:10px"><label style="font-size:12px;color:var(--text2)">حداقل مبلغ واریز برای دریافت بونوس ($)</label>'
+  +'<input id="ss-bonus-min" type="number" min="0" value="'+(S.deposit_bonus_min||0)+'" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);margin-top:4px;box-sizing:border-box"></div></div>'
   +'<button onclick="saveAdminSettings()" style="padding:12px 24px;background:var(--p);color:#fff;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-family:Vazirmatn,sans-serif">'+t('adm_save_settings')+'</button>'
   +'</div></div>';
 }
@@ -5873,7 +5917,9 @@ async function saveAdminSettings(){
     min_withdrawal:document.getElementById('ss-min-with').value,
     site_name:document.getElementById('ss-site-name').value,
     support_email:document.getElementById('ss-support-email').value,
-    maintenance_mode:document.getElementById('ss-maintenance').checked?'true':'false'
+    maintenance_mode:document.getElementById('ss-maintenance').checked?'true':'false',
+    deposit_bonus_pct:document.getElementById('ss-bonus-pct').value,
+    deposit_bonus_min:document.getElementById('ss-bonus-min').value
   };
   for(var key in settings){
     await sb.from('system_settings').upsert({key:key,value:settings[key]},{onConflict:'key'});
@@ -6472,45 +6518,44 @@ async function loadSIActiveList(){
   }).join('');
 }
 
-var _invHistOffset=0;
 var _invHistAll=[];
 async function loadSICompletedList(more){
   var c=document.getElementById('siCompletedList');
   if(!c)return;
-  if(!more){_invHistOffset=0;_invHistAll=[];}
-  var r=await sb.from('investments').select('*').in('status',['completed','withdrawn']).order('started_at',{ascending:false}).range(_invHistOffset,_invHistOffset+4);
-  var rows=r.data||[];
-  if(!more&&!rows.length){c.innerHTML='<p style="color:var(--text3);font-size:12px;text-align:center;padding:12px">هیچ سرمایه‌گذاری تکمیل‌شده‌ای وجود ندارد</p>';return;}
-  var ids=rows.map(function(x){return x.user_id;});
-  var emails={};
-  if(ids.length){
-    var pr=await sb.from('profiles').select('user_id,email').in('user_id',ids);
-    if(pr.data)pr.data.forEach(function(p){emails[p.user_id]=p.email;});
-  }
-  _invHistOffset+=5;
-  _invHistAll=_invHistAll.concat(rows);
-  var newHtml=rows.map(function(inv){
-    var profit=parseFloat(inv.amount)*parseFloat(inv.profit_pct)/100;
-    var statusLabel=inv.status==='withdrawn'?(t('inv_status_claimed')||'✅ برداشت شده'):inv.status==='completed'?(t('inv_status_done')||'⏳ منتظر برداشت'):(t('inv_status_'+inv.status)||inv.status);
-    return '<div class="dep-req" style="animation:fadeInUp .3s ease both"><div class="dep-top"><span class="dep-email">'+(emails[inv.user_id]||inv.user_id)+'</span><span style="font-size:10px;color:var(--text3)">'+statusLabel+'</span></div>'
-      +'<div style="font-size:12px;color:var(--text2)">مقدار: $'+siFmt(inv.amount)+' | سود: +$'+siFmt(profit)+'</div></div>';
-  }).join('');
-  // Remove old load more button if exists
-  var oldBtn=document.getElementById('siLoadMoreBtn');
-  if(oldBtn)oldBtn.remove();
-  if(more){
-    var existing=c.innerHTML;
-    c.innerHTML=existing+newHtml;
-  }else{
+  if(!more){
+    // Load all records, show only first 3 initially
+    var r=await sb.from('investments').select('*').in('status',['completed','withdrawn']).order('started_at',{ascending:false}).eq('user_id',U.id);
+    _invHistAll=r.data||[];
+    if(!_invHistAll.length){c.innerHTML='<p style="color:var(--text3);font-size:12px;text-align:center;padding:12px">هیچ سرمایه‌گذاری تکمیل‌شده‌ای وجود ندارد</p>';return;}
+    var toShow=_invHistAll.slice(0,3);
+    var newHtml=toShow.map(function(inv){
+      var profit=parseFloat(inv.amount)*parseFloat(inv.profit_pct)/100;
+      var statusLabel=inv.status==='withdrawn'?(t('inv_status_claimed')||'✅ برداشت شده'):inv.status==='completed'?(t('inv_status_done')||'⏳ منتظر برداشت'):(t('inv_status_'+inv.status)||inv.status);
+      var planLabel=inv.plan_name||(inv.profit_pct>1?'VIP Plan':'Standard Plan');
+      return '<div class="dep-req" style="animation:fadeInUp .3s ease both"><div class="dep-top"><span class="dep-email">'+planLabel+'</span><span style="font-size:10px;color:var(--text3)">'+statusLabel+'</span></div>'
+        +'<div style="font-size:12px;color:var(--text2)">مقدار: $'+siFmt(inv.amount)+' | سود: +$'+siFmt(profit)+'</div></div>';
+    }).join('');
     c.innerHTML=newHtml;
-  }
-  if(rows.length===5){
-    var btn=document.createElement('button');
-    btn.id='siLoadMoreBtn';
-    btn.className='load-more-btn';
-    btn.textContent='نمایش بیشتر ▼';
-    btn.onclick=function(){loadSICompletedList(true);};
-    c.appendChild(btn);
+    if(_invHistAll.length>3){
+      var btn=document.createElement('button');
+      btn.id='siLoadMoreBtn';
+      btn.className='load-more-btn';
+      btn.textContent='نمایش همه ('+(_invHistAll.length-3)+' بیشتر) ▼';
+      btn.onclick=function(){loadSICompletedList(true);};
+      c.appendChild(btn);
+    }
+  }else{
+    // Show all records
+    var oldBtn=document.getElementById('siLoadMoreBtn');
+    if(oldBtn)oldBtn.remove();
+    var allHtml=_invHistAll.map(function(inv){
+      var profit=parseFloat(inv.amount)*parseFloat(inv.profit_pct)/100;
+      var statusLabel=inv.status==='withdrawn'?(t('inv_status_claimed')||'✅ برداشت شده'):inv.status==='completed'?(t('inv_status_done')||'⏳ منتظر برداشت'):(t('inv_status_'+inv.status)||inv.status);
+      var planLabel=inv.plan_name||(inv.profit_pct>1?'VIP Plan':'Standard Plan');
+      return '<div class="dep-req" style="animation:fadeInUp .3s ease both"><div class="dep-top"><span class="dep-email">'+planLabel+'</span><span style="font-size:10px;color:var(--text3)">'+statusLabel+'</span></div>'
+        +'<div style="font-size:12px;color:var(--text2)">مقدار: $'+siFmt(inv.amount)+' | سود: +$'+siFmt(profit)+'</div></div>';
+    }).join('');
+    c.innerHTML=allHtml;
   }
 }
 
