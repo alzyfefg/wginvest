@@ -2471,8 +2471,10 @@ async function checkAlerts(){
 }
 function animMC(){var c=document.getElementById("MC");c.classList.remove("tab-anim");void c.offsetWidth;c.classList.add("tab-anim");}
 function goTab(tab){
-
   curTab=tab;
+  // Show/hide member hero banner based on tab
+  var heroBanner=document.getElementById("heroBanner");
+  if(heroBanner)heroBanner.style.display=(tab==="admin")?"none":"";
   document.querySelectorAll(".bnav-btn").forEach(function(b){b.classList.remove("on");});
   var bm={matches:"bn_m",profile:"bn_p",wallet:"bn_w",team:"bn_t",model:"bn_im"};
   if(bm[tab]){var b=document.getElementById(bm[tab]);if(b)b.classList.add("on");}
@@ -4579,6 +4581,9 @@ async function loadAdmin(){
     c.innerHTML='<div class="ebox"><span class="ei">⛔</span><p>دسترسی مجاز نیست</p></div>';
     return;
   }
+  // Hide member-facing hero banner in admin panel
+  var heroBanner=document.getElementById("heroBanner");
+  if(heroBanner)heroBanner.style.display="none";
   var now=new Date();
   var dateStr=now.toLocaleDateString("fa-IR",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
   c.innerHTML='<div class="adm-header"><div class="adm-header-left"><h2>👑 پنل مدیریت</h2><p>'+dateStr+'</p></div><div class="adm-header-badge">Admin</div></div>'
