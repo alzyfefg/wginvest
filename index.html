@@ -5614,7 +5614,7 @@ function filterDepQueue(){
     var dt=new Date(d.created_at).toLocaleString('fa-IR');
     var statusCls=d.status==='approved'?'wsb-approved':d.status==='rejected'?'wsb-rejected':'wsb-pending';
     var approveSource=isAuto?(' <span style="font-size:9px;background:rgba(99,102,241,.15);color:#818cf8;padding:1px 5px;border-radius:8px">🤖 '+t('adm_dep_auto_lbl')+'</span>'):
-                      (d.status==='approved'?' <span style="font-size:9px;background:rgba(0,212,170,.1);color:var(--ac);padding:1px 5px;border-radius:8px">👑 '+t('adm_dep_admin_lbl')+'</span>'):'');
+                      (d.status==='approved'?(' <span style="font-size:9px;background:rgba(0,212,170,.1);color:var(--ac);padding:1px 5px;border-radius:8px">👑 '+t('adm_dep_admin_lbl')+'</span>'):'');
     var statusLabel=(d.status==='approved'?'✅ '+t('adm_dep_approved'):d.status==='rejected'?'❌ '+t('adm_dep_rejected'):'⏳ '+t('adm_dep_pending_lbl'))+approveSource;
     var borderColor=d.status==='approved'?(isAuto?'rgba(99,102,241,.25)':'rgba(0,212,170,.2)'):d.status==='rejected'?'rgba(255,71,87,.15)':'rgba(255,215,0,.25)';
     var imgPreview=d.screenshot_url
