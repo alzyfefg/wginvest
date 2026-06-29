@@ -1819,6 +1819,30 @@ body.light .im-phil{background:linear-gradient(135deg,rgba(26,86,219,.06),rgba(0
 .adm-dot{width:5px;height:3px;border-radius:2px;background:rgba(255,255,255,.18);transition:all .35s cubic-bezier(.34,1.56,.64,1)}
 .adm-dot-active{width:18px!important;background:rgba(0,212,170,.75)!important}
 #adminContent{will-change:opacity,transform,filter}
+/* Premium visual system */
+:root{--adm-accent:0,212,170}
+.adm-header{position:relative;overflow:hidden}
+#admAurora{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;border-radius:inherit}
+#admAurora span{position:absolute;border-radius:50%;filter:blur(40px);opacity:.14;will-change:transform}
+#admAurora span:nth-child(1){width:220px;height:220px;background:#3b82f6;top:-60px;left:-40px;animation:aBlob1 78s ease-in-out infinite}
+#admAurora span:nth-child(2){width:180px;height:180px;background:#8b5cf6;top:20px;right:-50px;animation:aBlob2 92s ease-in-out infinite}
+#admAurora span:nth-child(3){width:160px;height:160px;background:#06b6d4;bottom:-70px;left:40%;animation:aBlob3 85s ease-in-out infinite}
+@keyframes aBlob1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,30px) scale(1.25)}}
+@keyframes aBlob2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-35px,25px) scale(1.15)}}
+@keyframes aBlob3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(20px,-30px) scale(1.2)}}
+.adm-particle{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.55),transparent 70%);pointer-events:none;z-index:1;will-change:transform,opacity}
+@keyframes pFloat{0%,100%{transform:translateY(0) translateX(0);opacity:.25}50%{transform:translateY(-10px) translateX(6px);opacity:.6}}
+#admAmbient{position:fixed;inset:0;pointer-events:none;z-index:0}
+#admAmbientInner{position:absolute;inset:0;background:radial-gradient(ellipse 90% 35% at 50% 0%,rgba(var(--adm-accent),.05) 0%,transparent 70%);transition:background 1.4s ease}
+.adm-snap-card{backdrop-filter:blur(4px);box-shadow:0 0 0 1.5px rgba(255,255,255,0)}
+.adm-snap-card.active{animation:breatheGlow 3s ease-in-out infinite;border-color:rgba(var(--adm-accent),.5)!important}
+@keyframes breatheGlow{0%,100%{box-shadow:0 0 0 1.5px rgba(var(--adm-accent),.35),0 6px 20px rgba(var(--adm-accent),.18)}50%{box-shadow:0 0 0 1.5px rgba(var(--adm-accent),.7),0 10px 32px rgba(var(--adm-accent),.4)}}
+.adm-snap-card{position:relative}
+.adm-snap-card::after{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.16) 45%,rgba(255,255,255,.28) 50%,rgba(255,255,255,.16) 55%,transparent 70%);background-size:220% 100%;background-position:140% 0;opacity:0;pointer-events:none}
+.adm-snap-card.sweeping::after{opacity:1;animation:lightSweep 1.1s ease}
+@keyframes lightSweep{0%{background-position:140% 0}100%{background-position:-40% 0}}
+#admSnapLine{position:relative;height:3px;margin:-2px auto 14px;width:140px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden}
+#admSnapThumb{position:absolute;top:0;height:100%;border-radius:3px;background:rgba(var(--adm-accent),.8);transition:left .42s cubic-bezier(.34,1.56,.64,1),width .42s cubic-bezier(.34,1.56,.64,1),background .3s ease}
 .adm-kpi-new-val{font-size:22px;font-weight:900;color:var(--ac);margin-bottom:4px;line-height:1}
 .adm-kpi-new-lbl{font-size:9px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
 .adm-kpi-new-icon{font-size:24px;margin-bottom:8px;display:block}
@@ -4660,14 +4684,31 @@ async function loadAdmin(){
       +'</div>';
   }).join('');
   c.innerHTML=
-    '<div class="adm-header"><div class="adm-header-left"><h2>👑 پنل مدیریت</h2><p>'+dateStr+'</p></div><div class="adm-header-badge">Admin</div></div>'
+    '<div id="admAmbient"><div id="admAmbientInner"></div></div>'
+    +'<div class="adm-header"><div id="admAurora"><span></span><span></span><span></span></div><div class="adm-header-left"><h2>👑 پنل مدیریت</h2><p>'+dateStr+'</p></div><div class="adm-header-badge">Admin</div></div>'
     +'<div id="admSnapCarousel"><div id="admSnapTrack">'+cardsHtml+'</div></div>'
-    +'<div id="admSnapDots"></div>'
+    +'<div id="admSnapLine"><div id="admSnapThumb"></div></div>'
     +'<input class="global-search" id="adminGlobalSearch" placeholder="🔍 جستجو: ایمیل، شناسه، TX Hash، آدرس کیف پول..." oninput="adminSearchDebounce(this.value)" style="margin-bottom:8px">'
     +'<div id="adminSearchResults" style="display:none;background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;margin-bottom:10px;max-height:300px;overflow-y:auto"></div>'
     +'<div id="adminContent"><div class="lbox"><div class="spin"></div></div></div>';
   await showAdminTab("overview");
   setTimeout(initAdmSnap,80);
+  spawnAdmParticles();
+}
+function spawnAdmParticles(){
+  var hdr=document.querySelector('.adm-header');
+  if(!hdr||hdr.querySelector('.adm-particle'))return;
+  for(var i=0;i<5;i++){
+    var p=document.createElement('div');
+    p.className='adm-particle';
+    var size=2+Math.random()*3;
+    p.style.width=size+'px';p.style.height=size+'px';
+    p.style.left=(Math.random()*90+5)+'%';
+    p.style.top=(Math.random()*70+10)+'%';
+    p.style.animation='pFloat '+(6+Math.random()*5)+'s ease-in-out infinite';
+    p.style.animationDelay=(Math.random()*4)+'s';
+    hdr.appendChild(p);
+  }
 }
 
 var _adminSearchTimer=null;
@@ -4728,16 +4769,18 @@ function admSnapGoTo(tab){
   if(card)card.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
 }
 
+function setAdmAccent(rgb){
+  if(!rgb)return;
+  document.documentElement.style.setProperty('--adm-accent',rgb);
+  var ambInner=document.getElementById('admAmbientInner');
+  if(ambInner)ambInner.style.background='radial-gradient(ellipse 90% 35% at 50% 0%,rgba('+rgb+',.05) 0%,transparent 70%)';
+}
 function initAdmSnap(){
   var track=document.getElementById('admSnapTrack');
   if(!track)return;
   var cards=Array.from(track.querySelectorAll('.adm-snap-card'));
-  var dotsEl=document.getElementById('admSnapDots');
-  if(dotsEl){
-    dotsEl.innerHTML=cards.map(function(c,i){
-      return '<div class="adm-dot'+(i===0?' adm-dot-active':'')+'"></div>';
-    }).join('');
-  }
+  var thumb=document.getElementById('admSnapThumb');
+  var lineEl=document.getElementById('admSnapLine');
   function applyScales(){
     var trackRect=track.getBoundingClientRect();
     var cx=trackRect.left+trackRect.width/2;
@@ -4758,7 +4801,7 @@ function initAdmSnap(){
       if(d===0){
         card.style.background='rgba('+rgb+',.13)';
         card.style.borderColor='rgba('+rgb+',.4)';
-        card.style.boxShadow='0 6px 24px rgba('+rgb+',.35)';
+        card.style.boxShadow='';
         card.querySelector('.adm-snap-lbl').style.color='rgb('+rgb+')';
         card.classList.add('active');
       }else{
@@ -4769,11 +4812,12 @@ function initAdmSnap(){
         card.classList.remove('active');
       }
     });
-    if(dotsEl){
-      dotsEl.querySelectorAll('.adm-dot').forEach(function(d,i){
-        if(i===closestIdx)d.classList.add('adm-dot-active');
-        else d.classList.remove('adm-dot-active');
-      });
+    if(thumb&&lineEl&&cards.length){
+      var pct=100/cards.length;
+      thumb.style.width=pct+'%';
+      thumb.style.left=(closestIdx*pct)+'%';
+      var rgb=cards[closestIdx].dataset.rgb;
+      if(rgb)thumb.style.background='rgba('+rgb+',.8)';
     }
     return closestIdx;
   }
@@ -4798,6 +4842,14 @@ function initAdmSnap(){
   });
   track.dataset.activeTab='overview';
   applyScales();
+  setAdmAccent(cards[0]&&cards[0].dataset.rgb);
+  if(track._sweepTimer)clearInterval(track._sweepTimer);
+  track._sweepTimer=setInterval(function(){
+    var active=track.querySelector('.adm-snap-card.active');
+    if(!active)return;
+    active.classList.add('sweeping');
+    setTimeout(function(){active.classList.remove('sweeping');},1100);
+  },8000);
 }
 
 async function showAdminTab(tab){
@@ -4843,10 +4895,13 @@ async function showAdminTab(tab){
   });
   // Sync carousel to this tab (for programmatic calls from KPI cards etc.)
   var track=document.getElementById('admSnapTrack');
-  if(track&&track.dataset.activeTab!==tab){
-    track.dataset.activeTab=tab;
+  if(track){
     var snapCard=track.querySelector('[data-tab="'+tab+'"]');
-    if(snapCard)snapCard.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+    if(track.dataset.activeTab!==tab){
+      track.dataset.activeTab=tab;
+      if(snapCard)snapCard.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+    }
+    if(snapCard)setAdmAccent(snapCard.dataset.rgb);
   }
 }
 
