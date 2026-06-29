@@ -4466,11 +4466,11 @@ async function subDep(){
   }
 
   if(apiChecked){
-    // TX not found or doesn't match our wallet — auto reject
-    var rejIns=await sb.from("deposits").insert({user_id:U.id,amount:amt,tx_hash:h,status:"rejected",network:net.toUpperCase(),screenshot_url:screenshotUrl});
-    if(rejIns.error)return toast("Error: "+rejIns.error.message,"red");
-    await sb.from("notifications").insert({user_id:U.id,type:"deposit_rejected",message:t("dep_auto_rejected_msg")||"Deposit request rejected: TX not found or doesn't match our wallet address.",is_read:false});
-    toast(t("dep_auto_rejected")||"❌ TX not verified. Deposit rejected.","red");
+    // TX checked by API but not confirmed — send to admin for manual review
+    var pendIns=await sb.from("deposits").insert({user_id:U.id,amount:amt,tx_hash:h,status:"pending",network:net.toUpperCase(),screenshot_url:screenshotUrl,reviewed_by:'api:unverified'});
+    if(pendIns.error)return toast("Error: "+pendIns.error.message,"red");
+    await sb.from("notifications").insert({user_id:U.id,type:"deposit_pending",message:t("dep_pending_admin_check")||"واریز شما ثبت شد و در انتظار بررسی دستی توسط ادمین است.",is_read:false});
+    toast(t("dep_pending_admin_check")||"⏳ TX در بلاکچین تأیید نشد — درخواست برای بررسی دستی ادمین ارسال شد","gold");
     setTimeout(loadWallet,1200);
     return;
   }
@@ -4684,12 +4684,18 @@ async function loadAdmin(){
   var CARDS=[
     {tab:'overview',icon:'🏠',label:'داشبورد',rgb:'0,212,170'},
     {tab:'users',icon:'👥',label:'کاربران',rgb:'59,130,246'},
+    {tab:'deposits',icon:'💳',label:'واریزها',rgb:'0,212,170'},
+    {tab:'withdrawals',icon:'💸',label:'برداشت‌ها',rgb:'255,71,87'},
     {tab:'finance',icon:'💰',label:'مالی',rgb:'16,185,129'},
     {tab:'matches',icon:'💎',label:'سرمایه',rgb:'139,92,246'},
     {tab:'bonus',icon:'🎁',label:'بونوس',rgb:'245,158,11'},
     {tab:'analytics',icon:'📊',label:'آنالیز',rgb:'6,182,212'},
-    {tab:'settings',icon:'⚙️',label:'تنظیمات',rgb:'107,114,128'},
-    {tab:'logs',icon:'📝',label:'لاگ',rgb:'100,116,139'}
+    {tab:'kyc',icon:'🪪',label:'احراز هویت',rgb:'99,102,241'},
+    {tab:'tickets',icon:'🎫',label:'تیکت‌ها',rgb:'236,72,153'},
+    {tab:'announce',icon:'📢',label:'اطلاعیه',rgb:'245,158,11'},
+    {tab:'walletchanges',icon:'💼',label:'کیف‌پول',rgb:'6,182,212'},
+    {tab:'auditlog',icon:'🔍',label:'حسابرسی',rgb:'139,92,246'},
+    {tab:'settings',icon:'⚙️',label:'تنظیمات',rgb:'107,114,128'}
   ];
   window._admCards=CARDS;
   var cardsHtml=CARDS.map(function(card,i){
@@ -5609,33 +5615,38 @@ function filterDepQueue(){
   con.innerHTML=data.map(function(d){
     var isPending=d.status==='pending';
     var isAuto=d.status==='approved'&&!d.reviewed_by;
+    var isApiUnverified=isPending&&d.reviewed_by==='api:unverified';
     var txHash=d.tx_hash||'—';
+    var net=(d.network||'').toUpperCase();
     var memberBadge=d.profiles&&d.profiles.member_id?'<span style="font-size:9px;color:var(--text3);margin-right:6px">#'+d.profiles.member_id+'</span>':'';
     var dt=new Date(d.created_at).toLocaleString('fa-IR');
-    var statusCls=d.status==='approved'?'wsb-approved':d.status==='rejected'?'wsb-rejected':'wsb-pending';
-    var approveSource=isAuto?(' <span style="font-size:9px;background:rgba(99,102,241,.15);color:#818cf8;padding:1px 5px;border-radius:8px">🤖 '+t('adm_dep_auto_lbl')+'</span>'):
-                      (d.status==='approved'?(' <span style="font-size:9px;background:rgba(0,212,170,.1);color:var(--ac);padding:1px 5px;border-radius:8px">👑 '+t('adm_dep_admin_lbl')+'</span>'):'');
-    var statusLabel=(d.status==='approved'?'✅ '+t('adm_dep_approved'):d.status==='rejected'?'❌ '+t('adm_dep_rejected'):'⏳ '+t('adm_dep_pending_lbl'))+approveSource;
-    var borderColor=d.status==='approved'?(isAuto?'rgba(99,102,241,.25)':'rgba(0,212,170,.2)'):d.status==='rejected'?'rgba(255,71,87,.15)':'rgba(255,215,0,.25)';
+    var approveSource=isAuto?(' <span style="font-size:9px;background:rgba(99,102,241,.15);color:#818cf8;padding:1px 5px;border-radius:8px">🤖 خودکار</span>'):
+                      (d.status==='approved'&&!isApiUnverified?(' <span style="font-size:9px;background:rgba(0,212,170,.1);color:var(--ac);padding:1px 5px;border-radius:8px">👑 ادمین</span>'):'');
+    var statusLabel=(d.status==='approved'?'✅ تأیید شد':d.status==='rejected'?'❌ رد شد':'⏳ در انتظار')+approveSource;
+    var apiWarnBadge=isApiUnverified?'<div style="background:rgba(255,165,0,.12);border:1px solid rgba(255,165,0,.3);border-radius:8px;padding:6px 10px;margin:6px 0;font-size:11px;color:#f59e0b">⚠️ API بلاکچین تأیید نکرد — بررسی دستی لازم است</div>':'';
+    var borderColor=isApiUnverified?'rgba(255,165,0,.5)':d.status==='approved'?(isAuto?'rgba(99,102,241,.25)':'rgba(0,212,170,.2)'):d.status==='rejected'?'rgba(255,71,87,.15)':'rgba(255,215,0,.25)';
+    var explorerUrl=txHash!=='—'?(net==='BEP20'?'https://bscscan.com/tx/'+txHash:'https://tronscan.org/#/transaction/'+txHash):'';
     var imgPreview=d.screenshot_url
-      ?'<div style="margin:8px 0"><a href="'+d.screenshot_url+'" target="_blank"><img src="'+d.screenshot_url+'" alt="receipt" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;border:1px solid var(--border);cursor:zoom-in" onerror="this.style.display=\'none\'"></a><div style="font-size:9px;color:var(--text3);text-align:center;margin-top:3px">📷 '+t('adm_dep_receipt')+' — '+t('adm_dep_click_zoom')+'</div></div>'
-      :'<div style="font-size:9px;color:var(--text3);margin:6px 0">📷 '+t('adm_dep_no_receipt')+'</div>';
-    var reviewedInfo=d.reviewed_by?'<div style="font-size:9px;color:var(--text3);margin-top:3px">👑 '+t('adm_dep_reviewed_by')+': '+d.reviewed_by+'</div>':'';
+      ?'<div style="margin:8px 0"><a href="'+d.screenshot_url+'" target="_blank"><img src="'+d.screenshot_url+'" alt="receipt" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;border:1px solid var(--border);cursor:zoom-in" onerror="this.style.display=\'none\'"></a><div style="font-size:9px;color:var(--text3);text-align:center;margin-top:3px">📷 رسید پرداخت — برای بزرگ‌نمایی کلیک کنید</div></div>'
+      :'<div style="font-size:9px;color:var(--text3);margin:6px 0">📷 رسید پیوست نشده</div>';
+    var reviewedInfo=(d.reviewed_by&&!d.reviewed_by.startsWith('api:'))?'<div style="font-size:9px;color:var(--text3);margin-top:3px">👑 بررسی‌شده توسط: '+d.reviewed_by+'</div>':'';
     return '<div class="dep-req" style="border-color:'+borderColor+'">'
       +'<div class="dep-top" style="align-items:flex-start">'
       +'<div style="flex:1"><span class="dep-email">'+((d.profiles&&d.profiles.email)||'—')+'</span>'+memberBadge+'</div>'
       +'<span class="dep-amt">$'+d.amount+'</span>'
       +'</div>'
-      +'<div style="margin-bottom:4px">'+statusLabel+'</div>'
+      +'<div style="margin-bottom:4px">'+statusLabel+' <span style="font-size:9px;color:var(--text3);background:rgba(255,255,255,.06);padding:1px 5px;border-radius:6px">'+net+'</span></div>'
       +'<div style="font-size:9px;color:var(--text3);margin-bottom:4px">📅 '+dt+'</div>'
+      +apiWarnBadge
       +reviewedInfo
       +'<div class="dep-hash" style="display:flex;align-items:center;gap:6px;margin-top:6px"><span style="flex:1;overflow:hidden;text-overflow:ellipsis;font-size:10px;direction:ltr">TX: '+txHash+'</span>'
-      +(txHash!=='—'?'<button onclick="copyText(\''+txHash+'\')" style="background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.2);border-radius:6px;padding:2px 7px;font-size:9px;color:var(--ac);cursor:pointer;white-space:nowrap;font-family:Vazirmatn,sans-serif">📋 '+t('adm_copy')+'</button>':'')
+      +(txHash!=='—'?'<button onclick="copyText(\''+txHash+'\')" style="background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.2);border-radius:6px;padding:2px 7px;font-size:9px;color:var(--ac);cursor:pointer;white-space:nowrap;font-family:Vazirmatn,sans-serif">📋 کپی</button>':'')
+      +(explorerUrl?'<a href="'+explorerUrl+'" target="_blank" style="background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);border-radius:6px;padding:2px 7px;font-size:9px;color:#60a5fa;cursor:pointer;white-space:nowrap;text-decoration:none">🔗 Explorer</a>':'')
       +'</div>'
       +imgPreview
       +(isPending
-        ?'<div class="dep-btns"><button class="dep-btn app" onclick="appDep(&quot;'+d.id+'&quot;,&quot;'+d.user_id+'&quot;,'+d.amount+')">✅ '+t('adm_dep_approve')+'</button><button class="dep-btn rej" onclick="rejDep(&quot;'+d.id+'&quot;)">❌ '+t('adm_dep_reject')+'</button><button class="dep-btn" style="background:rgba(26,86,219,.1);color:var(--pl);border:1px solid rgba(26,86,219,.2)" onclick="var c2=document.getElementById(&quot;adminContent&quot;);loadUser360(&quot;'+d.user_id+'&quot;,c2)">👁️ '+t('adm_profile')+'</button></div>'
-        :'<div style="margin-top:6px"><button class="dep-btn" style="background:rgba(26,86,219,.1);color:var(--pl);border:1px solid rgba(26,86,219,.2)" onclick="var c2=document.getElementById(&quot;adminContent&quot;);loadUser360(&quot;'+d.user_id+'&quot;,c2)">👁️ '+t('adm_profile')+'</button></div>')
+        ?'<div class="dep-btns"><button class="dep-btn app" onclick="appDep(&quot;'+d.id+'&quot;,&quot;'+d.user_id+'&quot;,'+d.amount+')">✅ تأیید واریز</button><button class="dep-btn rej" onclick="rejDep(&quot;'+d.id+'&quot;)">❌ رد کردن</button><button class="dep-btn" style="background:rgba(26,86,219,.1);color:var(--pl);border:1px solid rgba(26,86,219,.2)" onclick="var c2=document.getElementById(&quot;adminContent&quot;);loadUser360(&quot;'+d.user_id+'&quot;,c2)">👁️ پروفایل</button></div>'
+        :'<div style="margin-top:6px"><button class="dep-btn" style="background:rgba(26,86,219,.1);color:var(--pl);border:1px solid rgba(26,86,219,.2)" onclick="var c2=document.getElementById(&quot;adminContent&quot;);loadUser360(&quot;'+d.user_id+'&quot;,c2)">👁️ پروفایل</button></div>')
       +'</div>';
   }).join('');
 }
