@@ -1791,8 +1791,8 @@ body.light .im-phil{background:linear-gradient(135deg,rgba(26,86,219,.06),rgba(0
 .camp-badge.active{background:rgba(0,212,170,.1);color:var(--ac);border:1px solid rgba(0,212,170,.2)}
 .camp-badge.inactive{background:rgba(255,255,255,.05);color:var(--text3);border:1px solid rgba(255,255,255,.1)}
 /* Hero carousel nav */
-.hero-nav-card{scroll-snap-align:center;flex-shrink:0;width:110px;border-radius:20px;padding:18px 12px;text-align:center;cursor:pointer;transition:all .35s cubic-bezier(.34,1.56,.64,1);opacity:.65;transform:scale(.88);border:1.5px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03)}
-.hero-nav-card.active{opacity:1;transform:scale(1.08);border-color:rgba(0,212,170,.4);box-shadow:0 0 20px rgba(0,212,170,.2)}
+.hero-nav-card{scroll-snap-align:center;flex-shrink:0;width:112px;border-radius:22px;padding:20px 12px;text-align:center;cursor:pointer;transition:all .4s cubic-bezier(.34,1.56,.64,1);opacity:.55;transform:scale(.84);filter:blur(.6px);border:1.5px solid rgba(255,255,255,.07);background:rgba(255,255,255,.03)}
+.hero-nav-card.active{opacity:1;transform:scale(1.12);filter:blur(0);border-color:rgba(0,212,170,.5);box-shadow:0 0 28px rgba(0,212,170,.25),0 8px 32px rgba(0,0,0,.3)}
 #adminCarousel::-webkit-scrollbar{display:none}
 /* Withdrawal group header */
 .with-group-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 0;font-size:11px;font-weight:700;color:var(--text3);border-bottom:1px solid rgba(255,255,255,.05);margin-bottom:8px;cursor:pointer}
@@ -4602,12 +4602,16 @@ async function loadAdmin(){
     +'<div class="hero-nav-card" data-tab="logs" onclick="selectAdminCard(this,\'logs\')" style="background:rgba(100,116,139,.07);border-color:rgba(100,116,139,.18)"><div style="font-size:26px;margin-bottom:7px">📋</div><div style="font-size:10px;font-weight:800;color:#94a3b8">لاگ</div></div>'
     +'<div class="hero-nav-card" data-tab="walletchanges" onclick="selectAdminCard(this,\'walletchanges\')" style="background:rgba(6,182,212,.06);border-color:rgba(6,182,212,.15)"><div style="font-size:26px;margin-bottom:7px">🔑</div><div style="font-size:10px;font-weight:800;color:#06b6d4">کیف پول</div></div>'
     +'</div>'
+    +'<div id="carouselIndicatorWrap" style="display:flex;justify-content:center;margin:-8px 0 14px;gap:5px">'
+    +'<div id="carouselIndicator" style="height:3px;width:32px;border-radius:2px;background:rgba(0,212,170,.7);transition:transform .35s cubic-bezier(.34,1.56,.64,1);box-shadow:0 0 8px rgba(0,212,170,.4)"></div>'
+    +'</div>'
     +'<!-- legacy hidden tab buttons for backward compat -->'
     +'<div id="at_overview" style="display:none"></div><div id="at_users" style="display:none"></div><div id="at_finance" style="display:none"></div><div id="at_matches" style="display:none"></div><div id="at_withdrawals" style="display:none"></div><div id="at_deposits" style="display:none"></div><div id="at_kyc" style="display:none"></div><div id="at_tickets" style="display:none"></div><div id="at_announce" style="display:none"></div><div id="at_logs" style="display:none"></div><div id="at_auditlog" style="display:none"></div><div id="at_plans" style="display:none"></div><div id="at_bonus" style="display:none"></div><div id="at_analytics" style="display:none"></div><div id="at_notes" style="display:none"></div><div id="at_settings" style="display:none"></div><div id="at_walletchanges" style="display:none"></div>'
     +'<input class="global-search" id="adminGlobalSearch" placeholder="🔍 جستجو: ایمیل، شناسه، TX Hash، آدرس کیف پول..." oninput="adminSearchDebounce(this.value)" style="margin-bottom:8px">'
     +'<div id="adminSearchResults" style="display:none;background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;margin-bottom:10px;max-height:300px;overflow-y:auto"></div>'
     +'<div id="adminContent"><div class="lbox"><div class="spin"></div></div></div>';
   showAdminTab("overview");
+  setTimeout(initCarouselScroll,300);
 }
 
 var _adminSearchTimer=null;
@@ -4665,6 +4669,31 @@ function selectAdminCard(el,tab){
   showAdminTab(tab);
 }
 
+function initCarouselScroll(){
+  var carousel=document.getElementById('adminCarousel');
+  if(!carousel)return;
+  var _scrollTimer=null;
+  carousel.addEventListener('scroll',function(){
+    clearTimeout(_scrollTimer);
+    _scrollTimer=setTimeout(function(){
+      var cards=carousel.querySelectorAll('.hero-nav-card');
+      var cRect=carousel.getBoundingClientRect();
+      var cx=cRect.left+cRect.width/2;
+      var closest=null,closestDist=Infinity;
+      cards.forEach(function(card){
+        var r=card.getBoundingClientRect();
+        var cardCx=r.left+r.width/2;
+        var dist=Math.abs(cardCx-cx);
+        if(dist<closestDist){closestDist=dist;closest=card;}
+      });
+      if(closest&&!closest.classList.contains('active')){
+        var tab=closest.dataset.tab;
+        selectAdminCard(closest,tab);
+      }
+    },120);
+  },{passive:true});
+}
+
 async function showAdminTab(tab){
   var allTabs=["overview","users","finance","matches","deposits","withdrawals","kyc","tickets","announce","logs","auditlog","plans","bonus","analytics","notes","settings","walletchanges"];
   // Update carousel active state
@@ -4674,7 +4703,9 @@ async function showAdminTab(tab){
   allTabs.forEach(function(t){var el=document.getElementById("at_"+t);if(el)el.classList.remove("on");});
   var el=document.getElementById("at_"+tab);if(el)el.classList.add("on");
   var c=document.getElementById("adminContent");if(!c)return;
+  c.style.opacity='0';c.style.transform='translateY(10px)';
   c.innerHTML='<div class="lbox"><div class="spin"></div></div>';
+  setTimeout(function(){c.style.transition='opacity .3s ease,transform .3s ease';c.style.opacity='1';c.style.transform='translateY(0)';},50);
   if(tab==="overview")await loadAdminOverview(c);
   else if(tab==="users")await loadAdminUsers(c);
   else if(tab==="finance")await loadAdminFinance(c);
