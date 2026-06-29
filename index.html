@@ -811,7 +811,7 @@ button:hover, .btn-p:hover, .adm-btn:hover, .fc-card-btn:hover, .flow-next:hover
 .tx-right{text-align:left}.tx-amount{font-size:14px;font-weight:900}
 .tx-amount.dep{color:var(--ac)}.tx-amount.wit{color:var(--red)}
 .tx-badge{font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px;display:inline-block;margin-top:3px}
-.tx-badge.approved{background:rgba(0,212,170,.1);color:var(--ac);border:1px solid rgba(0,212,170,.2)}
+.tx-badge.approved,.tx-badge.completed{background:rgba(0,212,170,.1);color:var(--ac);border:1px solid rgba(0,212,170,.2)}
 .tx-badge.pending{background:rgba(255,215,0,.08);color:var(--gold);border:1px solid rgba(255,215,0,.2)}
 .tx-badge.rejected{background:rgba(255,71,87,.08);color:var(--red);border:1px solid rgba(255,71,87,.2)}
 /* ── FEATURED MATCH ── */
@@ -3377,7 +3377,7 @@ async function loadAnalyticsRange(days,btn){
   var sinceISO=since.toISOString();
   var [depsRes,withsRes,profsRes,invsRes]=await Promise.all([
     sb.from('deposits').select('amount,created_at').eq('status','approved').gte('created_at',sinceISO),
-    sb.from('withdrawals').select('amount,created_at').eq('status','approved').gte('created_at',sinceISO),
+    sb.from('withdrawals').select('amount,created_at').in('status',['approved','completed']).gte('created_at',sinceISO),
     sb.from('profiles').select('created_at').gte('created_at',sinceISO),
     sb.from('investments').select('created_at,status').gte('created_at',sinceISO)
   ]);
@@ -3982,7 +3982,7 @@ async function loadGrowthChart(){
   // Fetch real transactions: approved deposits, approved withdrawals, claimed profits
   var [depRes,witRes,invRes]=await Promise.all([
     sb.from("deposits").select("amount,updated_at").eq("user_id",U.id).eq("status","approved").order("updated_at",{ascending:true}),
-    sb.from("withdrawals").select("amount,created_at").eq("user_id",U.id).eq("status","approved").order("created_at",{ascending:true}),
+    sb.from("withdrawals").select("amount,created_at").eq("user_id",U.id).in("status",["approved","completed"]).order("created_at",{ascending:true}),
     sb.from("investments").select("amount,profit_pct,withdrawn_at").eq("user_id",U.id).eq("status","withdrawn").order("withdrawn_at",{ascending:true})
   ]);
 
@@ -4292,7 +4292,7 @@ async function loadTxNew(c){
 
 function renderTxItems(items){
   return items.map(function(x){
-    var bLbls={approved:t('tx_ok'),rejected:t('tx_rej'),pending:t('tx_pend')};
+    var bLbls={approved:t('tx_ok'),completed:t('tx_ok'),rejected:t('tx_rej'),pending:t('tx_pend')};
     var isDep=x._type==='dep';
     var locale=['fa','ar','ur'].indexOf(lang)>=0?'fa-IR':'en-US';
     var dt=new Date(x.created_at).toLocaleDateString(locale);
@@ -4742,7 +4742,7 @@ async function loadAdminOverview(c){
   var users=await sb.from('profiles').select('*',{count:'exact',head:true});
   var preds=await sb.from('predictions').select('*',{count:'exact',head:true});
   var deps=await sb.from('deposits').select('amount').eq('status','approved');
-  var withs=await sb.from('withdrawals').select('amount').eq('status','approved');
+  var withs=await sb.from('withdrawals').select('amount').in('status',['approved','completed']);
   var pendDeps=await sb.from('deposits').select('*',{count:'exact',head:true}).eq('status','pending');
   var pendWiths=await sb.from('withdrawals').select('*',{count:'exact',head:true}).eq('status','pending');
   var pendKyc=await sb.from('profiles').select('*',{count:'exact',head:true}).eq('kyc_status','pending');
@@ -4754,7 +4754,7 @@ async function loadAdminOverview(c){
   var todayISO=today.toISOString();
   var cmdRes=await Promise.all([
     sb.from('deposits').select('amount').eq('status','approved').gte('created_at',todayISO),
-    sb.from('withdrawals').select('amount').eq('status','approved').gte('created_at',todayISO),
+    sb.from('withdrawals').select('amount').in('status',['approved','completed']).gte('created_at',todayISO),
     sb.from('deposits').select('id',{count:'exact'}).eq('status','pending'),
     sb.from('withdrawals').select('id',{count:'exact'}).eq('status','pending'),
     sb.from('investments').select('id',{count:'exact'}).eq('status','active'),
@@ -5277,7 +5277,7 @@ async function arestore(){
   // Restore = sum of approved deposits minus approved withdrawals
   var [dep,wit]=await Promise.all([
     sb.from('deposits').select('amount').eq('user_id',u.user_id).eq('status','approved'),
-    sb.from('withdrawals').select('amount').eq('user_id',u.user_id).eq('status','approved')
+    sb.from('withdrawals').select('amount').eq('user_id',u.user_id).in('status',['approved','completed'])
   ]);
   var totalDep=(dep.data||[]).reduce(function(s,d){return s+parseFloat(d.amount||0);},0);
   var totalWit=(wit.data||[]).reduce(function(s,w){return s+parseFloat(w.amount||0);},0);
@@ -5599,7 +5599,7 @@ async function loadAW2(c){
   // ── Withdrawal Summary Header ──
   var todayMidnight=new Date();todayMidnight.setHours(0,0,0,0);
   var pendingList=allData.filter(function(w){return w.status==='pending';});
-  var approvedList=allData.filter(function(w){return w.status==='approved';});
+  var approvedList=allData.filter(function(w){return w.status==='approved'||w.status==='completed';});
   // Use reviewed_at for today filter (not created_at)
   var approvedToday=approvedList.filter(function(w){
     var d=new Date(w.reviewed_at||w.created_at);return d>=todayMidnight;
@@ -5662,7 +5662,7 @@ function filterWithQueue(){
   var activeTab=window._withActiveTab||'pending';
   var data=(window._withQueueData||[]).filter(function(w){
     var matchQ=!q||(w.profiles&&w.profiles.email&&w.profiles.email.toLowerCase().includes(q.toLowerCase()))||(w.wallet_address&&w.wallet_address.toLowerCase().includes(q.toLowerCase()));
-    var matchTab=activeTab==='pending'?w.status==='pending':(w.status==='approved'||w.status==='rejected');
+    var matchTab=activeTab==='pending'?w.status==='pending':(w.status==='approved'||w.status==='completed'||w.status==='rejected');
     return matchQ&&matchTab;
   });
   if(sort==='amount_desc')data.sort(function(a,b){return parseFloat(b.amount)-parseFloat(a.amount);});
@@ -5704,13 +5704,14 @@ function filterWithQueue(){
   var html=[];
   data.forEach(function(w){
     var isPending=w.status==='pending';
-    var statusCls=w.status==='approved'?'wsb-approved':w.status==='rejected'?'wsb-rejected':'wsb-pending';
-    var statusLabel=w.status==='approved'?'✅ تأیید':w.status==='rejected'?'❌ رد':'⏳ در انتظار';
+    var isDone=w.status==='approved'||w.status==='completed';
+    var statusCls=isDone?'wsb-approved':w.status==='rejected'?'wsb-rejected':'wsb-pending';
+    var statusLabel=w.status==='completed'?'✅ تکمیل':isDone?'✅ تأیید':w.status==='rejected'?'❌ رد':'⏳ در انتظار';
     var isCritical=parseFloat(w.amount)>=100;
-    var borderColor=w.status==='approved'?'rgba(0,212,170,.2)':w.status==='rejected'?'rgba(255,71,87,.15)':isCritical?'rgba(255,71,87,.4)':'rgba(255,215,0,.25)';
+    var borderColor=isDone?'rgba(0,212,170,.2)':w.status==='rejected'?'rgba(255,71,87,.15)':isCritical?'rgba(255,71,87,.4)':'rgba(255,215,0,.25)';
     var doneSubmit=true;
-    var doneReview=isPending||w.status==='approved';
-    var doneFinal=w.status==='approved'||w.status==='rejected';
+    var doneReview=isPending||isDone;
+    var doneFinal=isDone||w.status==='rejected';
     html.push('<div class="dep-req" style="border-color:'+borderColor+'" id="wcard_'+w.id+'">');
     html.push('<div class="dep-top" style="align-items:flex-start">');
     if(isPending)html.push('<input type="checkbox" class="with-sel-cb" data-id="'+w.id+'" data-uid="'+w.user_id+'" data-amt="'+w.amount+'" onchange="updateWithSelCount()" style="width:16px;height:16px;margin-top:2px;margin-left:8px;flex-shrink:0">');
@@ -5759,13 +5760,14 @@ function filterWithQueue(){
 
 function _renderWithCard(w){
   var isPending=w.status==='pending';
-  var statusCls=w.status==='approved'?'wsb-approved':w.status==='rejected'?'wsb-rejected':'wsb-pending';
-  var statusLabel=w.status==='approved'?'✅ تأیید':w.status==='rejected'?'❌ رد':'⏳ در انتظار';
+  var isDone=w.status==='approved'||w.status==='completed';
+  var statusCls=isDone?'wsb-approved':w.status==='rejected'?'wsb-rejected':'wsb-pending';
+  var statusLabel=w.status==='completed'?'✅ تکمیل':isDone?'✅ تأیید':w.status==='rejected'?'❌ رد':'⏳ در انتظار';
   var isCritical=parseFloat(w.amount)>=100;
-  var borderColor=w.status==='approved'?'rgba(0,212,170,.2)':w.status==='rejected'?'rgba(255,71,87,.15)':isCritical?'rgba(255,71,87,.4)':'rgba(255,215,0,.25)';
+  var borderColor=isDone?'rgba(0,212,170,.2)':w.status==='rejected'?'rgba(255,71,87,.15)':isCritical?'rgba(255,71,87,.4)':'rgba(255,215,0,.25)';
   var doneSubmit=true;
-  var doneReview=isPending||w.status==='approved';
-  var doneFinal=w.status==='approved'||w.status==='rejected';
+  var doneReview=isPending||isDone;
+  var doneFinal=isDone||w.status==='rejected';
   var rawAmt=parseFloat(w.amount||0);var feeAmt=rawAmt*0.08;var netAmt=rawAmt*0.92;
   var h=[];
   h.push('<div class="dep-req" style="border-color:'+borderColor+'" id="wcard_'+w.id+'">');
@@ -5891,7 +5893,7 @@ async function rejDep(id){
 async function appWith(id, userId, amount){
   var txid=prompt('TXID پرداخت (اختیاری):')||'';
   // Balance was already deducted at submission — only update status
-  var updateData={status:'approved',reviewed_at:new Date().toISOString(),reviewed_by:U.email};
+  var updateData={status:'completed',reviewed_at:new Date().toISOString(),reviewed_by:U.email};
   if(txid)updateData.txid=txid;
   var w=await sb.from('withdrawals').update(updateData).eq('id',id);
   if(w.error){toast('خطا: '+w.error.message,'red');return;}
