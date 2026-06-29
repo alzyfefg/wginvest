@@ -4397,7 +4397,8 @@ async function loadAdminOverview(c){
     if(pendKyc.count>0)html.push('<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;cursor:pointer" onclick="showAdminTab(&quot;kyc&quot;)"><span style="font-size:12px;color:var(--text)">🪪 KYC در انتظار</span><span class="tx-badge pending">'+pendKyc.count+'</span></div>');
     html.push('</div>');
   }
-  var recentDeps=await sb.from('deposits').select('*,profiles(email)').order('created_at',{ascending:false}).limit(5);
+  var recentDeps=await sb.from('deposits').select('*').order('created_at',{ascending:false}).limit(5);
+  if((recentDeps.data||[]).length){var _uids2=[...new Set(recentDeps.data.map(function(d){return d.user_id;}))];var _pr2=await sb.from('profiles').select('user_id,email').in('user_id',_uids2);var _pm2={};(_pr2.data||[]).forEach(function(p){_pm2[p.user_id]=p;});recentDeps.data.forEach(function(d){d.profiles=_pm2[d.user_id]||null;});}
   var recentUsers=await sb.from('profiles').select('*').order('created_at',{ascending:false}).limit(3);
   html.push('<div class="icard"><div class="ctitle">⚡ فعالیت اخیر</div>');
   var acts=[];
@@ -4885,8 +4886,15 @@ function toggleSetting(key){
 
 
 async function loadAD2(c){
-  var res=await sb.from('deposits').select('*,profiles(email,member_id)').eq('status','pending').order('created_at',{ascending:false});
+  var res=await sb.from('deposits').select('*').eq('status','pending').order('created_at',{ascending:false});
   var data=res.data||[];
+  if(data.length){
+    var uids=[...new Set(data.map(function(d){return d.user_id;}))];
+    var pr=await sb.from('profiles').select('user_id,email,member_id').in('user_id',uids);
+    var profMap={};
+    (pr.data||[]).forEach(function(p){profMap[p.user_id]=p;});
+    data.forEach(function(d){d.profiles=profMap[d.user_id]||null;});
+  }
   if(!data.length){c.innerHTML='<div class="ebox"><span class="ei">💳</span><p>هیچ واریزی در انتظار نیست ✅</p></div>';return;}
   c.innerHTML=data.map(function(d){
     return '<div class="dep-req"><div class="dep-top"><span class="dep-email">'+((d.profiles&&d.profiles.email)||'—')+'</span><span class="dep-amt">$'+d.amount+'</span></div>'
@@ -5014,13 +5022,17 @@ function saveU360Note(uid){
 async function loadAdminLogs(c){
   var html=[];
   html.push('<div class="icard"><div class="ctitle">📋 لاگ فعالیت‌های اخیر</div>');
-  var deps=await sb.from("deposits").select("*,profiles(email)").order("created_at",{ascending:false}).limit(15);
-  var withs=await sb.from("withdrawals").select("*,profiles(email)").order("created_at",{ascending:false}).limit(10);
-  var preds=await sb.from("predictions").select("*,profiles(email)").order("created_at",{ascending:false}).limit(10);
-  var users=await sb.from("profiles").select("email,created_at").order("created_at",{ascending:false}).limit(10);
+  var deps=await sb.from("deposits").select("*").order("created_at",{ascending:false}).limit(15);
+  var withs=await sb.from("withdrawals").select("*").order("created_at",{ascending:false}).limit(10);
+  var users=await sb.from("profiles").select("email,created_at,user_id").order("created_at",{ascending:false}).limit(10);
+  // Enrich with emails
+  var allUids=[...(deps.data||[]),...(withs.data||[])].map(function(x){return x.user_id;});
+  var uids=[...new Set(allUids)];
+  var profMap={};
+  if(uids.length){var pr=await sb.from("profiles").select("user_id,email").in("user_id",uids);(pr.data||[]).forEach(function(p){profMap[p.user_id]=p.email;});}
   var logs=[];
-  (deps.data||[]).forEach(function(d){logs.push({icon:"💳",title:"واریز $"+d.amount,sub:(d.profiles&&d.profiles.email)||"---",time:d.created_at,color:"rgba(0,212,170,.08)"});});
-  (withs.data||[]).forEach(function(w){logs.push({icon:"💸",title:"برداشت $"+w.amount,sub:(w.profiles&&w.profiles.email)||"---",time:w.created_at,color:"rgba(255,71,87,.08)"});});
+  (deps.data||[]).forEach(function(d){logs.push({icon:"💳",title:"واریز $"+d.amount,sub:profMap[d.user_id]||"---",time:d.created_at,color:"rgba(0,212,170,.08)"});});
+  (withs.data||[]).forEach(function(w){logs.push({icon:"💸",title:"برداشت $"+w.amount,sub:profMap[w.user_id]||"---",time:w.created_at,color:"rgba(255,71,87,.08)"});});
   (users.data||[]).forEach(function(u){logs.push({icon:"👤",title:"ثبت‌نام جدید",sub:u.email,time:u.created_at,color:"rgba(26,86,219,.08)"});});
   logs.sort(function(a,b){return new Date(b.time)-new Date(a.time);});
   logs.slice(0,20).forEach(function(l){
@@ -5095,8 +5107,16 @@ async function loadAdminAnnounce(c){
 
 // ── WITHDRAWAL QUEUE (Enhanced with priority) ──
 async function loadAW2(c){
-  var res=await sb.from("withdrawals").select("*,profiles(email,member_id,balance)").order("created_at",{ascending:false});
+  var res=await sb.from("withdrawals").select("*").order("created_at",{ascending:false});
   var allData=res.data||[];
+  // Enrich with profile data separately
+  if(allData.length){
+    var uids=[...new Set(allData.map(function(w){return w.user_id;}))];
+    var pr=await sb.from("profiles").select("user_id,email,member_id,balance").in("user_id",uids);
+    var profMap={};
+    (pr.data||[]).forEach(function(p){profMap[p.user_id]=p;});
+    allData.forEach(function(w){w.profiles=profMap[w.user_id]||null;});
+  }
   var html=[];
   // Search + filter bar
   html.push('<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">');
