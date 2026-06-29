@@ -3830,9 +3830,29 @@ async function loadGrowthChart(){
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return "$"+c.parsed.y.toFixed(2);}}}},scales:{x:{ticks:{color:tc,font:{family:"Vazirmatn",size:9},maxTicksLimit:8},grid:{color:"rgba(148,163,184,.1)"}},y:{ticks:{color:tc,font:{family:"Vazirmatn",size:9},callback:function(v){return "$"+v;}},grid:{color:"rgba(148,163,184,.1)"}}}}
   });
 }
-async function saveWP(){var p1=document.getElementById("wp1").value,p2=document.getElementById("wp2").value;if(!p1||!p2)return toast(t("err_wpass_required"),"red");if(p1!==p2)return toast(t("err_wpass_mismatch"),"red");if(p1.length<4)return toast(t("err_wpass_min4"),"red");await sb.from("profiles").update({withdrawal_pass:p1}).eq("user_id",U.id);P.withdrawal_pass=p1;toast(t("ok_wpass_set"),"green");loadProfile();}
+async function saveWP(){
+  var p1=document.getElementById("wp1").value,p2=document.getElementById("wp2").value;
+  if(!p1||!p2)return toast(t("err_wpass_required"),"red");
+  if(p1!==p2)return toast(t("err_wpass_mismatch"),"red");
+  if(p1.length<4)return toast(t("err_wpass_min4"),"red");
+  var res=await sb.from("profiles").update({withdrawal_pass:p1}).eq("user_id",U.id);
+  if(res.error)return toast("Error: "+res.error.message,"red");
+  // Verify it was actually saved
+  var check=await sb.from("profiles").select("withdrawal_pass").eq("user_id",U.id).single();
+  if(!check.data||check.data.withdrawal_pass!==p1)return toast("خطا: رمز ذخیره نشد. دوباره تلاش کنید","red");
+  P.withdrawal_pass=p1;
+  toast(t("ok_wpass_set"),"green");
+  loadProfile();
+}
 function showChangeWP(){var cards=document.getElementById("MC").querySelectorAll(".icard");if(cards[2])cards[2].innerHTML='<div class="ctitle">'+t("wp_t")+'</div><label style="font-size:11px;color:var(--text2);font-weight:700;display:block;margin-bottom:5px">'+t("wp_new")+'</label><input type="password" id="wp1" class="fin" placeholder="..."><label style="font-size:11px;color:var(--text2);font-weight:700;display:block;margin-bottom:5px">'+t("wp_rep")+'</label><input type="password" id="wp2" class="fin" placeholder="..."><button class="btn-p" onclick="saveWP()">'+t("wp_save")+'</button>';}
-async function saveName(){var n=document.getElementById("dname").value.trim();if(!n)return;await sb.from("profiles").update({display_name:n}).eq("user_id",U.id);P.display_name=n;toast(t("ok_profile_saved"),"green");}
+async function saveName(){
+  var n=document.getElementById("dname").value.trim();
+  if(!n)return;
+  var res=await sb.from("profiles").update({display_name:n}).eq("user_id",U.id);
+  if(res.error)return toast("Error: "+res.error.message,"red");
+  P.display_name=n;
+  toast(t("ok_profile_saved"),"green");
+}
 async function uploadKYC(input){if(!input.files[0])return;var path="kyc/"+U.id+"_"+Date.now();var res=await sb.storage.from("documents").upload(path,input.files[0]);if(res.error)return toast(t("err_upload"),"red");await sb.from("profiles").update({kyc_status:"pending",kyc_doc:path}).eq("user_id",U.id);P.kyc_status="pending";toast(t("ok_sent"),"green");loadProfile();}
 
 async function loadWallet(){
@@ -4248,7 +4268,8 @@ async function subWith(){
     var updateData={};
     if(net==='trc20')updateData.wallet_address_trc20=wa;
     else updateData.wallet_address_bep20=wa;
-    await sb.from("profiles").update(updateData).eq("user_id",U.id);
+    var addrRes=await sb.from("profiles").update(updateData).eq("user_id",U.id);
+    if(!addrRes.error){if(net==='trc20')P.wallet_address_trc20=wa;else P.wallet_address_bep20=wa;}
     if(net==='trc20')P.wallet_address_trc20=wa;
     else P.wallet_address_bep20=wa;
   }
