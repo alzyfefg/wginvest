@@ -1750,6 +1750,46 @@ body.light .im-phil{background:linear-gradient(135deg,rgba(26,86,219,.06),rgba(0
 .bal-card .bc-icon{font-size:22px;margin-bottom:6px}
 .bal-card .bc-val{font-size:1.1rem;font-weight:700;color:var(--ac)}
 .bal-card .bc-lbl{font-size:11px;color:var(--text2);margin-top:2px}
+/* Admin premium redesign */
+.adm-card{background:linear-gradient(135deg,rgba(255,255,255,.04),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:20px;transition:transform .2s,box-shadow .2s,border-color .2s}
+.adm-card:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.3);border-color:rgba(0,212,170,.2)}
+.adm-kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:20px}
+.adm-kpi{background:linear-gradient(135deg,rgba(0,212,170,.08),rgba(0,212,170,.03));border:1px solid rgba(0,212,170,.15);border-radius:16px;padding:16px;text-align:center;transition:all .2s}
+.adm-kpi:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,212,170,.1)}
+.adm-kpi-val{font-size:24px;font-weight:900;color:var(--ac);margin-bottom:4px}
+.adm-kpi-lbl{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.adm-section-title{font-size:13px;font-weight:900;color:var(--text2);margin:16px 0 10px;letter-spacing:.3px;display:flex;align-items:center;gap:6px}
+.adm-table{width:100%;border-collapse:collapse;font-size:12px}
+.adm-table th{padding:10px 12px;text-align:right;font-size:10px;font-weight:700;color:var(--text3);border-bottom:1px solid rgba(255,255,255,.06);position:sticky;top:0;background:var(--bg2);z-index:1;white-space:nowrap}
+.adm-table td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;animation:slideInRight .3s ease both}
+.adm-table tr:hover td{background:rgba(255,255,255,.02)}
+.adm-tab{padding:8px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.08);background:transparent;color:var(--text3);font-size:11px;font-weight:700;cursor:pointer;font-family:Vazirmatn,sans-serif;transition:all .2s;white-space:nowrap}
+.adm-tab.on{background:rgba(0,212,170,.12);color:var(--ac);border-color:rgba(0,212,170,.3)}
+.adm-tab:hover{background:rgba(255,255,255,.04);color:var(--text)}
+.health-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.health-item{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:12px;display:flex;align-items:center;gap:10px;font-size:12px}
+.health-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.health-dot.ok{background:#00d4aa;box-shadow:0 0 6px rgba(0,212,170,.5)}
+.health-dot.warn{background:#f59e0b;box-shadow:0 0 6px rgba(245,158,11,.5)}
+.health-dot.err{background:#ef4444;box-shadow:0 0 6px rgba(239,68,68,.5)}
+/* Withdrawal timeline */
+.wtl-wrap{display:flex;align-items:flex-start;gap:0;margin:12px 0;overflow-x:auto;padding-bottom:4px}
+.wtl-step{display:flex;flex-direction:column;align-items:center;min-width:70px;position:relative}
+.wtl-dot{width:24px;height:24px;border-radius:50%;border:2px solid rgba(255,255,255,.15);background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:10px;position:relative;z-index:1;transition:all .3s}
+.wtl-step.done .wtl-dot{border-color:var(--ac);background:rgba(0,212,170,.15);color:var(--ac)}
+.wtl-step.active .wtl-dot{border-color:var(--gold);background:rgba(255,215,0,.1);color:var(--gold);animation:countUpPulse 1.5s infinite}
+.wtl-lbl{font-size:9px;color:var(--text3);margin-top:5px;text-align:center;white-space:nowrap}
+.wtl-step.done .wtl-lbl,.wtl-step.active .wtl-lbl{color:var(--text2)}
+/* Bonus dashboard */
+.bonus-stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.bonus-stat{background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.15);border-radius:12px;padding:10px;text-align:center}
+.bonus-stat-val{font-size:18px;font-weight:900;color:var(--gold)}
+.bonus-stat-lbl{font-size:9px;color:var(--text3);margin-top:2px}
+.camp-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;margin-bottom:10px;transition:all .2s}
+.camp-card:hover{border-color:rgba(255,215,0,.2);background:rgba(255,215,0,.03)}
+.camp-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700}
+.camp-badge.active{background:rgba(0,212,170,.1);color:var(--ac);border:1px solid rgba(0,212,170,.2)}
+.camp-badge.inactive{background:rgba(255,255,255,.05);color:var(--text3);border:1px solid rgba(255,255,255,.1)}
 </style>
 </head>
 
@@ -3197,6 +3237,64 @@ async function loadAdminBonusManager(c){
   c.innerHTML=html.join('');
 }
 
+async function loadAdminBonus(c){
+  c.innerHTML='<div style="padding:4px"><div class="adm-section-title">🎁 مدیریت بونوس</div>';
+  var html='';
+  var campaigns=await sb.from('bonus_campaigns').select('*').order('created_at',{ascending:false});
+  var bonusTx=await sb.from('bonus_transactions').select('*').order('created_at',{ascending:false}).limit(50);
+  var txData=bonusTx.data||[];
+  var totalGranted=txData.filter(function(b){return b.type==='grant';}).reduce(function(s,b){return s+parseFloat(b.amount||0);},0);
+  var totalUsed=txData.filter(function(b){return b.type==='use';}).reduce(function(s,b){return s+parseFloat(b.amount||0);},0);
+  var totalExpired=txData.filter(function(b){return b.type==='expire';}).reduce(function(s,b){return s+parseFloat(b.amount||0);},0);
+  html+='<div class="bonus-stat-grid">'
+    +'<div class="bonus-stat"><div class="bonus-stat-val">$'+(typeof siFmt==='function'?siFmt(totalGranted):totalGranted.toFixed(0))+'</div><div class="bonus-stat-lbl">اعطا شده</div></div>'
+    +'<div class="bonus-stat"><div class="bonus-stat-val">$'+(typeof siFmt==='function'?siFmt(totalUsed):totalUsed.toFixed(0))+'</div><div class="bonus-stat-lbl">استفاده شده</div></div>'
+    +'<div class="bonus-stat"><div class="bonus-stat-val">$'+(typeof siFmt==='function'?siFmt(totalExpired):totalExpired.toFixed(0))+'</div><div class="bonus-stat-lbl">منقضی</div></div>'
+    +'</div>';
+  html+='<div class="adm-section-title">📋 کمپین‌ها</div>';
+  (campaigns.data||[]).forEach(function(camp){
+    html+='<div class="camp-card">'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-start">'
+      +'<div><div style="font-size:13px;font-weight:700;color:var(--text)">'+camp.name+'</div>'
+      +'<div style="font-size:11px;color:var(--text3);margin-top:2px">حداقل واریز: $'+(camp.min_deposit||0)+' → بونوس: $'+(camp.bonus_amount||0)+'</div></div>'
+      +'<span class="camp-badge '+(camp.is_active?'active':'inactive')+'">'+(camp.is_active?'فعال':'غیرفعال')+'</span>'
+      +'</div>'
+      +'<div style="display:flex;gap:6px;margin-top:10px">'
+      +'<button onclick="toggleCampaign(\''+camp.id+'\','+(camp.is_active?'true':'false')+')" style="padding:4px 10px;border-radius:8px;border:none;background:'+(camp.is_active?'rgba(239,68,68,.1)':'rgba(0,212,170,.1)')+';color:'+(camp.is_active?'var(--red)':'var(--ac)')+';font-size:10px;cursor:pointer;font-family:Vazirmatn,sans-serif">'+(camp.is_active?'غیرفعال کن':'فعال کن')+'</button>'
+      +'</div>'
+      +'</div>';
+  });
+  if(!(campaigns.data||[]).length)html+='<div style="font-size:11px;color:var(--text3);text-align:center;padding:16px">هیچ کمپینی یافت نشد</div>';
+  html+='<div class="adm-section-title">➕ کمپین جدید</div>'
+    +'<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px">'
+    +'<input id="campName" placeholder="نام کمپین" style="width:100%;padding:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-family:Vazirmatn,sans-serif;font-size:12px;outline:none;margin-bottom:8px;box-sizing:border-box">'
+    +'<input id="campMinDep" type="number" placeholder="حداقل واریز (USDT)" style="width:100%;padding:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-family:Vazirmatn,sans-serif;font-size:12px;outline:none;margin-bottom:8px;box-sizing:border-box">'
+    +'<input id="campBonusAmt" type="number" placeholder="مبلغ بونوس (USDT)" style="width:100%;padding:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-family:Vazirmatn,sans-serif;font-size:12px;outline:none;margin-bottom:8px;box-sizing:border-box">'
+    +'<input id="campExpiry" type="date" style="width:100%;padding:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-family:Vazirmatn,sans-serif;font-size:12px;outline:none;margin-bottom:10px;box-sizing:border-box">'
+    +'<button onclick="createCampaign()" style="width:100%;padding:11px;background:linear-gradient(135deg,var(--p),var(--ac));color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-family:Vazirmatn,sans-serif">➕ ایجاد کمپین</button>'
+    +'</div>';
+  c.innerHTML+= html+'</div>';
+}
+
+async function toggleCampaign(id,isActive){
+  await sb.from('bonus_campaigns').update({is_active:!isActive}).eq('id',id);
+  var c=document.getElementById('adminContent');
+  if(c)loadAdminBonus(c);
+}
+
+async function createCampaign(){
+  var name=document.getElementById('campName').value.trim();
+  var minDep=parseFloat(document.getElementById('campMinDep').value)||0;
+  var bonusAmt=parseFloat(document.getElementById('campBonusAmt').value)||0;
+  var expiry=document.getElementById('campExpiry').value;
+  if(!name||!bonusAmt)return toast('نام و مبلغ بونوس الزامی است','red');
+  var res=await sb.from('bonus_campaigns').insert({name:name,min_deposit:minDep,bonus_amount:bonusAmt,expires_at:expiry||null,is_active:true,type:'deposit'});
+  if(res.error)return toast('خطا: '+res.error.message,'red');
+  toast('✅ کمپین ایجاد شد','green');
+  var c=document.getElementById('adminContent');
+  if(c)loadAdminBonus(c);
+}
+
 function filterBonusRows(q){
   var rows=document.querySelectorAll('#bonusMgrList .bonus-mgr-row');
   rows.forEach(function(r){r.style.display=(!q||r.dataset.email.includes(q.toLowerCase()))?'flex':'none';});
@@ -4134,7 +4232,7 @@ function checkWarnAndNextW(){
 
 function generateQR(text){
   var encoded=encodeURIComponent(text);
-  return '<img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data='+encoded+'" width="220" height="220" style="display:block;border-radius:10px" alt="QR Code">';
+  return '<img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&bgcolor=1a1a2e&color=00d4aa&data='+encoded+'" width="220" height="220" style="display:block;border-radius:12px;border:2px solid rgba(0,212,170,.2)" alt="QR Code">';
 }
 
 async function loadTxNew(c){
@@ -4168,8 +4266,32 @@ function renderTxItems(items){
       +'</div>'
       +'<div class="tx-right"><div class="tx-amount '+(isDep?'dep':'wit')+'">'+(isDep?'+':'-')+'$'+parseFloat(x.amount).toFixed(2)+'</div>'
       +'<div class="tx-badge '+(x.status||'pending')+'">'+bLbls[x.status||'pending']+'</div>'
-      +'</div></div>';
+      +'</div></div>'
+      +(!isDep?renderWithTimeline(x.status||'pending'):'');
   }).join('');
+}
+
+function renderWithTimeline(status){
+  var steps=[
+    {key:'pending',label:'ثبت شد',icon:'📝'},
+    {key:'review',label:'بررسی',icon:'🔍'},
+    {key:'approved',label:'تأیید',icon:'✅'},
+    {key:'paid',label:'پرداخت',icon:'💰'},
+    {key:'completed',label:'تکمیل',icon:'🎉'}
+  ];
+  var statusMap={pending:0,review:1,approved:2,paid:3,completed:4,rejected:-1};
+  var cur=statusMap[status]===undefined?0:statusMap[status];
+  if(status==='rejected'){
+    return '<div style="text-align:center;padding:8px;color:var(--red);font-size:11px;font-weight:700">❌ رد شده</div>';
+  }
+  var html='<div class="wtl-wrap">';
+  steps.forEach(function(step,i){
+    var cls=i<cur?'done':i===cur?'active':'';
+    html+='<div class="wtl-step '+cls+'"><div class="wtl-dot">'+step.icon+'</div><div class="wtl-lbl">'+step.label+'</div></div>';
+    if(i<steps.length-1)html+='<div style="flex:1;height:2px;align-self:flex-start;margin-top:11px;background:'+(i<cur?'rgba(0,212,170,.4)':'rgba(255,255,255,.08)')+'"></div>';
+  });
+  html+='</div>';
+  return html;
 }
 
 function filterTx(type){
@@ -4524,7 +4646,7 @@ async function showAdminTab(tab){
   else if(tab==="logs")await loadAdminLogs(c);
   else if(tab==="auditlog")await loadAdminAuditLog(c);
   else if(tab==="plans")await loadAdminPlans(c);
-  else if(tab==="bonus")await loadAdminBonusManager(c);
+  else if(tab==="bonus"){await loadAdminBonusManager(c);}
   else if(tab==="analytics")await loadAdminAnalytics(c);
   else if(tab==="notes")loadAdminNotes(c);
   else if(tab==="settings")loadAdminSettings(c);
@@ -4605,6 +4727,50 @@ async function loadAdminOverview(c){
     html.push('<div class="act-item"><div class="act-icon" style="background:'+bg+'">'+icon+'</div><div class="act-txt"><div class="act-title">'+title+'</div><div class="act-sub">'+sub+'</div></div></div>');
   });
   html.push('</div>');
+  // Platform Health
+  var healthHtml='<div class="icard" style="margin-top:14px"><div class="ctitle">🏥 وضعیت سیستم</div><div class="health-grid">';
+  try{
+    var hCheck=await sb.from('profiles').select('user_id').limit(1);
+    healthHtml+='<div class="health-item"><div class="health-dot ok"></div><span>Supabase DB</span></div>';
+  }catch(e){
+    healthHtml+='<div class="health-item"><div class="health-dot err"></div><span>Supabase DB ❌</span></div>';
+  }
+  healthHtml+='<div class="health-item"><div class="health-dot ok"></div><span>Auth Service</span></div>';
+  healthHtml+='<div class="health-item"><div class="health-dot ok"></div><span>Storage</span></div>';
+  var pendDepsH=await sb.from('deposits').select('id',{count:'exact'}).eq('status','pending');
+  var pendWithsH=await sb.from('withdrawals').select('id',{count:'exact'}).eq('status','pending');
+  var pendDCnt=pendDepsH.count||0;
+  var pendWCnt=pendWithsH.count||0;
+  healthHtml+='<div class="health-item"><div class="health-dot '+(pendDCnt>0?'warn':'ok')+'"></div><span>واریز در انتظار: '+pendDCnt+'</span></div>';
+  healthHtml+='<div class="health-item"><div class="health-dot '+(pendWCnt>0?'warn':'ok')+'"></div><span>برداشت در انتظار: '+pendWCnt+'</span></div>';
+  healthHtml+='</div></div>';
+  html.push(healthHtml);
+  // Recent Activity (enhanced)
+  var [recDeps2,recWiths2,recInvs2]=await Promise.all([
+    sb.from('deposits').select('*').order('created_at',{ascending:false}).limit(5),
+    sb.from('withdrawals').select('*').order('created_at',{ascending:false}).limit(5),
+    sb.from('investments').select('*').order('created_at',{ascending:false}).limit(5)
+  ]);
+  var acts2=[];
+  (recDeps2.data||[]).forEach(function(d){acts2.push({type:'deposit',icon:'💳',amount:d.amount,status:d.status,ts:d.created_at,uid:d.user_id});});
+  (recWiths2.data||[]).forEach(function(w){acts2.push({type:'withdrawal',icon:'💸',amount:w.amount,status:w.status,ts:w.created_at,uid:w.user_id});});
+  (recInvs2.data||[]).forEach(function(i){acts2.push({type:'investment',icon:'📈',amount:i.amount,status:i.status,ts:i.created_at,uid:i.user_id});});
+  acts2.sort(function(a,b){return new Date(b.ts)-new Date(a.ts);});
+  acts2=acts2.slice(0,10);
+  if(acts2.length){
+    html.push('<div class="icard" style="margin-top:14px"><div class="ctitle">📡 فعالیت‌های اخیر</div>');
+    acts2.forEach(function(a){
+      var locale=['fa','ar'].indexOf(lang)>=0?'fa-IR':'en-US';
+      var dt=new Date(a.ts).toLocaleString(locale);
+      var clr=a.type==='deposit'?'rgba(0,212,170,.08)':a.type==='withdrawal'?'rgba(255,71,87,.08)':'rgba(59,130,246,.08)';
+      html.push('<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04)">');
+      html.push('<div style="width:32px;height:32px;border-radius:10px;background:'+clr+';display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">'+a.icon+'</div>');
+      html.push('<div style="flex:1"><div style="font-size:11px;font-weight:700;color:var(--text)">'+a.type+' · $'+parseFloat(a.amount||0).toFixed(2)+'</div><div style="font-size:10px;color:var(--text3)">'+dt+'</div></div>');
+      html.push('<span class="tx-badge '+(a.status||'pending')+'" style="font-size:9px">'+a.status+'</span>');
+      html.push('</div>');
+    });
+    html.push('</div>');
+  }
   c.innerHTML=html.join('');
 }
 
