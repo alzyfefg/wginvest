@@ -1808,6 +1808,17 @@ body.light .im-phil{background:linear-gradient(135deg,rgba(26,86,219,.06),rgba(0
 .adm-kpi-glow-purple:hover{box-shadow:0 8px 28px rgba(139,92,246,.35),0 12px 32px rgba(0,0,0,.2)!important}
 .adm-kpi-glow-gold:hover{box-shadow:0 8px 28px rgba(245,158,11,.35),0 12px 32px rgba(0,0,0,.2)!important}
 .adm-kpi-glow-rev:hover{box-shadow:0 8px 28px rgba(255,215,0,.35),0 12px 32px rgba(0,0,0,.2)!important}
+#admSnapCarousel{margin:8px -16px 10px;overflow:hidden;position:relative}
+#admSnapTrack{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:10px calc(50% - 50px) 14px;scroll-padding:0 calc(50% - 50px)}
+#admSnapTrack::-webkit-scrollbar{display:none}
+.adm-snap-card{flex:0 0 100px;scroll-snap-align:center;border-radius:22px;padding:18px 10px 14px;text-align:center;cursor:pointer;border:1.5px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03);transform:scale(.85);opacity:.48;transition:transform .42s cubic-bezier(.34,1.56,.64,1),opacity .3s ease,box-shadow .3s ease,background .25s ease,border-color .25s ease;will-change:transform;user-select:none;-webkit-tap-highlight-color:transparent}
+.adm-snap-card.active{transform:scale(1.13)!important;opacity:1!important}
+.adm-snap-icon{font-size:30px;display:block;margin-bottom:9px;line-height:1}
+.adm-snap-lbl{font-size:10px;font-weight:800;letter-spacing:.3px;transition:color .25s ease;color:var(--text3)}
+#admSnapDots{display:flex;justify-content:center;gap:4px;margin:-2px 0 14px;padding:2px 0}
+.adm-dot{width:5px;height:3px;border-radius:2px;background:rgba(255,255,255,.18);transition:all .35s cubic-bezier(.34,1.56,.64,1)}
+.adm-dot-active{width:18px!important;background:rgba(0,212,170,.75)!important}
+#adminContent{will-change:opacity,transform,filter}
 .adm-kpi-new-val{font-size:22px;font-weight:900;color:var(--ac);margin-bottom:4px;line-height:1}
 .adm-kpi-new-lbl{font-size:9px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
 .adm-kpi-new-icon{font-size:24px;margin-bottom:8px;display:block}
@@ -4627,37 +4638,36 @@ async function loadAdmin(){
     c.innerHTML='<div class="ebox"><span class="ei">⛔</span><p>دسترسی مجاز نیست</p></div>';
     return;
   }
-  // Hide member-facing hero banner in admin panel
   var heroBanner=document.getElementById("heroBanner");
   if(heroBanner)heroBanner.style.display="none";
   var now=new Date();
   var dateStr=now.toLocaleDateString("fa-IR",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
-  c.innerHTML='<div class="adm-header"><div class="adm-header-left"><h2>👑 پنل مدیریت</h2><p>'+dateStr+'</p></div><div class="adm-header-badge">Admin</div></div>'
-    +'<div id="adminCarousel" style="display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:14px 4px 18px;margin:-4px -4px 14px;scrollbar-width:none">'
-    +'<div class="hero-nav-card active" data-tab="overview" onclick="selectAdminCard(this,\'overview\')" style="background:rgba(0,212,170,.1);border-color:rgba(0,212,170,.3)"><div style="font-size:26px;margin-bottom:7px">🏠</div><div style="font-size:10px;font-weight:800;color:var(--ac)">داشبورد</div></div>'
-    +'<div class="hero-nav-card" data-tab="users" onclick="selectAdminCard(this,\'users\')" style="background:rgba(26,86,219,.08);border-color:rgba(26,86,219,.2)"><div style="font-size:26px;margin-bottom:7px">👥</div><div style="font-size:10px;font-weight:800;color:#3b82f6">کاربران</div></div>'
-    +'<div class="hero-nav-card" data-tab="finance" onclick="selectAdminCard(this,\'finance\')" style="background:rgba(0,212,170,.06);border-color:rgba(0,212,170,.18)"><div style="font-size:26px;margin-bottom:7px">💰</div><div style="font-size:10px;font-weight:800;color:var(--ac)">مالی</div></div>'
-    +'<div class="hero-nav-card" data-tab="withdrawals" onclick="selectAdminCard(this,\'withdrawals\')" style="background:rgba(255,71,87,.06);border-color:rgba(255,71,87,.18)"><div style="font-size:26px;margin-bottom:7px">💸</div><div style="font-size:10px;font-weight:800;color:#ff4757">برداشت</div></div>'
-    +'<div class="hero-nav-card" data-tab="deposits" onclick="selectAdminCard(this,\'deposits\')" style="background:rgba(0,212,170,.06);border-color:rgba(0,212,170,.18)"><div style="font-size:26px;margin-bottom:7px">💳</div><div style="font-size:10px;font-weight:800;color:var(--ac)">واریز</div></div>'
-    +'<div class="hero-nav-card" data-tab="matches" onclick="selectAdminCard(this,\'matches\')" style="background:rgba(139,92,246,.08);border-color:rgba(139,92,246,.2)"><div style="font-size:26px;margin-bottom:7px">📈</div><div style="font-size:10px;font-weight:800;color:#a78bfa">سرمایه</div></div>'
-    +'<div class="hero-nav-card" data-tab="bonus" onclick="selectAdminCard(this,\'bonus\')" style="background:rgba(245,158,11,.07);border-color:rgba(245,158,11,.2)"><div style="font-size:26px;margin-bottom:7px">🎁</div><div style="font-size:10px;font-weight:800;color:#f59e0b">بونوس</div></div>'
-    +'<div class="hero-nav-card" data-tab="kyc" onclick="selectAdminCard(this,\'kyc\')" style="background:rgba(6,182,212,.07);border-color:rgba(6,182,212,.2)"><div style="font-size:26px;margin-bottom:7px">🪪</div><div style="font-size:10px;font-weight:800;color:#06b6d4">KYC</div></div>'
-    +'<div class="hero-nav-card" data-tab="tickets" onclick="selectAdminCard(this,\'tickets\')" style="background:rgba(139,92,246,.06);border-color:rgba(139,92,246,.15)"><div style="font-size:26px;margin-bottom:7px">🎧</div><div style="font-size:10px;font-weight:800;color:#a78bfa">تیکت</div></div>'
-    +'<div class="hero-nav-card" data-tab="announce" onclick="selectAdminCard(this,\'announce\')" style="background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.15)"><div style="font-size:26px;margin-bottom:7px">📢</div><div style="font-size:10px;font-weight:800;color:#f59e0b">اعلان</div></div>'
-    +'<div class="hero-nav-card" data-tab="settings" onclick="selectAdminCard(this,\'settings\')" style="background:rgba(107,114,128,.07);border-color:rgba(107,114,128,.2)"><div style="font-size:26px;margin-bottom:7px">⚙️</div><div style="font-size:10px;font-weight:800;color:#9ca3af">تنظیمات</div></div>'
-    +'<div class="hero-nav-card" data-tab="logs" onclick="selectAdminCard(this,\'logs\')" style="background:rgba(100,116,139,.07);border-color:rgba(100,116,139,.18)"><div style="font-size:26px;margin-bottom:7px">📋</div><div style="font-size:10px;font-weight:800;color:#94a3b8">لاگ</div></div>'
-    +'<div class="hero-nav-card" data-tab="walletchanges" onclick="selectAdminCard(this,\'walletchanges\')" style="background:rgba(6,182,212,.06);border-color:rgba(6,182,212,.15)"><div style="font-size:26px;margin-bottom:7px">🔑</div><div style="font-size:10px;font-weight:800;color:#06b6d4">کیف پول</div></div>'
-    +'</div>'
-    +'<div id="carouselIndicatorWrap" style="display:flex;justify-content:center;margin:-8px 0 14px;gap:5px">'
-    +'<div id="carouselIndicator" style="height:3px;width:32px;border-radius:2px;background:rgba(0,212,170,.7);transition:transform .35s cubic-bezier(.34,1.56,.64,1);box-shadow:0 0 8px rgba(0,212,170,.4)"></div>'
-    +'</div>'
-    +'<!-- legacy hidden tab buttons for backward compat -->'
-    +'<div id="at_overview" style="display:none"></div><div id="at_users" style="display:none"></div><div id="at_finance" style="display:none"></div><div id="at_matches" style="display:none"></div><div id="at_withdrawals" style="display:none"></div><div id="at_deposits" style="display:none"></div><div id="at_kyc" style="display:none"></div><div id="at_tickets" style="display:none"></div><div id="at_announce" style="display:none"></div><div id="at_logs" style="display:none"></div><div id="at_auditlog" style="display:none"></div><div id="at_plans" style="display:none"></div><div id="at_bonus" style="display:none"></div><div id="at_analytics" style="display:none"></div><div id="at_notes" style="display:none"></div><div id="at_settings" style="display:none"></div><div id="at_walletchanges" style="display:none"></div>'
+  var CARDS=[
+    {tab:'overview',icon:'🏠',label:'داشبورد',rgb:'0,212,170'},
+    {tab:'users',icon:'👥',label:'کاربران',rgb:'59,130,246'},
+    {tab:'finance',icon:'💰',label:'مالی',rgb:'16,185,129'},
+    {tab:'matches',icon:'💎',label:'سرمایه',rgb:'139,92,246'},
+    {tab:'bonus',icon:'🎁',label:'بونوس',rgb:'245,158,11'},
+    {tab:'analytics',icon:'📊',label:'آنالیز',rgb:'6,182,212'},
+    {tab:'settings',icon:'⚙️',label:'تنظیمات',rgb:'107,114,128'},
+    {tab:'logs',icon:'📝',label:'لاگ',rgb:'100,116,139'}
+  ];
+  window._admCards=CARDS;
+  var cardsHtml=CARDS.map(function(card,i){
+    return '<div class="adm-snap-card'+(i===0?' active':'')+'" data-tab="'+card.tab+'" data-rgb="'+card.rgb+'">'
+      +'<span class="adm-snap-icon">'+card.icon+'</span>'
+      +'<div class="adm-snap-lbl">'+card.label+'</div>'
+      +'</div>';
+  }).join('');
+  c.innerHTML=
+    '<div class="adm-header"><div class="adm-header-left"><h2>👑 پنل مدیریت</h2><p>'+dateStr+'</p></div><div class="adm-header-badge">Admin</div></div>'
+    +'<div id="admSnapCarousel"><div id="admSnapTrack">'+cardsHtml+'</div></div>'
+    +'<div id="admSnapDots"></div>'
     +'<input class="global-search" id="adminGlobalSearch" placeholder="🔍 جستجو: ایمیل، شناسه، TX Hash، آدرس کیف پول..." oninput="adminSearchDebounce(this.value)" style="margin-bottom:8px">'
     +'<div id="adminSearchResults" style="display:none;background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;margin-bottom:10px;max-height:300px;overflow-y:auto"></div>'
     +'<div id="adminContent"><div class="lbox"><div class="spin"></div></div></div>';
-  showAdminTab("overview");
-  setTimeout(initCarouselScroll,300);
+  await showAdminTab("overview");
+  setTimeout(initAdmSnap,80);
 }
 
 var _adminSearchTimer=null;
@@ -4708,50 +4718,106 @@ async function adminSearch(q){
   res.innerHTML=html.join('');
 }
 
-function selectAdminCard(el,tab){
-  document.querySelectorAll('.hero-nav-card').forEach(function(c){c.classList.remove('active');});
-  el.classList.add('active');
-  el.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
-  showAdminTab(tab);
+function selectAdminCard(el,tab){admSnapGoTo(tab);}
+function initCarouselScroll(){}
+
+function admSnapGoTo(tab){
+  var track=document.getElementById('admSnapTrack');
+  if(!track)return;
+  var card=track.querySelector('[data-tab="'+tab+'"]');
+  if(card)card.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
 }
 
-function initCarouselScroll(){
-  var carousel=document.getElementById('adminCarousel');
-  if(!carousel)return;
-  var _scrollTimer=null;
-  carousel.addEventListener('scroll',function(){
-    clearTimeout(_scrollTimer);
-    _scrollTimer=setTimeout(function(){
-      var cards=carousel.querySelectorAll('.hero-nav-card');
-      var cRect=carousel.getBoundingClientRect();
-      var cx=cRect.left+cRect.width/2;
-      var closest=null,closestDist=Infinity;
-      cards.forEach(function(card){
-        var r=card.getBoundingClientRect();
-        var cardCx=r.left+r.width/2;
-        var dist=Math.abs(cardCx-cx);
-        if(dist<closestDist){closestDist=dist;closest=card;}
-      });
-      if(closest&&!closest.classList.contains('active')){
-        var tab=closest.dataset.tab;
-        selectAdminCard(closest,tab);
+function initAdmSnap(){
+  var track=document.getElementById('admSnapTrack');
+  if(!track)return;
+  var cards=Array.from(track.querySelectorAll('.adm-snap-card'));
+  var dotsEl=document.getElementById('admSnapDots');
+  if(dotsEl){
+    dotsEl.innerHTML=cards.map(function(c,i){
+      return '<div class="adm-dot'+(i===0?' adm-dot-active':'')+'"></div>';
+    }).join('');
+  }
+  function applyScales(){
+    var trackRect=track.getBoundingClientRect();
+    var cx=trackRect.left+trackRect.width/2;
+    var closestIdx=0,closestDist=Infinity;
+    cards.forEach(function(card,i){
+      var r=card.getBoundingClientRect();
+      var cardCx=r.left+r.width/2;
+      var d=Math.abs(cardCx-cx);
+      if(d<closestDist){closestDist=d;closestIdx=i;}
+    });
+    cards.forEach(function(card,i){
+      var d=Math.abs(i-closestIdx);
+      var sc=d===0?1.13:d===1?0.91:0.82;
+      var op=d===0?1:d===1?0.65:0.42;
+      card.style.transform='scale('+sc+')';
+      card.style.opacity=op;
+      var rgb=card.dataset.rgb;
+      if(d===0){
+        card.style.background='rgba('+rgb+',.13)';
+        card.style.borderColor='rgba('+rgb+',.4)';
+        card.style.boxShadow='0 6px 24px rgba('+rgb+',.35)';
+        card.querySelector('.adm-snap-lbl').style.color='rgb('+rgb+')';
+        card.classList.add('active');
+      }else{
+        card.style.background='rgba(255,255,255,.03)';
+        card.style.borderColor='rgba(255,255,255,.06)';
+        card.style.boxShadow='none';
+        card.querySelector('.adm-snap-lbl').style.color='';
+        card.classList.remove('active');
       }
-    },120);
+    });
+    if(dotsEl){
+      dotsEl.querySelectorAll('.adm-dot').forEach(function(d,i){
+        if(i===closestIdx)d.classList.add('adm-dot-active');
+        else d.classList.remove('adm-dot-active');
+      });
+    }
+    return closestIdx;
+  }
+  var scrollTimer=null;
+  track.addEventListener('scroll',function(){
+    applyScales();
+    clearTimeout(scrollTimer);
+    scrollTimer=setTimeout(function(){
+      var idx=applyScales();
+      var tab=cards[idx]&&cards[idx].dataset.tab;
+      var last=track.dataset.activeTab||'overview';
+      if(tab&&tab!==last){
+        track.dataset.activeTab=tab;
+        showAdminTab(tab);
+      }
+    },100);
   },{passive:true});
+  cards.forEach(function(card){
+    card.addEventListener('click',function(){
+      card.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+    });
+  });
+  track.dataset.activeTab='overview';
+  applyScales();
 }
 
 async function showAdminTab(tab){
-  var allTabs=["overview","users","finance","matches","deposits","withdrawals","kyc","tickets","announce","logs","auditlog","plans","bonus","analytics","notes","settings","walletchanges"];
-  // Update carousel active state
-  document.querySelectorAll('.hero-nav-card').forEach(function(c){
-    if(c.dataset.tab===tab)c.classList.add('active');else c.classList.remove('active');
-  });
-  allTabs.forEach(function(t){var el=document.getElementById("at_"+t);if(el)el.classList.remove("on");});
-  var el=document.getElementById("at_"+tab);if(el)el.classList.add("on");
-  var c=document.getElementById("adminContent");if(!c)return;
-  c.style.opacity='0';c.style.transform='translateY(10px)';
+  var c=document.getElementById("adminContent");
+  if(!c)return;
+  // Exit animation (skip if only spinner showing)
+  if(c.children.length&&!c.querySelector('.lbox')){
+    c.style.transition='opacity .18s ease,transform .18s ease,filter .18s ease';
+    c.style.opacity='0';
+    c.style.transform='translateY(6px) scale(0.99)';
+    c.style.filter='blur(3px)';
+    await new Promise(function(r){setTimeout(r,180);});
+  }
+  // Reset for enter
+  c.style.transition='none';
+  c.style.opacity='0';
+  c.style.transform='translateY(-10px) scale(0.98)';
+  c.style.filter='blur(0)';
   c.innerHTML='<div class="lbox"><div class="spin"></div></div>';
-  setTimeout(function(){c.style.transition='opacity .3s ease,transform .3s ease';c.style.opacity='1';c.style.transform='translateY(0)';},50);
+  // Load workspace
   if(tab==="overview")await loadAdminOverview(c);
   else if(tab==="users")await loadAdminUsers(c);
   else if(tab==="finance")await loadAdminFinance(c);
@@ -4764,11 +4830,24 @@ async function showAdminTab(tab){
   else if(tab==="logs")await loadAdminLogs(c);
   else if(tab==="auditlog")await loadAdminAuditLog(c);
   else if(tab==="plans")await loadAdminPlans(c);
-  else if(tab==="bonus"){await loadAdminBonusManager(c);}
+  else if(tab==="bonus")await loadAdminBonusManager(c);
   else if(tab==="analytics")await loadAdminAnalytics(c);
   else if(tab==="notes")loadAdminNotes(c);
   else if(tab==="settings")loadAdminSettings(c);
   else if(tab==="walletchanges")loadAdminWalletChanges(c);
+  // Enter animation
+  requestAnimationFrame(function(){
+    c.style.transition='opacity .38s cubic-bezier(.16,1,.3,1),transform .38s cubic-bezier(.16,1,.3,1)';
+    c.style.opacity='1';
+    c.style.transform='translateY(0) scale(1)';
+  });
+  // Sync carousel to this tab (for programmatic calls from KPI cards etc.)
+  var track=document.getElementById('admSnapTrack');
+  if(track&&track.dataset.activeTab!==tab){
+    track.dataset.activeTab=tab;
+    var snapCard=track.querySelector('[data-tab="'+tab+'"]');
+    if(snapCard)snapCard.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  }
 }
 
 async function loadAdminOverview(c){
