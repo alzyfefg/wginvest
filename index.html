@@ -1792,7 +1792,7 @@ body.light .im-phil{background:linear-gradient(135deg,rgba(26,86,219,.06),rgba(0
 .camp-badge.inactive{background:rgba(255,255,255,.05);color:var(--text3);border:1px solid rgba(255,255,255,.1)}
 /* Hero carousel nav */
 .hero-nav-card{scroll-snap-align:center;flex-shrink:0;width:110px;border-radius:20px;padding:18px 12px;text-align:center;cursor:pointer;transition:all .35s cubic-bezier(.34,1.56,.64,1);opacity:.65;transform:scale(.88);border:1.5px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03)}
-.hero-nav-card.active{opacity:1;transform:scale(1.08)}
+.hero-nav-card.active{opacity:1;transform:scale(1.08);border-color:rgba(0,212,170,.4);box-shadow:0 0 20px rgba(0,212,170,.2)}
 #adminCarousel::-webkit-scrollbar{display:none}
 /* Withdrawal group header */
 .with-group-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 0;font-size:11px;font-weight:700;color:var(--text3);border-bottom:1px solid rgba(255,255,255,.05);margin-bottom:8px;cursor:pointer}
@@ -1808,6 +1808,12 @@ body.light .im-phil{background:linear-gradient(135deg,rgba(26,86,219,.06),rgba(0
 /* Load more button */
 .load-more-btn{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:11px;font-family:Vazirmatn,sans-serif;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;margin-top:8px;transition:all .2s}
 .load-more-btn:hover{border-color:var(--ac);color:var(--ac);background:rgba(0,212,170,.05)}
+/* Admin workspace fade transition */
+#adminContent{animation:fadeInUp .3s ease both}
+/* KPI glow on hover */
+.adm-kpi:hover{box-shadow:0 0 20px rgba(0,212,170,.15);transform:translateY(-3px)}
+/* Collapsible group */
+.with-group-body{overflow:hidden;transition:max-height .3s ease}
 </style>
 </head>
 
@@ -4756,6 +4762,14 @@ async function loadAdminOverview(c){
     +'<div class="adm-kpi-new-val" id="kpi_fees" style="color:var(--gold)">—</div>'
     +'<div class="adm-kpi-new-lbl">درآمد امروز (کارمزد)</div>'
     +'</div>');
+  html.push('</div>');
+
+  // ── Financial KPIs Today ──
+  html.push('<div class="adm-section-title">💰 شاخص‌های مالی امروز</div>');
+  html.push('<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px">');
+  html.push('<div class="adm-kpi" style="background:rgba(0,212,170,.06)"><div style="font-size:20px">💵</div><div class="adm-kpi-val">$'+todayDep.toFixed(0)+'</div><div class="adm-kpi-lbl">واریز امروز</div></div>');
+  html.push('<div class="adm-kpi" style="background:rgba(255,71,87,.06)"><div style="font-size:20px">💸</div><div class="adm-kpi-val" style="color:var(--red)">$'+todayWit.toFixed(0)+'</div><div class="adm-kpi-lbl">برداشت امروز</div></div>');
+  html.push('<div class="adm-kpi" style="background:rgba(255,215,0,.06)"><div style="font-size:20px">🏦</div><div class="adm-kpi-val" style="color:var(--gold)">$'+todayFees.toFixed(0)+'</div><div class="adm-kpi-lbl">کارمزد امروز</div></div>');
   html.push('</div>');
 
   // ── Platform Health ──
