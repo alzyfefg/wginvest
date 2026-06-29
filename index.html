@@ -3142,20 +3142,24 @@ async function renderInvestHistory(container){
   // skeleton loading
   container.innerHTML='<div class="inv-hist-section"><div class="inv-hist-header"><div class="inv-hist-title">📋 '+t('inv_hist_title')+'</div></div>'
     +'<div class="inv-hist-skeleton"></div><div class="inv-hist-skeleton"></div><div class="inv-hist-skeleton" style="opacity:.5"></div></div>';
-  var r=await sb.from("investments").select("*").eq("user_id",U.id).order("started_at",{ascending:false}).limit(50);
+  var r=await sb.from("investments").select("*").eq("user_id",U.id).order("started_at",{ascending:false}).limit(200);
   var all=r.data||[];
   var locale=['fa','ar','ur'].indexOf(lang)>=0?'fa-IR':'en-US';
   var isRtl=['fa','ar','ur'].indexOf(lang)>=0;
   if(!all.length){container.innerHTML='<div class="inv-hist-section"><div class="inv-hist-header"><div class="inv-hist-title">📋 '+t('inv_hist_title')+'</div></div><div class="inv-hist-empty">'+t('inv_hist_empty')+'</div></div>';return;}
   var curFilter='all';
+  var _invShowAll=false;
   function fmtD(dateStr){if(!dateStr)return '—';return new Date(dateStr).toLocaleDateString(locale);}
   function renderList(filter){
-    var list=filter==='all'?all:all.filter(function(x){
+    var listFull=filter==='all'?all:all.filter(function(x){
       if(filter==='withdrawn')return x.status==='withdrawn';
       if(filter==='active')return x.status==='active';
       if(filter==='completed')return x.status==='completed';
       return true;
     });
+    // Show only 3 initially, rest hidden until "show all" tapped
+    var list=_invShowAll?listFull:listFull.slice(0,3);
+    var hasMore=!_invShowAll&&listFull.length>3;
     var h='';
     if(!list.length){h='<div class="inv-hist-empty">'+t('inv_hist_none')+'</div>';}
     else{list.forEach(function(inv){
@@ -3184,15 +3188,20 @@ async function renderInvestHistory(container){
         +'</div>';
     });}
     var listEl=document.getElementById('invHistList');
-    if(listEl)listEl.innerHTML=h;
+    if(listEl){
+      var moreBtn=hasMore?'<button class="load-more-btn" id="invHistMoreBtn" onclick="window._invShowAllFn()">نمایش همه ('+(listFull.length-3)+' بیشتر) ▼</button>':'';
+      listEl.innerHTML=h+moreBtn;
+    }
   }
   var filters=[{k:'all',l:t('inv_hist_all')},{k:'active',l:t('inv_hist_active')},{k:'withdrawn',l:t('inv_hist_claimed')},{k:'completed',l:t('inv_hist_done')}];
   var fHtml=filters.map(function(f){return '<button class="inv-hist-filter'+(f.k==='all'?' on':'')+'" onclick="invHistFilter(\''+f.k+'\')" id="ihf_'+f.k+'">'+f.l+'</button>';}).join('');
   container.innerHTML='<div class="inv-hist-section"><div class="inv-hist-header"><div class="inv-hist-title">📋 '+t('inv_hist_title')+'</div><div class="inv-hist-filters">'+fHtml+'</div></div><div id="invHistList"></div></div>';
   renderList('all');
   window._invHistData=all;
+  window._invShowAllFn=function(){_invShowAll=true;renderList(curFilter);};
   window.invHistFilter=function(f){
     curFilter=f;
+    _invShowAll=false;
     document.querySelectorAll('.inv-hist-filter').forEach(function(b){b.classList.toggle('on',b.id==='ihf_'+f);});
     renderList(f);
   };
@@ -5587,45 +5596,73 @@ async function loadAW2(c){
   var html=[];
 
   // ── Withdrawal Summary Header ──
+  var todayMidnight=new Date();todayMidnight.setHours(0,0,0,0);
   var pendingList=allData.filter(function(w){return w.status==='pending';});
-  var approvedToday=allData.filter(function(w){
-    if(w.status!=='approved')return false;
-    var d=new Date(w.created_at);var t2=new Date();t2.setHours(0,0,0,0);return d>=t2;
+  var approvedList=allData.filter(function(w){return w.status==='approved';});
+  // Use reviewed_at for today filter (not created_at)
+  var approvedToday=approvedList.filter(function(w){
+    var d=new Date(w.reviewed_at||w.created_at);return d>=todayMidnight;
   });
   var pendingCount=pendingList.length;
   var approvedTodayCount=approvedToday.length;
-  var feesToday=approvedToday.reduce(function(s,w){return s+parseFloat(w.amount||0)*0.08;},0);
-  html.push('<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">');
+  // Fee percentage from settings
+  var {data:feeRow}=await sb.from('system_settings').select('value').eq('key','withdrawal_fee').single();
+  var feePct=parseFloat((feeRow&&feeRow.value)||8)/100;
+  var feesToday=approvedToday.reduce(function(s,w){return s+parseFloat(w.amount||0)*feePct;},0);
+  var feesTotal=approvedList.reduce(function(s,w){return s+parseFloat(w.amount||0)*feePct;},0);
+  // Total deposits all time
+  var depRes=await sb.from('deposits').select('amount').eq('status','approved');
+  var totalDeposits=(depRes.data||[]).reduce(function(s,d){return s+parseFloat(d.amount||0);},0);
+  html.push('<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px">');
   html.push('<div style="background:rgba(255,165,0,.08);border:1px solid rgba(255,165,0,.2);border-radius:12px;padding:10px;text-align:center"><div style="font-size:16px;font-weight:900;color:#f59e0b">'+pendingCount+'</div><div style="font-size:9px;color:var(--text3)">در انتظار</div></div>');
   html.push('<div style="background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);border-radius:12px;padding:10px;text-align:center"><div style="font-size:16px;font-weight:900;color:var(--ac)">'+approvedTodayCount+'</div><div style="font-size:9px;color:var(--text3)">تأیید امروز</div></div>');
   html.push('<div style="background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.2);border-radius:12px;padding:10px;text-align:center"><div style="font-size:16px;font-weight:900;color:var(--gold)">$'+feesToday.toFixed(0)+'</div><div style="font-size:9px;color:var(--text3)">کارمزد امروز</div></div>');
   html.push('</div>');
+  html.push('<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px">');
+  html.push('<div style="background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);border-radius:12px;padding:10px;text-align:center"><div style="font-size:15px;font-weight:900;color:#a78bfa">$'+feesTotal.toFixed(0)+'</div><div style="font-size:9px;color:var(--text3)">کارمزد کل (از ابتدا)</div></div>');
+  html.push('<div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:12px;padding:10px;text-align:center"><div style="font-size:15px;font-weight:900;color:#60a5fa">$'+totalDeposits.toFixed(0)+'</div><div style="font-size:9px;color:var(--text3)">واریز کل (از ابتدا)</div></div>');
+  html.push('</div>');
 
-  // Search + filter bar
+  // Tab switcher: pending vs history
+  html.push('<div style="display:flex;gap:8px;margin-bottom:12px">');
+  html.push('<button id="withTabPending" onclick="switchWithTab(\'pending\')" style="flex:1;padding:8px;border-radius:10px;border:1px solid rgba(255,165,0,.4);background:rgba(255,165,0,.12);color:#f59e0b;font-family:Vazirmatn,sans-serif;font-size:12px;font-weight:700;cursor:pointer">⏳ در انتظار ('+pendingCount+')</button>');
+  html.push('<button id="withTabHistory" onclick="switchWithTab(\'history\')" style="flex:1;padding:8px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-family:Vazirmatn,sans-serif;font-size:12px;font-weight:700;cursor:pointer">📋 تاریخچه ('+(allData.length-pendingCount)+')</button>');
+  html.push('</div>');
+  // Search + sort bar
   html.push('<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">');
   html.push('<input type="text" class="user-search" id="withSearch" placeholder="🔍 ایمیل یا آدرس کیف پول..." oninput="filterWithQueue()" style="flex:1;min-width:160px">');
-  html.push('<select id="withStatusFilter" class="adm-in" style="width:auto;min-width:110px" onchange="filterWithQueue()"><option value="">همه وضعیت‌ها</option><option value="pending">در انتظار</option><option value="approved">تأیید</option><option value="rejected">رد</option></select>');
   html.push('<select id="withSortFilter" class="adm-in" style="width:auto;min-width:130px" onchange="filterWithQueue()"><option value="date">جدیدترین</option><option value="amount_desc">بیشترین مبلغ</option><option value="amount_asc">کمترین مبلغ</option></select>');
   html.push('</div>');
   // Bulk reject for pending
-  html.push('<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center">');
+  html.push('<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center" id="withBulkBar">');
   html.push('<button class="adm-btn" style="background:rgba(255,71,87,.1);color:var(--red);border:1px solid rgba(255,71,87,.2);font-size:11px" onclick="bulkRejectSelected()">❌ رد انتخاب‌شده‌ها</button>');
   html.push('<span style="font-size:10px;color:var(--text3)" id="withSelCount">۰ انتخاب‌شده</span>');
   html.push('</div>');
   html.push('<div id="withQueueList"></div>');
   c.innerHTML=html.join('');
   window._withQueueData=allData;
+  window._withActiveTab='pending';
+  window.switchWithTab=function(tab){
+    window._withActiveTab=tab;
+    var btnP=document.getElementById('withTabPending');
+    var btnH=document.getElementById('withTabHistory');
+    var bulkBar=document.getElementById('withBulkBar');
+    if(btnP){btnP.style.background=tab==='pending'?'rgba(255,165,0,.12)':'var(--bg2)';btnP.style.color=tab==='pending'?'#f59e0b':'var(--text2)';btnP.style.borderColor=tab==='pending'?'rgba(255,165,0,.4)':'var(--border)';}
+    if(btnH){btnH.style.background=tab==='history'?'rgba(0,212,170,.12)':'var(--bg2)';btnH.style.color=tab==='history'?'var(--ac)':'var(--text2)';btnH.style.borderColor=tab==='history'?'rgba(0,212,170,.4)':'var(--border)';}
+    if(bulkBar)bulkBar.style.display=tab==='pending'?'':'none';
+    filterWithQueue();
+  };
   filterWithQueue();
 }
 
 function filterWithQueue(){
   var q=(document.getElementById('withSearch')||{}).value||'';
-  var st=(document.getElementById('withStatusFilter')||{}).value||'';
   var sort=(document.getElementById('withSortFilter')||{}).value||'date';
+  var activeTab=window._withActiveTab||'pending';
   var data=(window._withQueueData||[]).filter(function(w){
     var matchQ=!q||(w.profiles&&w.profiles.email&&w.profiles.email.toLowerCase().includes(q.toLowerCase()))||(w.wallet_address&&w.wallet_address.toLowerCase().includes(q.toLowerCase()));
-    var matchSt=!st||w.status===st;
-    return matchQ&&matchSt;
+    var matchTab=activeTab==='pending'?w.status==='pending':(w.status==='approved'||w.status==='rejected');
+    return matchQ&&matchTab;
   });
   if(sort==='amount_desc')data.sort(function(a,b){return parseFloat(b.amount)-parseFloat(a.amount);});
   else if(sort==='amount_asc')data.sort(function(a,b){return parseFloat(a.amount)-parseFloat(b.amount);});
