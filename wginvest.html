@@ -4250,7 +4250,7 @@ async function subWith(){
   var balUpd=await sb.from('profiles').update({balance:newBal}).eq('user_id',U.id);
   if(balUpd.error)return toast("Error: "+balUpd.error.message,"red");
   P.balance=newBal;
-  var res=await sb.from("withdrawals").insert({user_id:U.id,amount:amt,wallet_address:wa,status:"pending"});
+  var res=await sb.from("withdrawals").insert({user_id:U.id,amount:amt,wallet_address:wa,network:net.toUpperCase(),status:"pending"});
   if(res.error){
     // Rollback balance if insert failed
     await sb.from('profiles').update({balance:parseFloat(P.balance)+amt}).eq('user_id',U.id);
