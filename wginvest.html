@@ -1790,6 +1790,24 @@ body.light .im-phil{background:linear-gradient(135deg,rgba(26,86,219,.06),rgba(0
 .camp-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700}
 .camp-badge.active{background:rgba(0,212,170,.1);color:var(--ac);border:1px solid rgba(0,212,170,.2)}
 .camp-badge.inactive{background:rgba(255,255,255,.05);color:var(--text3);border:1px solid rgba(255,255,255,.1)}
+/* Hero carousel nav */
+.hero-nav-card{scroll-snap-align:center;flex-shrink:0;width:110px;border-radius:20px;padding:18px 12px;text-align:center;cursor:pointer;transition:all .35s cubic-bezier(.34,1.56,.64,1);opacity:.65;transform:scale(.88);border:1.5px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03)}
+.hero-nav-card.active{opacity:1;transform:scale(1.08)}
+#adminCarousel::-webkit-scrollbar{display:none}
+/* Withdrawal group header */
+.with-group-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 0;font-size:11px;font-weight:700;color:var(--text3);border-bottom:1px solid rgba(255,255,255,.05);margin-bottom:8px;cursor:pointer}
+.with-group-hdr:hover{color:var(--text2)}
+/* KPI badge */
+.kpi-badge{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-size:8px;font-weight:900;padding:2px 5px;border-radius:10px;min-width:16px;text-align:center}
+/* Admin KPI premium cards */
+.adm-kpi-new{background:rgba(255,255,255,.03);border:1.5px solid rgba(255,255,255,.08);border-radius:18px;padding:18px 14px;text-align:center;cursor:pointer;position:relative;transition:all .25s;overflow:hidden}
+.adm-kpi-new:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.3)}
+.adm-kpi-new-val{font-size:22px;font-weight:900;color:var(--ac);margin-bottom:4px;line-height:1}
+.adm-kpi-new-lbl{font-size:9px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.adm-kpi-new-icon{font-size:24px;margin-bottom:8px;display:block}
+/* Load more button */
+.load-more-btn{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:11px;font-family:Vazirmatn,sans-serif;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;margin-top:8px;transition:all .2s}
+.load-more-btn:hover{border-color:var(--ac);color:var(--ac);background:rgba(0,212,170,.05)}
 </style>
 </head>
 
@@ -4558,25 +4576,23 @@ async function loadAdmin(){
   var now=new Date();
   var dateStr=now.toLocaleDateString("fa-IR",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
   c.innerHTML='<div class="adm-header"><div class="adm-header-left"><h2>👑 پنل مدیریت</h2><p>'+dateStr+'</p></div><div class="adm-header-badge">Admin</div></div>'
-    +'<div class="adm-tabs">'
-    +'<button class="adm-tab on" id="at_overview" onclick="showAdminTab(&quot;overview&quot;)">📊 داشبورد</button>'
-    +'<button class="adm-tab" id="at_users" onclick="showAdminTab(&quot;users&quot;)">👥 کاربران</button>'
-    +'<button class="adm-tab" id="at_finance" onclick="showAdminTab(&quot;finance&quot;)">💰 مالی</button>'
-    +'<button class="adm-tab" id="at_matches" onclick="showAdminTab(&quot;matches&quot;)">💎 Smart Invest</button>'
-    +'<button class="adm-tab" id="at_withdrawals" onclick="showAdminTab(&quot;withdrawals&quot;)">💸 برداشت</button>'
-    +'<button class="adm-tab" id="at_deposits" onclick="showAdminTab(&quot;deposits&quot;)">💳 واریز</button>'
-    +'<button class="adm-tab" id="at_kyc" onclick="showAdminTab(&quot;kyc&quot;)">🪪 KYC</button>'
-    +'<button class="adm-tab" id="at_tickets" onclick="showAdminTab(&quot;tickets&quot;)">🎧 تیکت‌ها</button>'
-    +'<button class="adm-tab" id="at_announce" onclick="showAdminTab(&quot;announce&quot;)">📢 اعلان</button>'
-    +'<button class="adm-tab" id="at_logs" onclick="showAdminTab(&quot;logs&quot;)">📋 لاگ</button>'
-    +'<button class="adm-tab" id="at_auditlog" onclick="showAdminTab(&quot;auditlog&quot;)">🔍 لاگ ادمین</button>'
-    +'<button class="adm-tab" id="at_plans" onclick="showAdminTab(&quot;plans&quot;)">💎 پلن‌ها</button>'
-    +'<button class="adm-tab" id="at_bonus" onclick="showAdminTab(&quot;bonus&quot;)">🎁 بونوس</button>'
-    +'<button class="adm-tab" id="at_analytics" onclick="showAdminTab(&quot;analytics&quot;)">📈 آنالیز</button>'
-    +'<button class="adm-tab" id="at_notes" onclick="showAdminTab(&quot;notes&quot;)">📝 یادداشت</button>'
-    +'<button class="adm-tab" id="at_settings" onclick="showAdminTab(&quot;settings&quot;)">⚙️ تنظیمات</button>'
-    +'<button class="adm-tab" id="at_walletchanges" onclick="showAdminTab(&quot;walletchanges&quot;)">🔑 '+t('adm_wallet_changes')+'</button>'
+    +'<div id="adminCarousel" style="display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:14px 4px 18px;margin:-4px -4px 14px;scrollbar-width:none">'
+    +'<div class="hero-nav-card active" data-tab="overview" onclick="selectAdminCard(this,\'overview\')" style="background:rgba(0,212,170,.1);border-color:rgba(0,212,170,.3)"><div style="font-size:26px;margin-bottom:7px">🏠</div><div style="font-size:10px;font-weight:800;color:var(--ac)">داشبورد</div></div>'
+    +'<div class="hero-nav-card" data-tab="users" onclick="selectAdminCard(this,\'users\')" style="background:rgba(26,86,219,.08);border-color:rgba(26,86,219,.2)"><div style="font-size:26px;margin-bottom:7px">👥</div><div style="font-size:10px;font-weight:800;color:#3b82f6">کاربران</div></div>'
+    +'<div class="hero-nav-card" data-tab="finance" onclick="selectAdminCard(this,\'finance\')" style="background:rgba(0,212,170,.06);border-color:rgba(0,212,170,.18)"><div style="font-size:26px;margin-bottom:7px">💰</div><div style="font-size:10px;font-weight:800;color:var(--ac)">مالی</div></div>'
+    +'<div class="hero-nav-card" data-tab="withdrawals" onclick="selectAdminCard(this,\'withdrawals\')" style="background:rgba(255,71,87,.06);border-color:rgba(255,71,87,.18)"><div style="font-size:26px;margin-bottom:7px">💸</div><div style="font-size:10px;font-weight:800;color:#ff4757">برداشت</div></div>'
+    +'<div class="hero-nav-card" data-tab="deposits" onclick="selectAdminCard(this,\'deposits\')" style="background:rgba(0,212,170,.06);border-color:rgba(0,212,170,.18)"><div style="font-size:26px;margin-bottom:7px">💳</div><div style="font-size:10px;font-weight:800;color:var(--ac)">واریز</div></div>'
+    +'<div class="hero-nav-card" data-tab="matches" onclick="selectAdminCard(this,\'matches\')" style="background:rgba(139,92,246,.08);border-color:rgba(139,92,246,.2)"><div style="font-size:26px;margin-bottom:7px">📈</div><div style="font-size:10px;font-weight:800;color:#a78bfa">سرمایه</div></div>'
+    +'<div class="hero-nav-card" data-tab="bonus" onclick="selectAdminCard(this,\'bonus\')" style="background:rgba(245,158,11,.07);border-color:rgba(245,158,11,.2)"><div style="font-size:26px;margin-bottom:7px">🎁</div><div style="font-size:10px;font-weight:800;color:#f59e0b">بونوس</div></div>'
+    +'<div class="hero-nav-card" data-tab="kyc" onclick="selectAdminCard(this,\'kyc\')" style="background:rgba(6,182,212,.07);border-color:rgba(6,182,212,.2)"><div style="font-size:26px;margin-bottom:7px">🪪</div><div style="font-size:10px;font-weight:800;color:#06b6d4">KYC</div></div>'
+    +'<div class="hero-nav-card" data-tab="tickets" onclick="selectAdminCard(this,\'tickets\')" style="background:rgba(139,92,246,.06);border-color:rgba(139,92,246,.15)"><div style="font-size:26px;margin-bottom:7px">🎧</div><div style="font-size:10px;font-weight:800;color:#a78bfa">تیکت</div></div>'
+    +'<div class="hero-nav-card" data-tab="announce" onclick="selectAdminCard(this,\'announce\')" style="background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.15)"><div style="font-size:26px;margin-bottom:7px">📢</div><div style="font-size:10px;font-weight:800;color:#f59e0b">اعلان</div></div>'
+    +'<div class="hero-nav-card" data-tab="settings" onclick="selectAdminCard(this,\'settings\')" style="background:rgba(107,114,128,.07);border-color:rgba(107,114,128,.2)"><div style="font-size:26px;margin-bottom:7px">⚙️</div><div style="font-size:10px;font-weight:800;color:#9ca3af">تنظیمات</div></div>'
+    +'<div class="hero-nav-card" data-tab="logs" onclick="selectAdminCard(this,\'logs\')" style="background:rgba(100,116,139,.07);border-color:rgba(100,116,139,.18)"><div style="font-size:26px;margin-bottom:7px">📋</div><div style="font-size:10px;font-weight:800;color:#94a3b8">لاگ</div></div>'
+    +'<div class="hero-nav-card" data-tab="walletchanges" onclick="selectAdminCard(this,\'walletchanges\')" style="background:rgba(6,182,212,.06);border-color:rgba(6,182,212,.15)"><div style="font-size:26px;margin-bottom:7px">🔑</div><div style="font-size:10px;font-weight:800;color:#06b6d4">کیف پول</div></div>'
     +'</div>'
+    +'<!-- legacy hidden tab buttons for backward compat -->'
+    +'<div id="at_overview" style="display:none"></div><div id="at_users" style="display:none"></div><div id="at_finance" style="display:none"></div><div id="at_matches" style="display:none"></div><div id="at_withdrawals" style="display:none"></div><div id="at_deposits" style="display:none"></div><div id="at_kyc" style="display:none"></div><div id="at_tickets" style="display:none"></div><div id="at_announce" style="display:none"></div><div id="at_logs" style="display:none"></div><div id="at_auditlog" style="display:none"></div><div id="at_plans" style="display:none"></div><div id="at_bonus" style="display:none"></div><div id="at_analytics" style="display:none"></div><div id="at_notes" style="display:none"></div><div id="at_settings" style="display:none"></div><div id="at_walletchanges" style="display:none"></div>'
     +'<input class="global-search" id="adminGlobalSearch" placeholder="🔍 جستجو: ایمیل، شناسه، TX Hash، آدرس کیف پول..." oninput="adminSearchDebounce(this.value)" style="margin-bottom:8px">'
     +'<div id="adminSearchResults" style="display:none;background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;margin-bottom:10px;max-height:300px;overflow-y:auto"></div>'
     +'<div id="adminContent"><div class="lbox"><div class="spin"></div></div></div>';
@@ -4631,8 +4647,19 @@ async function adminSearch(q){
   res.innerHTML=html.join('');
 }
 
+function selectAdminCard(el,tab){
+  document.querySelectorAll('.hero-nav-card').forEach(function(c){c.classList.remove('active');});
+  el.classList.add('active');
+  el.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  showAdminTab(tab);
+}
+
 async function showAdminTab(tab){
   var allTabs=["overview","users","finance","matches","deposits","withdrawals","kyc","tickets","announce","logs","auditlog","plans","bonus","analytics","notes","settings","walletchanges"];
+  // Update carousel active state
+  document.querySelectorAll('.hero-nav-card').forEach(function(c){
+    if(c.dataset.tab===tab)c.classList.add('active');else c.classList.remove('active');
+  });
   allTabs.forEach(function(t){var el=document.getElementById("at_"+t);if(el)el.classList.remove("on");});
   var el=document.getElementById("at_"+tab);if(el)el.classList.add("on");
   var c=document.getElementById("adminContent");if(!c)return;
@@ -4657,6 +4684,7 @@ async function showAdminTab(tab){
 }
 
 async function loadAdminOverview(c){
+  // ── Supabase queries (all kept intact) ──
   var users=await sb.from('profiles').select('*',{count:'exact',head:true});
   var preds=await sb.from('predictions').select('*',{count:'exact',head:true});
   var deps=await sb.from('deposits').select('amount').eq('status','approved');
@@ -4668,7 +4696,6 @@ async function loadAdminOverview(c){
   var totalWith=(withs.data||[]).reduce(function(s,w){return s+parseFloat(w.amount||0);},0);
   var profit=totalDep-totalWith;
   var pending=(pendDeps.count||0)+(pendWiths.count||0)+(pendKyc.count||0);
-  // Today's command center stats
   var today=new Date();today.setHours(0,0,0,0);
   var todayISO=today.toISOString();
   var cmdRes=await Promise.all([
@@ -4676,107 +4703,120 @@ async function loadAdminOverview(c){
     sb.from('withdrawals').select('amount').eq('status','approved').gte('created_at',todayISO),
     sb.from('deposits').select('id',{count:'exact'}).eq('status','pending'),
     sb.from('withdrawals').select('id',{count:'exact'}).eq('status','pending'),
-    sb.from('investments').select('id',{count:'exact'}).eq('status','active')
+    sb.from('investments').select('id',{count:'exact'}).eq('status','active'),
+    sb.from('bonus_campaigns').select('id',{count:'exact'}).eq('is_active',true)
   ]);
   var todayDep=(cmdRes[0].data||[]).reduce(function(s,r){return s+parseFloat(r.amount||0);},0);
   var todayWit=(cmdRes[1].data||[]).reduce(function(s,r){return s+parseFloat(r.amount||0);},0);
   var pDepCnt=cmdRes[2].count||0;
   var pWitCnt=cmdRes[3].count||0;
   var actInvCnt=cmdRes[4].count||0;
-  var html=[];
-  html.push('<div class="icard anim-fadeup" style="background:linear-gradient(135deg,rgba(0,212,170,.08),rgba(26,86,219,.08));border-color:rgba(0,212,170,.2);margin-bottom:14px"><div class="ctitle">🎛️ فرماندهی امروز</div>');
-  html.push('<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px;margin-top:10px">');
-  html.push('<div style="text-align:center;padding:10px 4px;background:rgba(0,212,170,.08);border-radius:10px"><div style="font-size:16px;font-weight:900;color:#00d4aa">$'+todayDep.toFixed(0)+'</div><div style="font-size:9px;color:var(--text3);margin-top:3px">واریز امروز</div></div>');
-  html.push('<div style="text-align:center;padding:10px 4px;background:rgba(255,71,87,.08);border-radius:10px"><div style="font-size:16px;font-weight:900;color:#ff4757">$'+todayWit.toFixed(0)+'</div><div style="font-size:9px;color:var(--text3);margin-top:3px">برداشت امروز</div></div>');
+  var actBonusCnt=cmdRes[5].count||0;
   var todayFees=todayWit*0.08;
-  html.push('<div style="text-align:center;padding:10px 4px;background:rgba(255,215,0,.08);border-radius:10px"><div id="kpi_today_fees" style="font-size:16px;font-weight:900;color:var(--gold)">$'+todayFees.toFixed(0)+'</div><div style="font-size:9px;color:var(--text3);margin-top:3px">کارمزد امروز</div></div>');
-  html.push('<div style="text-align:center;padding:10px 4px;background:rgba(245,158,11,.08);border-radius:10px;cursor:pointer" onclick="showAdminTab(&quot;deposits&quot;)"><div style="font-size:16px;font-weight:900;color:#f59e0b">'+pDepCnt+'</div><div style="font-size:9px;color:var(--text3);margin-top:3px">واریز معلق</div></div>');
-  html.push('<div style="text-align:center;padding:10px 4px;background:rgba(245,158,11,.08);border-radius:10px;cursor:pointer" onclick="showAdminTab(&quot;withdrawals&quot;)"><div style="font-size:16px;font-weight:900;color:#f59e0b">'+pWitCnt+'</div><div style="font-size:9px;color:var(--text3);margin-top:3px">برداشت معلق</div></div>');
-  html.push('<div style="text-align:center;padding:10px 4px;background:rgba(26,86,219,.08);border-radius:10px"><div style="font-size:16px;font-weight:900;color:#3b82f6">'+actInvCnt+'</div><div style="font-size:9px;color:var(--text3);margin-top:3px">سرمایه‌گذاری فعال</div></div>');
-  html.push('</div></div>');
-  html.push('<div class="icard"><div class="ctitle">⚡ دسترسی سریع</div>');
-  html.push('<div class="quick-actions">');
-  ['matches','deposits','withdrawals','users','announce','tickets'].forEach(function(t,i){
-    var icons=['💎','💳','💸','👥','📢','🎧'];
-    var labels=['بازی جدید','واریزها','برداشت‌ها','کاربران','اطلاع‌رسانی','تیکت‌ها'];
-    html.push('<div class="qa-btn" onclick="showAdminTab(&quot;'+t+'&quot;)"><span class="qa-icon">'+icons[i]+'</span><span class="qa-label">'+labels[i]+'</span></div>');
-  });
-  html.push('</div></div>');
-  html.push('<div class="kpi-grid">');
-  html.push('<div class="kpi-card"><span class="kpi-icon">👥</span><div class="kpi-val">'+(users.count||0)+'</div><div class="kpi-lbl">کل کاربران</div></div>');
-  html.push('<div class="kpi-card"><span class="kpi-icon">🎯</span><div class="kpi-val">'+(preds.count||0)+'</div><div class="kpi-lbl">کل پیش‌بینی</div></div>');
-  html.push('<div class="kpi-card" style="border-color:rgba(0,212,170,.2)"><span class="kpi-icon">💳</span><div class="kpi-val" style="color:var(--ac)">$'+totalDep.toFixed(0)+'</div><div class="kpi-lbl">کل واریز</div></div>');
-  html.push('<div class="kpi-card" style="border-color:rgba(255,71,87,.2)"><span class="kpi-icon">💸</span><div class="kpi-val" style="color:var(--red)">$'+totalWith.toFixed(0)+'</div><div class="kpi-lbl">کل برداشت</div></div>');
-  html.push('<div class="kpi-card" style="border-color:rgba(255,215,0,.2)"><span class="kpi-icon">📈</span><div class="kpi-val" style="color:var(--gold)">$'+profit.toFixed(0)+'</div><div class="kpi-lbl">سود پلتفرم</div></div>');
-  html.push('<div class="kpi-card" style="border-color:rgba(255,71,87,.2)"><span class="kpi-icon">⏳</span><div class="kpi-val" style="color:var(--red)">'+pending+'</div><div class="kpi-lbl">در انتظار بررسی</div></div>');
+
+  var html=[];
+
+  // ── KPI Cards Grid (6 cards) ──
+  html.push('<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px">');
+  // 1. Total Members
+  html.push('<div class="adm-kpi-new" onclick="showAdminTab(\'users\')" style="border-color:rgba(26,86,219,.25);background:rgba(26,86,219,.07)">'
+    +'<span class="adm-kpi-new-icon">👥</span>'
+    +'<div class="adm-kpi-new-val" id="kpi_members" style="color:#3b82f6">—</div>'
+    +'<div class="adm-kpi-new-lbl">کل اعضا</div>'
+    +'</div>');
+  // 2. Pending Deposits
+  html.push('<div class="adm-kpi-new" onclick="showAdminTab(\'deposits\')" style="border-color:rgba(0,212,170,.2);background:rgba(0,212,170,.06)">'
+    +(pDepCnt>0?'<span class="kpi-badge">'+pDepCnt+'</span>':'')
+    +'<span class="adm-kpi-new-icon">💳</span>'
+    +'<div class="adm-kpi-new-val" id="kpi_pdep" style="color:'+(pDepCnt>0?'#f59e0b':'var(--ac)')+'">—</div>'
+    +'<div class="adm-kpi-new-lbl">واریز معلق</div>'
+    +'</div>');
+  // 3. Pending Withdrawals
+  html.push('<div class="adm-kpi-new" onclick="showAdminTab(\'withdrawals\')" style="border-color:rgba(255,71,87,.2);background:rgba(255,71,87,.06)">'
+    +(pWitCnt>0?'<span class="kpi-badge">'+pWitCnt+'</span>':'')
+    +'<span class="adm-kpi-new-icon">💸</span>'
+    +'<div class="adm-kpi-new-val" id="kpi_pwit" style="color:'+(pWitCnt>0?'#f59e0b':'var(--red)')+'">—</div>'
+    +'<div class="adm-kpi-new-lbl">برداشت معلق</div>'
+    +'</div>');
+  // 4. Active Investments
+  html.push('<div class="adm-kpi-new" onclick="showAdminTab(\'matches\')" style="border-color:rgba(139,92,246,.2);background:rgba(139,92,246,.06)">'
+    +'<span class="adm-kpi-new-icon">📈</span>'
+    +'<div class="adm-kpi-new-val" id="kpi_inv" style="color:#a78bfa">—</div>'
+    +'<div class="adm-kpi-new-lbl">سرمایه‌گذاری فعال</div>'
+    +'</div>');
+  // 5. Active Bonus Campaigns
+  html.push('<div class="adm-kpi-new" onclick="showAdminTab(\'bonus\')" style="border-color:rgba(245,158,11,.2);background:rgba(245,158,11,.06)">'
+    +'<span class="adm-kpi-new-icon">🎁</span>'
+    +'<div class="adm-kpi-new-val" id="kpi_bonus" style="color:#f59e0b">—</div>'
+    +'<div class="adm-kpi-new-lbl">کمپین بونوس فعال</div>'
+    +'</div>');
+  // 6. Today's Revenue (fees)
+  html.push('<div class="adm-kpi-new" style="border-color:rgba(255,215,0,.2);background:rgba(255,215,0,.06)">'
+    +'<span class="adm-kpi-new-icon">💰</span>'
+    +'<div class="adm-kpi-new-val" id="kpi_fees" style="color:var(--gold)">—</div>'
+    +'<div class="adm-kpi-new-lbl">درآمد امروز (کارمزد)</div>'
+    +'</div>');
   html.push('</div>');
-  if(pending>0){
-    html.push('<div class="icard" style="border-color:rgba(255,215,0,.2)"><div class="ctitle" style="color:var(--gold)">⚠️ نیاز به بررسی</div>');
-    if(pendDeps.count>0)html.push('<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer" onclick="showAdminTab(&quot;deposits&quot;)"><span style="font-size:12px;color:var(--text)">💳 واریز در انتظار</span><span class="tx-badge pending">'+pendDeps.count+'</span></div>');
-    if(pendWiths.count>0)html.push('<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer" onclick="showAdminTab(&quot;withdrawals&quot;)"><span style="font-size:12px;color:var(--text)">💸 برداشت در انتظار</span><span class="tx-badge pending">'+pendWiths.count+'</span></div>');
-    if(pendKyc.count>0)html.push('<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;cursor:pointer" onclick="showAdminTab(&quot;kyc&quot;)"><span style="font-size:12px;color:var(--text)">🪪 KYC در انتظار</span><span class="tx-badge pending">'+pendKyc.count+'</span></div>');
-    html.push('</div>');
-  }
-  var recentDeps=await sb.from('deposits').select('*').order('created_at',{ascending:false}).limit(5);
-  if((recentDeps.data||[]).length){var _uids2=[...new Set(recentDeps.data.map(function(d){return d.user_id;}))];var _pr2=await sb.from('profiles').select('user_id,email').in('user_id',_uids2);var _pm2={};(_pr2.data||[]).forEach(function(p){_pm2[p.user_id]=p;});recentDeps.data.forEach(function(d){d.profiles=_pm2[d.user_id]||null;});}
-  var recentUsers=await sb.from('profiles').select('*').order('created_at',{ascending:false}).limit(3);
-  html.push('<div class="icard"><div class="ctitle">⚡ فعالیت اخیر</div>');
-  var acts=[];
-  (recentDeps.data||[]).forEach(function(d){acts.push({type:'dep',data:d,time:d.created_at});});
-  (recentUsers.data||[]).forEach(function(u){acts.push({type:'user',data:u,time:u.created_at});});
-  acts.sort(function(a,b){return new Date(b.time)-new Date(a.time);}).slice(0,6).forEach(function(a){
-    var icon=a.type==='dep'?'💳':'👤';
-    var title=a.type==='dep'?'واریز $'+a.data.amount:'ثبت‌نام جدید';
-    var sub=a.type==='dep'?((a.data.profiles&&a.data.profiles.email)||'---'):a.data.email;
-    var bg=a.type==='dep'?'rgba(0,212,170,.08)':'rgba(26,86,219,.08)';
-    html.push('<div class="act-item"><div class="act-icon" style="background:'+bg+'">'+icon+'</div><div class="act-txt"><div class="act-title">'+title+'</div><div class="act-sub">'+sub+'</div></div></div>');
-  });
-  html.push('</div>');
-  // Platform Health
-  var healthHtml='<div class="icard" style="margin-top:14px"><div class="ctitle">🏥 وضعیت سیستم</div><div class="health-grid">';
-  try{
-    var hCheck=await sb.from('profiles').select('user_id').limit(1);
-    healthHtml+='<div class="health-item"><div class="health-dot ok"></div><span>Supabase DB</span></div>';
-  }catch(e){
-    healthHtml+='<div class="health-item"><div class="health-dot err"></div><span>Supabase DB ❌</span></div>';
-  }
-  healthHtml+='<div class="health-item"><div class="health-dot ok"></div><span>Auth Service</span></div>';
-  healthHtml+='<div class="health-item"><div class="health-dot ok"></div><span>Storage</span></div>';
-  var pendDepsH=await sb.from('deposits').select('id',{count:'exact'}).eq('status','pending');
-  var pendWithsH=await sb.from('withdrawals').select('id',{count:'exact'}).eq('status','pending');
-  var pendDCnt=pendDepsH.count||0;
-  var pendWCnt=pendWithsH.count||0;
-  healthHtml+='<div class="health-item"><div class="health-dot '+(pendDCnt>0?'warn':'ok')+'"></div><span>واریز در انتظار: '+pendDCnt+'</span></div>';
-  healthHtml+='<div class="health-item"><div class="health-dot '+(pendWCnt>0?'warn':'ok')+'"></div><span>برداشت در انتظار: '+pendWCnt+'</span></div>';
-  healthHtml+='</div></div>';
-  html.push(healthHtml);
-  // Recent Activity (enhanced)
-  var [recDeps2,recWiths2,recInvs2]=await Promise.all([
+
+  // ── Platform Health ──
+  var dbOk=true;
+  try{await sb.from('profiles').select('user_id').limit(1);}catch(e){dbOk=false;}
+  html.push('<div class="icard anim-fadeup" style="margin-bottom:14px"><div class="ctitle">🏥 سلامت پلتفرم</div>');
+  html.push('<div class="health-grid">');
+  html.push('<div class="health-item"><div class="health-dot '+(dbOk?'ok':'err')+'"></div><span>اتصال Supabase: '+(dbOk?'✅ متصل':'❌ قطع')+'</span></div>');
+  html.push('<div class="health-item"><div class="health-dot ok"></div><span>Auth Service: ✅ فعال</span></div>');
+  html.push('<div class="health-item"><div class="health-dot '+(pDepCnt>0?'warn':'ok')+'"></div><span>واریز در انتظار: '+(pDepCnt>0?'⚠️ ':'')+pDepCnt+'</span></div>');
+  html.push('<div class="health-item"><div class="health-dot '+(pWitCnt>0?'warn':'ok')+'"></div><span>برداشت در انتظار: '+(pWitCnt>0?'⚠️ ':'')+pWitCnt+'</span></div>');
+  html.push('</div></div>');
+
+  // ── Recent Activity Feed (last 10 events) ──
+  var [recDeps2,recWiths2]=await Promise.all([
     sb.from('deposits').select('*').order('created_at',{ascending:false}).limit(5),
-    sb.from('withdrawals').select('*').order('created_at',{ascending:false}).limit(5),
-    sb.from('investments').select('*').order('created_at',{ascending:false}).limit(5)
+    sb.from('withdrawals').select('*').order('created_at',{ascending:false}).limit(5)
   ]);
   var acts2=[];
-  (recDeps2.data||[]).forEach(function(d){acts2.push({type:'deposit',icon:'💳',amount:d.amount,status:d.status,ts:d.created_at,uid:d.user_id});});
-  (recWiths2.data||[]).forEach(function(w){acts2.push({type:'withdrawal',icon:'💸',amount:w.amount,status:w.status,ts:w.created_at,uid:w.user_id});});
-  (recInvs2.data||[]).forEach(function(i){acts2.push({type:'investment',icon:'📈',amount:i.amount,status:i.status,ts:i.created_at,uid:i.user_id});});
+  (recDeps2.data||[]).forEach(function(d){acts2.push({type:'deposit',icon:'💳',amount:d.amount,status:d.status,ts:d.created_at});});
+  (recWiths2.data||[]).forEach(function(w){acts2.push({type:'withdrawal',icon:'💸',amount:w.amount,status:w.status,ts:w.created_at});});
   acts2.sort(function(a,b){return new Date(b.ts)-new Date(a.ts);});
   acts2=acts2.slice(0,10);
   if(acts2.length){
-    html.push('<div class="icard" style="margin-top:14px"><div class="ctitle">📡 فعالیت‌های اخیر</div>');
+    html.push('<div class="icard anim-fadeup" style="margin-bottom:14px"><div class="ctitle">📡 فعالیت‌های اخیر</div>');
     acts2.forEach(function(a){
       var locale=['fa','ar'].indexOf(lang)>=0?'fa-IR':'en-US';
       var dt=new Date(a.ts).toLocaleString(locale);
-      var clr=a.type==='deposit'?'rgba(0,212,170,.08)':a.type==='withdrawal'?'rgba(255,71,87,.08)':'rgba(59,130,246,.08)';
+      var typeLabel=a.type==='deposit'?'واریز':'برداشت';
+      var clr=a.type==='deposit'?'rgba(0,212,170,.1)':'rgba(255,71,87,.1)';
       html.push('<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04)">');
-      html.push('<div style="width:32px;height:32px;border-radius:10px;background:'+clr+';display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">'+a.icon+'</div>');
-      html.push('<div style="flex:1"><div style="font-size:11px;font-weight:700;color:var(--text)">'+a.type+' · $'+parseFloat(a.amount||0).toFixed(2)+'</div><div style="font-size:10px;color:var(--text3)">'+dt+'</div></div>');
+      html.push('<div style="width:34px;height:34px;border-radius:11px;background:'+clr+';display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">'+a.icon+'</div>');
+      html.push('<div style="flex:1"><div style="font-size:11px;font-weight:700;color:var(--text)">'+typeLabel+' · $'+parseFloat(a.amount||0).toFixed(2)+'</div><div style="font-size:10px;color:var(--text3)">'+dt+'</div></div>');
       html.push('<span class="tx-badge '+(a.status||'pending')+'" style="font-size:9px">'+a.status+'</span>');
       html.push('</div>');
     });
     html.push('</div>');
   }
+
   c.innerHTML=html.join('');
+
+  // ── countUp animations ──
+  function countUp(id,target,prefix,isInt){
+    var el=document.getElementById(id);if(!el)return;
+    var start=0,dur=900,startTime=null;
+    function step(ts){
+      if(!startTime)startTime=ts;
+      var prog=Math.min((ts-startTime)/dur,1);
+      var eased=1-Math.pow(1-prog,3);
+      var cur=isInt?Math.round(eased*target):(eased*target).toFixed(2);
+      el.textContent=(prefix||'')+cur;
+      if(prog<1)requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  countUp('kpi_members',users.count||0,'',true);
+  countUp('kpi_pdep',pDepCnt,'',true);
+  countUp('kpi_pwit',pWitCnt,'',true);
+  countUp('kpi_inv',actInvCnt,'',true);
+  countUp('kpi_bonus',actBonusCnt,'',true);
+  countUp('kpi_fees',todayFees,'$',false);
 }
 
 async function loadAdminFinance(c){
@@ -5493,6 +5533,22 @@ async function loadAW2(c){
     allData.forEach(function(w){w.profiles=profMap[w.user_id]||null;});
   }
   var html=[];
+
+  // ── Withdrawal Summary Header ──
+  var pendingList=allData.filter(function(w){return w.status==='pending';});
+  var approvedToday=allData.filter(function(w){
+    if(w.status!=='approved')return false;
+    var d=new Date(w.created_at);var t2=new Date();t2.setHours(0,0,0,0);return d>=t2;
+  });
+  var pendingCount=pendingList.length;
+  var approvedTodayCount=approvedToday.length;
+  var feesToday=approvedToday.reduce(function(s,w){return s+parseFloat(w.amount||0)*0.08;},0);
+  html.push('<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">');
+  html.push('<div style="background:rgba(255,165,0,.08);border:1px solid rgba(255,165,0,.2);border-radius:12px;padding:10px;text-align:center"><div style="font-size:16px;font-weight:900;color:#f59e0b">'+pendingCount+'</div><div style="font-size:9px;color:var(--text3)">در انتظار</div></div>');
+  html.push('<div style="background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);border-radius:12px;padding:10px;text-align:center"><div style="font-size:16px;font-weight:900;color:var(--ac)">'+approvedTodayCount+'</div><div style="font-size:9px;color:var(--text3)">تأیید امروز</div></div>');
+  html.push('<div style="background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.2);border-radius:12px;padding:10px;text-align:center"><div style="font-size:16px;font-weight:900;color:var(--gold)">$'+feesToday.toFixed(0)+'</div><div style="font-size:9px;color:var(--text3)">کارمزد امروز</div></div>');
+  html.push('</div>');
+
   // Search + filter bar
   html.push('<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">');
   html.push('<input type="text" class="user-search" id="withSearch" placeholder="🔍 ایمیل یا آدرس کیف پول..." oninput="filterWithQueue()" style="flex:1;min-width:160px">');
@@ -5523,6 +5579,37 @@ function filterWithQueue(){
   else if(sort==='amount_asc')data.sort(function(a,b){return parseFloat(a.amount)-parseFloat(b.amount);});
   var listEl=document.getElementById('withQueueList');
   if(!listEl)return;
+
+  // ── Group by date ──
+  var todayD=new Date();todayD.setHours(0,0,0,0);
+  var yesterdayD=new Date(todayD);yesterdayD.setDate(todayD.getDate()-1);
+  var groups={today:[],yesterday:[],older:[]};
+  data.forEach(function(w){
+    var d=new Date(w.created_at);
+    if(d>=todayD)groups.today.push(w);
+    else if(d>=yesterdayD)groups.yesterday.push(w);
+    else groups.older.push(w);
+  });
+  var groupDefs=[
+    {key:'today',label:'امروز',data:groups.today},
+    {key:'yesterday',label:'دیروز',data:groups.yesterday},
+    {key:'older',label:'قدیمی‌تر',data:groups.older}
+  ];
+  var allHtml=[];
+  groupDefs.forEach(function(g){
+    if(!g.data.length)return;
+    var totalAmt=g.data.reduce(function(s,w){return s+parseFloat(w.amount||0);},0);
+    allHtml.push('<div class="with-group-hdr" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">'
+      +'<span>'+g.label+' ('+g.data.length+')</span>'
+      +'<span style="color:var(--gold)">$'+totalAmt.toFixed(2)+'</span></div>');
+    allHtml.push('<div>');
+    g.data.forEach(function(w){
+      allHtml.push(_renderWithCard(w));
+    });
+    allHtml.push('</div>');
+  });
+  listEl.innerHTML=allHtml.length?allHtml.join(''):'<div class="ebox"><span class="ei">💸</span><p>هیچ برداشتی یافت نشد</p></div>';
+  return; // skip old rendering below
   if(!data.length){listEl.innerHTML='<div class="ebox"><span class="ei">💸</span><p>هیچ برداشتی یافت نشد</p></div>';return;}
   var html=[];
   data.forEach(function(w){
@@ -5578,6 +5665,59 @@ function filterWithQueue(){
     html.push('</div>');
   });
   listEl.innerHTML=html.join('');
+}
+
+function _renderWithCard(w){
+  var isPending=w.status==='pending';
+  var statusCls=w.status==='approved'?'wsb-approved':w.status==='rejected'?'wsb-rejected':'wsb-pending';
+  var statusLabel=w.status==='approved'?'✅ تأیید':w.status==='rejected'?'❌ رد':'⏳ در انتظار';
+  var isCritical=parseFloat(w.amount)>=100;
+  var borderColor=w.status==='approved'?'rgba(0,212,170,.2)':w.status==='rejected'?'rgba(255,71,87,.15)':isCritical?'rgba(255,71,87,.4)':'rgba(255,215,0,.25)';
+  var doneSubmit=true;
+  var doneReview=isPending||w.status==='approved';
+  var doneFinal=w.status==='approved'||w.status==='rejected';
+  var rawAmt=parseFloat(w.amount||0);var feeAmt=rawAmt*0.08;var netAmt=rawAmt*0.92;
+  var h=[];
+  h.push('<div class="dep-req" style="border-color:'+borderColor+'" id="wcard_'+w.id+'">');
+  h.push('<div class="dep-top" style="align-items:flex-start">');
+  if(isPending)h.push('<input type="checkbox" class="with-sel-cb" data-id="'+w.id+'" data-uid="'+w.user_id+'" data-amt="'+w.amount+'" onchange="updateWithSelCount()" style="width:16px;height:16px;margin-top:2px;margin-left:8px;flex-shrink:0">');
+  h.push('<div style="flex:1"><span class="dep-email">'+((w.profiles&&w.profiles.email)||"—")+'</span>');
+  if(w.profiles&&w.profiles.member_id)h.push('<span style="font-size:9px;color:var(--text3);margin-right:6px">#'+w.profiles.member_id+'</span>');
+  h.push('</div>');
+  h.push('<span class="dep-amt">$'+rawAmt.toFixed(2)+'</span>');
+  h.push('<span class="with-status-badge '+statusCls+'" style="margin-right:8px">'+statusLabel+'</span>');
+  h.push('</div>');
+  h.push('<div style="display:flex;gap:8px;font-size:10px;margin-bottom:6px;flex-wrap:wrap">');
+  h.push('<span style="color:var(--red)">کارمزد ۸٪: -$'+feeAmt.toFixed(2)+'</span>');
+  h.push('<span style="color:var(--ac)">خالص دریافتی: $'+netAmt.toFixed(2)+'</span>');
+  if(w.txid)h.push('<span style="color:var(--gold)">TXID: '+w.txid.slice(0,16)+'...</span>');
+  h.push('</div>');
+  h.push('<div class="dep-hash" style="direction:ltr;word-break:break-all;display:flex;align-items:center;gap:6px">');
+  h.push('<span style="flex:1;overflow:hidden;text-overflow:ellipsis">'+w.wallet_address+'</span>');
+  h.push('<button onclick="copyText(\''+w.wallet_address+'\')" style="background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.2);border-radius:6px;padding:2px 7px;font-size:9px;color:var(--ac);cursor:pointer;white-space:nowrap;font-family:Vazirmatn,sans-serif">📋 کپی</button>');
+  h.push('</div>');
+  h.push('<div style="font-size:10px;color:var(--text3);margin-bottom:4px">شبکه: '+(w.network||'—')+' | تاریخ: '+new Date(w.created_at).toLocaleString("fa-IR")+'</div>');
+  h.push('<div class="with-timeline">');
+  h.push('<div class="wt-dot'+(doneSubmit?' done':'')+'" title="ثبت"></div>');
+  h.push('<span style="font-size:9px;color:'+(doneSubmit?'var(--ac)':'rgba(255,255,255,.25)')+'">ثبت</span>');
+  h.push('<div class="wt-line'+(doneReview?' done':'')+'"></div>');
+  h.push('<div class="wt-dot'+(doneReview?' done':'')+'" title="بررسی"></div>');
+  h.push('<span style="font-size:9px;color:'+(doneReview?'var(--ac)':'rgba(255,255,255,.25)')+'">بررسی</span>');
+  h.push('<div class="wt-line'+(doneFinal?' done':'')+'"></div>');
+  h.push('<div class="wt-dot'+(doneFinal?' done':'')+'" title="نهایی"></div>');
+  h.push('<span style="font-size:9px;color:'+(doneFinal?'var(--ac)':'rgba(255,255,255,.25)')+'">نهایی</span>');
+  h.push('</div>');
+  if(isPending){
+    h.push('<div class="dep-btns">');
+    h.push('<button class="dep-btn app" onclick="appWith(&quot;'+w.id+'&quot;,&quot;'+w.user_id+'&quot;,'+w.amount+')">✅ پرداخت شد</button>');
+    h.push('<button class="dep-btn rej" onclick="rejWith(&quot;'+w.id+'&quot;)">❌ رد</button>');
+    h.push('<button class="dep-btn" style="background:rgba(26,86,219,.1);color:var(--pl);border:1px solid rgba(26,86,219,.2)" onclick="var c2=document.getElementById(&quot;adminContent&quot;);loadUser360(&quot;'+w.user_id+'&quot;,c2)">👁️ پروفایل</button>');
+    h.push('</div>');
+  }else{
+    h.push('<div style="margin-top:6px"><button class="dep-btn" style="background:rgba(26,86,219,.1);color:var(--pl);border:1px solid rgba(26,86,219,.2)" onclick="var c2=document.getElementById(&quot;adminContent&quot;);loadUser360(&quot;'+w.user_id+'&quot;,c2)">👁️ پروفایل</button></div>');
+  }
+  h.push('</div>');
+  return h.join('');
 }
 
 function updateWithSelCount(){
@@ -6282,22 +6422,46 @@ async function loadSIActiveList(){
   }).join('');
 }
 
-async function loadSICompletedList(){
+var _invHistOffset=0;
+var _invHistAll=[];
+async function loadSICompletedList(more){
   var c=document.getElementById('siCompletedList');
   if(!c)return;
-  var r=await sb.from('investments').select('*').in('status',['completed','withdrawn']).order('started_at',{ascending:false}).limit(30);
+  if(!more){_invHistOffset=0;_invHistAll=[];}
+  var r=await sb.from('investments').select('*').in('status',['completed','withdrawn']).order('started_at',{ascending:false}).range(_invHistOffset,_invHistOffset+4);
   var rows=r.data||[];
-  if(!rows.length){c.innerHTML='<p style="color:var(--text3);font-size:12px;text-align:center;padding:12px">هیچ سرمایه‌گذاری تکمیل‌شده‌ای وجود ندارد</p>';return;}
-  var emails={};
+  if(!more&&!rows.length){c.innerHTML='<p style="color:var(--text3);font-size:12px;text-align:center;padding:12px">هیچ سرمایه‌گذاری تکمیل‌شده‌ای وجود ندارد</p>';return;}
   var ids=rows.map(function(x){return x.user_id;});
-  var pr=await sb.from('profiles').select('user_id,email').in('user_id',ids);
-  if(pr.data)pr.data.forEach(function(p){emails[p.user_id]=p.email;});
-  c.innerHTML=rows.map(function(inv){
+  var emails={};
+  if(ids.length){
+    var pr=await sb.from('profiles').select('user_id,email').in('user_id',ids);
+    if(pr.data)pr.data.forEach(function(p){emails[p.user_id]=p.email;});
+  }
+  _invHistOffset+=5;
+  _invHistAll=_invHistAll.concat(rows);
+  var newHtml=rows.map(function(inv){
     var profit=parseFloat(inv.amount)*parseFloat(inv.profit_pct)/100;
     var statusLabel=inv.status==='withdrawn'?(t('inv_status_claimed')||'✅ برداشت شده'):inv.status==='completed'?(t('inv_status_done')||'⏳ منتظر برداشت'):(t('inv_status_'+inv.status)||inv.status);
-    return '<div class="dep-req"><div class="dep-top"><span class="dep-email">'+(emails[inv.user_id]||inv.user_id)+'</span><span style="font-size:10px;color:var(--text3)">'+statusLabel+'</span></div>'
+    return '<div class="dep-req" style="animation:fadeInUp .3s ease both"><div class="dep-top"><span class="dep-email">'+(emails[inv.user_id]||inv.user_id)+'</span><span style="font-size:10px;color:var(--text3)">'+statusLabel+'</span></div>'
       +'<div style="font-size:12px;color:var(--text2)">مقدار: $'+siFmt(inv.amount)+' | سود: +$'+siFmt(profit)+'</div></div>';
   }).join('');
+  // Remove old load more button if exists
+  var oldBtn=document.getElementById('siLoadMoreBtn');
+  if(oldBtn)oldBtn.remove();
+  if(more){
+    var existing=c.innerHTML;
+    c.innerHTML=existing+newHtml;
+  }else{
+    c.innerHTML=newHtml;
+  }
+  if(rows.length===5){
+    var btn=document.createElement('button');
+    btn.id='siLoadMoreBtn';
+    btn.className='load-more-btn';
+    btn.textContent='نمایش بیشتر ▼';
+    btn.onclick=function(){loadSICompletedList(true);};
+    c.appendChild(btn);
+  }
 }
 
 async function adjustBalance(type){
