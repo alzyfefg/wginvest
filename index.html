@@ -2375,6 +2375,21 @@ function updateBal(){
   var nav=document.getElementById("navBal");if(nav)nav.textContent="$"+b;
   var sb2=document.getElementById("sBal");if(sb2)sb2.textContent="$"+b;
 }
+function subscribeBalanceUpdates(){
+  if(!U||window._balSub)return;
+  window._balSub=sb.channel('profile-bal-'+U.id)
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'profiles',filter:'user_id=eq.'+U.id},function(payload){
+      if(!payload.new)return;
+      if(payload.new.balance!==undefined)P.balance=payload.new.balance;
+      if(payload.new.bonus!==undefined)P.bonus=payload.new.bonus;
+      if(payload.new.bonus_expires_at!==undefined)P.bonus_expires_at=payload.new.bonus_expires_at;
+      updateBal();
+      // Reload wallet view if open
+      var mc=document.getElementById('MC');
+      if(mc&&mc.querySelector('#sBal'))loadWallet();
+    })
+    .subscribe();
+}
 function updateHeroDashboard(inv){
   var bal=P?getTotalBal():0;
   var name=(P&&P.display_name)||t('default_name');
@@ -2492,6 +2507,7 @@ async function enterApp(){
     }
   }catch(e){P={user_id:U&&U.id,email:resolvedEmail,balance:0};}
   updateBal();
+  subscribeBalanceUpdates();
   var adminEmail=(ADMIN||"").toLowerCase().trim();
   isAdmin=!!(resolvedEmail&&adminEmail&&resolvedEmail===adminEmail);
   applyLang();
@@ -2900,9 +2916,11 @@ function renderInvestPlans(c,inv){
   _investPlans.forEach(function(plan){
     var isVip=plan.theme==='vip';
     var isLocked=userBal<parseFloat(plan.min_balance||0)&&parseFloat(plan.min_balance||0)>0;
+    var isPaused=!!plan.is_paused;
     var lockPeriod=fmtLockLabel(plan.lock_minutes||5);
-    h.push('<div class="plan-card '+(isVip?'vip':'standard')+(isLocked?' locked':'')+'" id="planCard_'+plan.id+'">'
-      +'<div class="plan-badge '+(isVip?'vip':'standard')+'">'+(isVip?'💎 VIP EXCLUSIVE':'⚡ STANDARD')+'</div>'
+    h.push('<div class="plan-card '+(isVip?'vip':'standard')+(isLocked?' locked':'')+'" id="planCard_'+plan.id+'" style="'+(isPaused?'opacity:0.4;pointer-events:none;':'')+'">');
+    if(isPaused)h.push('<div style="position:absolute;top:10px;left:10px;background:rgba(245,158,11,.9);color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;z-index:2">⏸ موقتاً متوقف</div>');
+    h.push('<div class="plan-badge '+(isVip?'vip':'standard')+'">'+(isVip?'💎 VIP EXCLUSIVE':'⚡ STANDARD')+'</div>'
       +'<div class="plan-name">'+plan.name+'</div>'
       +'<div class="plan-roi">'
       +'<div><div style="display:flex;align-items:baseline;gap:2px"><span class="plan-roi-num">'+plan.roi+'</span><span class="plan-roi-pct">%</span></div><div class="plan-roi-label">'+t('si_per_cycle')+'</div></div>'
@@ -2912,7 +2930,9 @@ function renderInvestPlans(c,inv){
       +'<div class="plan-stat"><div class="plan-stat-val">'+lockPeriod+'</div><div class="plan-stat-lbl">'+t('si_lock_period')+'</div></div>'
       +'<div class="plan-stat"><div class="plan-stat-val">'+plan.roi+'%</div><div class="plan-stat-lbl">'+t('si_yield_rate')+'</div></div>'
       +'</div>');
-    if(isLocked){
+    if(isPaused){
+      h.push('<button class="plan-btn '+(isVip?'vip':'standard')+'" disabled>⏸ موقتاً متوقف</button>');
+    }else if(isLocked){
       h.push('<button class="plan-btn '+(isVip?'vip':'standard')+'" disabled>🔒 $'+siFmt(plan.min_balance)+'</button>');
     }else if(!_siSettings.enabled){
       h.push('<button class="plan-btn '+(isVip?'vip':'standard')+'" disabled>⏸ '+t('si_disabled_msg')+'</button>');
@@ -3331,7 +3351,26 @@ async function loadAdminBonusManager(c){
     html.push('<div style="font-size:11px;color:var(--text3);text-align:center;padding:16px">هیچ تاریخچه‌ای یافت نشد</div>');
   }
   html.push('</div>');
+  // Deposit bonus settings section
+  var {data:bRows}=await sb.from('system_settings').select('key,value').in('key',['deposit_bonus_pct','deposit_bonus_min']);
+  var bMap={};(bRows||[]).forEach(function(r){bMap[r.key]=r.value;});
+  html.push('<div class="icard" style="margin-top:12px"><div class="ctitle">🎁 بونوس همگانی واریز</div>'
+    +'<div style="display:grid;gap:10px;margin-top:10px">'
+    +'<div><label style="font-size:12px;color:var(--text2)">درصد بونوس واریز (% — صفر = غیرفعال)</label>'
+    +'<input id="dep-bonus-pct" type="number" min="0" max="100" step="0.1" value="'+(bMap.deposit_bonus_pct||0)+'" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);margin-top:4px;box-sizing:border-box"></div>'
+    +'<div><label style="font-size:12px;color:var(--text2)">حداقل مبلغ واریز برای دریافت بونوس ($)</label>'
+    +'<input id="dep-bonus-min" type="number" min="0" value="'+(bMap.deposit_bonus_min||0)+'" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);margin-top:4px;box-sizing:border-box"></div>'
+    +'<button onclick="saveDepBonusSettings()" style="padding:11px 20px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-family:Vazirmatn,sans-serif">💾 ذخیره تنظیمات بونوس</button>'
+    +'</div></div>');
   c.innerHTML=html.join('');
+}
+async function saveDepBonusSettings(){
+  var pct=document.getElementById('dep-bonus-pct');
+  var min=document.getElementById('dep-bonus-min');
+  if(!pct||!min)return toast('فرم یافت نشد','red');
+  await sb.from('system_settings').upsert({key:'deposit_bonus_pct',value:pct.value},{onConflict:'key'});
+  await sb.from('system_settings').upsert({key:'deposit_bonus_min',value:min.value},{onConflict:'key'});
+  toast('✅ تنظیمات بونوس واریز ذخیره شد','green');
 }
 
 async function loadAdminBonus(c){
@@ -3503,7 +3542,7 @@ async function loadAdminPlans(c){
     html.push('<div class="icard" style="margin-bottom:12px;border:1px solid '+(isVip?'rgba(255,200,0,.2)':'rgba(0,212,170,.15)')+'">'
       +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">'
       +'<div style="font-weight:900;color:var(--text)">'+plan.name+'</div>'
-      +'<span style="font-size:10px;padding:2px 8px;border-radius:20px;background:'+(plan.is_active?'rgba(0,212,170,.15)':'rgba(255,71,87,.1)')+';color:'+(plan.is_active?'var(--ac)':'var(--red)')+';">'+(plan.is_active?'✅ فعال':'⏸ غیرفعال')+'</span>'
+      +'<span style="font-size:10px;padding:2px 8px;border-radius:20px;background:'+(plan.is_paused?'rgba(245,158,11,.15)':plan.is_active?'rgba(0,212,170,.15)':'rgba(255,71,87,.1)')+';color:'+(plan.is_paused?'#f59e0b':plan.is_active?'var(--ac)':'var(--red)')+';">'+(plan.is_paused?'⏸ متوقف':plan.is_active?'✅ فعال':'🚫 غیرفعال (مخفی)')+'</span>'
       +'</div>'
       +'<div class="adm-row">'
       +'<input class="adm-in" id="pn_'+plan.id+'" value="'+plan.name+'" placeholder="نام پلن">'
@@ -3519,6 +3558,7 @@ async function loadAdminPlans(c){
       +'<div class="adm-row">'
       +'<button class="adm-btn" onclick="savePlan('+plan.id+')">💾 ذخیره</button>'
       +'<button class="adm-btn" style="background:rgba(255,71,87,.1);color:var(--red);border:1px solid rgba(255,71,87,.2)" onclick="togglePlan('+plan.id+','+(!plan.is_active)+')">'+(plan.is_active?'⏸ غیرفعال':'✅ فعال')+'</button>'
+      +'<button class="adm-btn" style="background:'+(plan.is_paused?'rgba(0,212,170,.1)':'rgba(245,158,11,.1)')+';color:'+(plan.is_paused?'var(--ac)':'#f59e0b')+';border:1px solid '+(plan.is_paused?'rgba(0,212,170,.2)':'rgba(245,158,11,.2)')+'" onclick="pausePlan('+plan.id+','+(!plan.is_paused)+')">'+(plan.is_paused?'▶️ رفع توقف':'⏸ توقف')+'</button>'
       +'</div>'
       +'</div>');
   });
@@ -3544,6 +3584,18 @@ async function togglePlan(id,active){
   await loadInvestPlans();
   var c=document.getElementById('adminContent');
   if(c){var activeTab=document.querySelector('.adm-tab.on');if(activeTab&&activeTab.id==='at_matches')loadAdminMatches(c);else loadAdminPlans(c);}
+}
+async function pausePlan(id,paused){
+  var r=await sb.from('invest_plans').update({is_paused:paused}).eq('id',id);
+  if(r.error){
+    // Column may not exist yet — show instructions
+    toast('⚠️ ستون is_paused در دیتابیس وجود ندارد. در Supabase اجرا کنید: ALTER TABLE invest_plans ADD COLUMN is_paused BOOLEAN DEFAULT FALSE;','red');
+    return;
+  }
+  await logAdminAction('Investment Plan '+(paused?'Paused':'Resumed'),'Plan #'+id);
+  toast((paused?'⏸ پلن متوقف شد — کارت مات نشان داده می‌شود':'▶️ توقف رفع شد'),'green');
+  var c=document.getElementById('adminContent');
+  if(c)loadAdminPlans(c);
 }
 
 async function loadInvestSettings(){
@@ -6120,11 +6172,13 @@ async function appDep(id, userId, amount){
   var bonusMin=sMap.deposit_bonus_min||0;
   if(bonusPct>0&&depAmount>=bonusMin){
     var bonusAmt=Math.round(depAmount*bonusPct/100*100)/100;
-    var freshBal=await sb.from('profiles').select('balance').eq('user_id',userId).single();
+    var freshBal=await sb.from('profiles').select('balance,bonus,bonus_expires_at').eq('user_id',userId).single();
     if(freshBal.data){
-      var bonusBal=parseFloat(freshBal.data.balance||0)+bonusAmt;
-      await sb.from('profiles').update({balance:bonusBal}).eq('user_id',userId);
-      await sb.from('notifications').insert({user_id:userId,type:'bonus',message:'🎁 بونوس واریز '+bonusPct+'٪ = $'+bonusAmt+' به موجودی شما اضافه شد.',is_read:false});
+      var bonusExpiry=new Date(Date.now()+30*24*60*60*1000).toISOString();
+      var curBonus=parseFloat(freshBal.data.bonus||0);
+      var bonusUpdate={bonus:curBonus+bonusAmt,bonus_expires_at:bonusExpiry};
+      await sb.from('profiles').update(bonusUpdate).eq('user_id',userId);
+      await sb.from('notifications').insert({user_id:userId,type:'bonus_received',message:'🎁 بونوس واریز '+bonusPct+'٪ = $'+bonusAmt+' به موجودی بونوس شما اضافه شد. (اعتبار ۳۰ روزه)',is_read:false});
     }
   }
   // Referral bonus: on user's first deposit, check if they have completed their first investment
@@ -6216,11 +6270,6 @@ async function loadAdminSettings(c){
   +'<div style="display:flex;align-items:center;gap:10px">'
   +'<input id="ss-maintenance" type="checkbox" '+(S.maintenance_mode==='true'?'checked':'')+'>'
   +'<label>'+t('adm_setting_maintenance')+'</label></div>'
-  +'<div style="border-top:1px solid var(--border);margin:8px 0;padding-top:12px"><div style="font-size:13px;font-weight:700;color:var(--p);margin-bottom:10px">🎁 '+t('adm_bonus_dep_title')+'</div>'
-  +'<div><label style="font-size:12px;color:var(--text2)">'+t('adm_bonus_dep_pct')+'</label>'
-  +'<input id="ss-bonus-pct" type="number" min="0" max="100" step="0.1" value="'+(S.deposit_bonus_pct||0)+'" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);margin-top:4px;box-sizing:border-box"></div>'
-  +'<div style="margin-top:10px"><label style="font-size:12px;color:var(--text2)">'+t('adm_bonus_dep_min')+'</label>'
-  +'<input id="ss-bonus-min" type="number" min="0" value="'+(S.deposit_bonus_min||0)+'" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);margin-top:4px;box-sizing:border-box"></div></div>'
   +'<button onclick="saveAdminSettings()" style="padding:12px 24px;background:var(--p);color:#fff;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-family:Vazirmatn,sans-serif">'+t('adm_save_settings')+'</button>'
   +'</div></div>';
 }
@@ -6232,8 +6281,6 @@ async function saveAdminSettings(){
     site_name:document.getElementById('ss-site-name').value,
     support_email:document.getElementById('ss-support-email').value,
     maintenance_mode:document.getElementById('ss-maintenance').checked?'true':'false',
-    deposit_bonus_pct:document.getElementById('ss-bonus-pct').value,
-    deposit_bonus_min:document.getElementById('ss-bonus-min').value
   };
   for(var key in settings){
     await sb.from('system_settings').upsert({key:key,value:settings[key]},{onConflict:'key'});
