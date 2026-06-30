@@ -1935,24 +1935,6 @@ body.light .im-phil{background:linear-gradient(135deg,rgba(26,86,219,.06),rgba(0
     <div class="fg"><label id="albl_ref">کد دعوت (اختیاری)</label><input type="text" id="refCode" placeholder="کد دعوت را وارد کنید" style="direction:ltr;text-align:left"></div>
     <button class="btn-p" id="abtn_up" onclick="doRegister()">ثبت‌نام رایگان 🚀</button>
   </div>
-  <div id="otpForm" style="display:none">
-    <div style="text-align:center;margin-bottom:16px">
-      <div style="font-size:32px;margin-bottom:8px">📧</div>
-      <div style="font-size:16px;font-weight:900;color:var(--text);margin-bottom:6px" id="otpTitle"></div>
-      <div style="font-size:12px;color:var(--text2);line-height:1.6" id="otpDesc"></div>
-      <div style="font-size:11px;color:var(--ac);margin-top:4px;font-weight:700" id="otpEmailShow"></div>
-    </div>
-    <div class="fg">
-      <input type="text" id="otpCode" placeholder="000000" maxlength="6" style="text-align:center;font-size:24px;letter-spacing:8px;direction:ltr;font-weight:900">
-    </div>
-    <button class="btn-p" id="otpBtn" onclick="doVerifyOtp()">✅ <span id="otpBtnTxt"></span></button>
-    <div style="text-align:center;margin-top:10px">
-      <button onclick="resendOtp()" id="resendBtn" style="background:none;border:none;color:var(--ac);font-size:12px;cursor:pointer;font-family:Vazirmatn,sans-serif">📨 <span id="otpResendTxt"></span></button>
-    </div>
-    <div style="text-align:center;margin-top:6px">
-      <button onclick="showAuthTab('register')" style="background:none;border:none;color:var(--text2);font-size:12px;cursor:pointer;font-family:Vazirmatn,sans-serif" id="otpBackBtn"></button>
-    </div>
-  </div>
   <div class="amsg" id="authMsg"></div>
   <div class="flags" id="authFlags">
     <button onclick="setLang('fa')" class="cur">🇮🇷</button>
@@ -2397,7 +2379,6 @@ function showAuthTab(tab){
   document.getElementById("loginForm").style.display=tab==="login"?"block":"none";
   document.getElementById("forgotPwForm").style.display="none";
   document.getElementById("registerForm").style.display=tab==="register"?"block":"none";
-  document.getElementById("otpForm").style.display="none";
   document.getElementById("authMsg").className="amsg";
 }
 function showForgotPw(){
@@ -2436,7 +2417,6 @@ async function doLogin(){
   if(U&&!U.email)U.email=email;
   await enterApp();
 }
-var _otpEmail=null,_otpPass=null,_otpRef=null;
 async function doRegister(){
   var email=document.getElementById("re").value.trim().toLowerCase();
   var pass=document.getElementById("rp").value;
@@ -2453,33 +2433,10 @@ async function doRegister(){
     var rr=await sb.from('profiles').select('user_id').eq('member_id',rawRef).single();
     if(rr.data)ref=rr.data.user_id;
   }
-  var res=await sb.auth.signUp({email:email,password:pass,options:{emailRedirectTo:null,data:{referred_by:ref||null}}});
+  var res=await sb.auth.signUp({email:email,password:pass,options:{data:{referred_by:ref||null}}});
   btn.disabled=false;btn.textContent=t("btn_up");
   if(res.error)return amsg("❌ "+res.error.message,"err");
-  _otpEmail=email;_otpPass=pass;_otpRef=ref;
-  document.getElementById("registerForm").style.display="none";
-  document.getElementById("otpForm").style.display="block";
-  document.getElementById("otpEmailShow").textContent=email;
-  document.getElementById("otpCode").value="";
-  document.getElementById("otpCode").focus();
-  amsg("","");
-}
-async function doVerifyOtp(){
-  var code=document.getElementById("otpCode").value.trim();
-  if(!code||code.length<6)return amsg("❌ کد ۶ رقمی را وارد کنید","err");
-  var btn=document.getElementById("otpBtn");btn.disabled=true;btn.innerHTML='✅ تایید<span class="btn-spinner"></span>';
-  var res=await sb.auth.verifyOtp({email:_otpEmail,token:code,type:"signup"});
-  btn.disabled=false;btn.textContent="✅ تایید";
-  if(res.error)return amsg("❌ "+res.error.message,"err");
   amsg(t("ok_registered"),"ok");
-  document.getElementById("otpForm").style.display="none";
-}
-async function resendOtp(){
-  if(!_otpEmail||!_otpPass)return;
-  var btn=document.getElementById("resendBtn");btn.disabled=true;
-  await sb.auth.signUp({email:_otpEmail,password:_otpPass,options:{emailRedirectTo:null,data:{referred_by:_otpRef||null}}});
-  btn.disabled=false;
-  amsg("📨 کد جدید ارسال شد","ok");
 }
 async function doLogout(){
   isAdmin=false;await sb.auth.signOut();U=null;P=null;claimedMatches={};showPage("authPage");}
