@@ -6079,7 +6079,11 @@ async function loadUser360(uid,c){
   html.push('<div class="kpi-grid" style="margin-bottom:12px">');
   html.push('<div class="kpi-card"><span class="kpi-icon">🎯</span><div class="kpi-val">'+(preds.data||[]).length+'</div><div class="kpi-lbl">پیش‌بینی</div></div>');
   html.push('<div class="kpi-card"><span class="kpi-icon">👥</span><div class="kpi-val">'+(refs.count||0)+'</div><div class="kpi-lbl">زیرمجموعه</div></div>');
-  html.push('<div class="kpi-card"><span class="kpi-icon">🪪</span><div class="kpi-val">'+(u.kyc_status==="verified"?"✅":"⏳")+'</div><div class="kpi-lbl">KYC</div></div>');
+  html.push('<div class="kpi-card" style="cursor:'+(u.kyc_doc_base64?'pointer':'default')+'" onclick="'+( u.kyc_doc_base64 ? 'showKycModal(&quot;'+u.user_id+'&quot;)' : '')+'" title="'+(u.kyc_doc_base64?'مشاهده مدرک':'')+'">'
+    +'<span class="kpi-icon">🪪</span>'
+    +'<div class="kpi-val">'+(u.kyc_status==="verified"?"✅":u.kyc_status==="pending"?"⏳":"❌")+'</div>'
+    +'<div class="kpi-lbl">KYC'+(u.kyc_doc_base64?' 👁️':'')+'</div>'
+    +'</div>');
   html.push('<div class="kpi-card"><span class="kpi-icon">📅</span><div class="kpi-val">'+(u.created_at?new Date(u.created_at).toLocaleDateString("fa-IR"):"---")+'</div><div class="kpi-lbl">ثبت‌نام</div></div>');
   html.push('</div>');
   // Quick actions
@@ -6167,6 +6171,32 @@ async function loadUser360(uid,c){
   html.push('</div>');
   html.push('</div>');
   c.innerHTML=html.join("");
+}
+
+function showKycModal(uid){
+  var existing=document.getElementById('kycImgModal');
+  if(existing)existing.remove();
+  var u=null;
+  // Find cached doc from page or fetch
+  sb.from('profiles').select('kyc_doc_base64,kyc_status,display_name,email').eq('user_id',uid).single().then(function(r){
+    if(!r.data||!r.data.kyc_doc_base64){alert('مدرکی ارسال نشده');return;}
+    var p=r.data;
+    var name=p.display_name||(p.email||'').split('@')[0];
+    var statusLbl={none:'❌ ارسال نشده',pending:'⏳ در انتظار',verified:'✅ تأیید شده'}[p.kyc_status||'none'];
+    var m=document.createElement('div');
+    m.id='kycImgModal';
+    m.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px';
+    m.onclick=function(e){if(e.target===m)m.remove();};
+    m.innerHTML='<div style="background:var(--bg2);border-radius:16px;padding:16px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
+      +'<div><div style="font-size:14px;font-weight:900;color:var(--text)">🪪 مدرک KYC — '+name+'</div>'
+      +'<div style="font-size:11px;color:var(--text3);margin-top:2px">'+statusLbl+'</div></div>'
+      +'<button onclick="document.getElementById(&quot;kycImgModal&quot;).remove()" style="background:rgba(255,255,255,.08);border:none;border-radius:50%;width:32px;height:32px;color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>'
+      +'</div>'
+      +'<img src="'+p.kyc_doc_base64+'" style="width:100%;border-radius:12px;object-fit:contain;display:block">'
+      +'</div>';
+    document.body.appendChild(m);
+  });
 }
 
 function u360Tab(btn,tabId){
