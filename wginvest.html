@@ -3960,6 +3960,12 @@ async function withdrawInvestment(invId,finalAmt){
   if(!U||!P)return;
   var btn=document.getElementById('siWithdrawBtn');
   if(btn)btn.disabled=true;
+  // Fetch investment to get profit amount
+  var invRow=await sb.from("investments").select("amount,profit_pct").eq("id",invId).single();
+  var profitAmt=0;
+  if(invRow.data){
+    profitAmt=Math.round(parseFloat(invRow.data.amount||0)*parseFloat(invRow.data.profit_pct||0)/100*100)/100;
+  }
   var upd=await sb.from("investments").update({status:"withdrawn",withdrawn_at:new Date().toISOString()}).eq("id",invId);
   if(upd.error){toast("Error: "+upd.error.message,"red");if(btn)btn.disabled=false;return;}
   var newBal=parseFloat(P.balance||0)+finalAmt;
@@ -3970,6 +3976,28 @@ async function withdrawInvestment(invId,finalAmt){
   showClaimSuccess(finalAmt);
   pushNotif('profit_ready','سود دریافت شد','$'+siFmt(finalAmt)+' به موجودی شما افزوده شد');
   fireConfetti();
+  // Investment profit commissions for referrer chain (L1:10%, L2:5%, L3:1% of profit only)
+  if(profitAmt>0){
+    try{
+      var COMM_PCTS=[0.10,0.05,0.01];
+      var curId=U.id;
+      for(var lvl=0;lvl<3;lvl++){
+        var refRow=await sb.from('profiles').select('user_id,balance,referred_by').eq('user_id',curId).single();
+        if(!refRow.data||!refRow.data.referred_by)break;
+        var referrerId=refRow.data.referred_by;
+        var commAmt=Math.round(profitAmt*COMM_PCTS[lvl]*100)/100;
+        if(commAmt<=0){curId=referrerId;continue;}
+        var refPr=await sb.from('profiles').select('balance').eq('user_id',referrerId).single();
+        if(refPr.data){
+          var refNewBal=parseFloat(refPr.data.balance||0)+commAmt;
+          await sb.from('profiles').update({balance:refNewBal}).eq('user_id',referrerId);
+          await sb.from('notifications').insert({user_id:referrerId,type:'inv_profit_comm',title:'کمیسیون سود سرمایه‌گذاری',body:'💹 کمیسیون سطح '+(lvl+1)+': $'+siFmt(commAmt)+' (از سود $'+siFmt(profitAmt)+' کاربر زیرمجموعه)',is_read:false});
+          try{await sb.from('referral_commissions').insert({referrer_id:referrerId,depositor_id:U.id,deposit_id:parseInt(invId),deposit_amount:profitAmt,commission_amount:commAmt,commission_pct:COMM_PCTS[lvl]*100});}catch(e){}
+        }
+        curId=referrerId;
+      }
+    }catch(e){}
+  }
   loadMatches();
 }
 
