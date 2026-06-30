@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 @keyframes fadeInUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
@@ -2117,7 +2118,7 @@ dep_addr_label:"آدرس واریز",dep_amount_label:"مبلغ (USDT)",dep_min_
 with_warn_title:"⚠️ هشدار برداشت",with_warn1:"آدرس مقصد را با دقت بررسی کنید. برداشت‌ها غیرقابل برگشت هستند.",with_warn3:"حداقل مبلغ برداشت ۲۰ USDT است.",
 withdrawable_bal:"موجودی قابل برداشت",selected_network:"🌐 شبکه انتخابی:",saved_wallet:"📌 آدرس کیف پول ذخیره شده",no_saved_addr:"هنوز آدرسی ذخیره نشده",new_addr_label:"آدرس جدید (اختیاری)",save_addr_label:"این آدرس را برای دفعات بعد ذخیره کن",del_enter_new:"🗑️ حذف و وارد کردن آدرس جدید",with_submit:"📤 ثبت درخواست برداشت",
 err_select_net:"لطفاً یک شبکه انتخاب کنید",err_confirm_warn:"لطفاً موارد هشدار را تأیید کنید",err_amount_tx:"مبلغ و TX Hash را وارد کنید",err_min10:"حداقل مبلغ ۱۰ USDT است",verifying_tx:"⏳ در حال بررسی تراکنش...",dep_pending_admin:"✅ درخواست ثبت شد — در حال بررسی توسط ادمین",
-err_min5:"حداقل مبلغ ۲۰ USDT است",err_insuf_bal:"موجودی کافی نیست",err_set_wpass:"ابتدا رمز برداشت تنظیم کنید",err_wrong_wpass:"رمز برداشت اشتباه است",err_trc20_T:"آدرس TRC20 باید با T شروع شود",err_bep20_0x:"آدرس BEP20 باید با 0x شروع شود",with_submitted:"✅ درخواست برداشت ثبت شد",
+err_min5:"حداقل مبلغ ۲۰ USDT است",err_insuf_bal:"موجودی کافی نیست",err_set_wpass:"ابتدا رمز برداشت تنظیم کنید",err_wrong_wpass:"رمز برداشت اشتباه است",err_trc20_T:"آدرس TRC20 باید با T شروع شود",err_bep20_0x:"آدرس BEP20 باید با 0x شروع شود",err_daily_with_limit:"سقف برداشت روزانه: فقط ۱ برداشت در روز مجاز است",profit_calc_title:"محاسبه‌گر سود",profit_calc_enter_amount:"مبلغ سرمایه‌گذاری را وارد کنید...",with_submitted:"✅ درخواست برداشت ثبت شد",
 copied:"📋 کپی شد",default_name:"بازیکن",err_wpass_required:"رمز برداشت را وارد کنید",err_wpass_mismatch:"رمزها یکسان نیستند",err_wpass_min4:"رمز حداقل ۴ کاراکتر",ok_wpass_set:"✅ رمز برداشت تنظیم شد",err_upload:"خطا در آپلود",ok_sent:"✅ ارسال شد",ok_profile_saved:"✅ پروفایل ذخیره شد",
 unit_min:"دقیقه",unit_hr:"ساعت",unit_day:"روز",lbl_avail_bal:"موجودی قابل استفاده:",lbl_inv_amount_min:"مبلغ سرمایه‌گذاری (حداقل $",lbl_profit_pct:"سود",lbl_final_amt:"مقدار نهایی",lbl_lock_dur:"مدت قفل",btn_confirm_inv:"تأیید سرمایه‌گذاری",modal_invest_title:"💎 شروع سرمایه‌گذاری",err_active_inv:"شما در حال حاضر یک سرمایه‌گذاری فعال دارید",ok_inv_recorded:"✅ سرمایه‌گذاری با موفقیت ثبت شد",cert_subtitle:"گواهی سود ثابت",inv_sum_title:"تأیید سرمایه‌گذاری",inv_sum_sub:"جزئیات را بررسی کنید",inv_sum_amount:"مبلغ سرمایه‌گذاری",inv_sum_profit:"سود مورد انتظار",inv_sum_roi:"بازدهی (ROI)",inv_sum_lock:"مدت قفل",inv_sum_unlock:"زمان بازگشایی",inv_sum_final:"مبلغ نهایی",inv_sum_btn:"✅ تأیید و شروع سرمایه‌گذاری",inv_sum_cancel:"انصراف",claim_done_title:"سود دریافت شد",claim_done_sub:"به موجودی شما اضافه شد",claim_done_btn:"عالیه! 🎉",err_min_invest:"حداقل سرمایه‌گذاری",err_bal_low:"موجودی کافی نیست",
 team_total_members:"کل اعضا",team_total_income:"درآمد کل",team_direct:"مستقیم (L1)",team_strongest:"قوی‌ترین",team_structure:"ساختار تیم",team_you:"شما",status_active:"✅ فعال",status_inactive:"💤 غیرفعال",
@@ -2146,7 +2147,7 @@ dep_addr_label:"Deposit Address",dep_amount_label:"Amount (USDT)",dep_min_placeh
 with_warn_title:"⚠️ Withdrawal Warning",with_warn1:"Verify destination carefully. Withdrawals are irreversible.",with_warn3:"Minimum withdrawal is 20 USDT.",
 withdrawable_bal:"Withdrawable Balance",selected_network:"🌐 Selected network:",saved_wallet:"📌 Saved Wallet Address",no_saved_addr:"No address saved yet",new_addr_label:"New address (optional)",save_addr_label:"Save address for next time",del_enter_new:"🗑️ Delete & enter new address",with_submit:"📤 Submit Withdrawal",
 err_select_net:"Please select a network",err_confirm_warn:"Please confirm the warnings",err_amount_tx:"Enter amount and TX hash",err_min10:"Minimum amount is 10 USDT",verifying_tx:"⏳ Verifying transaction...",dep_pending_admin:"✅ Request submitted — pending admin review",
-err_min5:"Minimum amount is 20 USDT",err_insuf_bal:"Insufficient balance",err_set_wpass:"Set withdrawal password first",err_wrong_wpass:"Wrong withdrawal password",err_trc20_T:"TRC20 address must start with T",err_bep20_0x:"BEP20 address must start with 0x",with_submitted:"✅ Withdrawal request submitted",
+err_min5:"Minimum amount is 20 USDT",err_insuf_bal:"Insufficient balance",err_set_wpass:"Set withdrawal password first",err_wrong_wpass:"Wrong withdrawal password",err_trc20_T:"TRC20 address must start with T",err_bep20_0x:"BEP20 address must start with 0x",err_daily_with_limit:"Daily withdrawal limit: only 1 withdrawal per day is allowed",profit_calc_title:"Profit Calculator",profit_calc_enter_amount:"Enter investment amount...",with_submitted:"✅ Withdrawal request submitted",
 copied:"📋 Copied",default_name:"Player",err_wpass_required:"Enter withdrawal password",err_wpass_mismatch:"Passwords don't match",err_wpass_min4:"Password min 4 chars",ok_wpass_set:"✅ Withdrawal password set",err_upload:"Upload error",ok_sent:"✅ Sent",ok_profile_saved:"✅ Profile saved",
 unit_min:"minutes",unit_hr:"hours",unit_day:"days",lbl_avail_bal:"Available balance:",lbl_inv_amount_min:"Investment amount (min $",lbl_profit_pct:"Profit",lbl_final_amt:"Final amount",lbl_lock_dur:"Lock period",btn_confirm_inv:"Confirm Investment",modal_invest_title:"💎 Start Investment",err_active_inv:"You already have an active investment",ok_inv_recorded:"✅ Investment recorded successfully",cert_subtitle:"Fixed Yield Certificate",inv_sum_title:"Investment Confirmation",inv_sum_sub:"Review details below",inv_sum_amount:"Investment Amount",inv_sum_profit:"Expected Profit",inv_sum_roi:"Return (ROI)",inv_sum_lock:"Lock Period",inv_sum_unlock:"Unlock Time",inv_sum_final:"Final Amount",inv_sum_btn:"✅ Confirm & Start Investing",inv_sum_cancel:"Cancel",claim_done_title:"Profit Received",claim_done_sub:"Added to your balance",claim_done_btn:"Awesome! 🎉",err_min_invest:"Minimum investment",err_bal_low:"Insufficient balance",
 team_total_members:"Total Members",team_total_income:"Total Income",team_direct:"Direct (L1)",team_strongest:"Strongest",team_structure:"Team Structure",team_you:"You",status_active:"✅ Active",status_inactive:"💤 Inactive",
@@ -2389,6 +2390,23 @@ function subscribeBalanceUpdates(){
       if(mc&&mc.querySelector('#sBal'))loadWallet();
     })
     .subscribe();
+}
+async function initEmailJS(){
+  if(!window.emailjs)return;
+  var {data:rows}=await sb.from('system_settings').select('key,value').in('key',['emailjs_public_key']);
+  if(rows&&rows.length){
+    var key=(rows[0]||{}).value;
+    if(key)window.emailjs.init({publicKey:key});
+  }
+}
+async function sendEmailNotif(toEmail,subject,message){
+  if(!window.emailjs)return;
+  var {data:rows}=await sb.from('system_settings').select('key,value').in('key',['emailjs_service_id','emailjs_template_id','emailjs_public_key']);
+  var S={};(rows||[]).forEach(function(r){S[r.key]=r.value;});
+  if(!S.emailjs_service_id||!S.emailjs_template_id||!S.emailjs_public_key)return;
+  try{
+    await window.emailjs.send(S.emailjs_service_id,S.emailjs_template_id,{to_email:toEmail,subject:subject,message:message},{publicKey:S.emailjs_public_key});
+  }catch(e){console.warn('EmailJS error:',e);}
 }
 function updateHeroDashboard(inv){
   var bal=P?getTotalBal():0;
@@ -3352,7 +3370,7 @@ async function loadAdminBonusManager(c){
   }
   html.push('</div>');
   // Deposit bonus settings section
-  var {data:bRows}=await sb.from('system_settings').select('key,value').in('key',['deposit_bonus_pct','deposit_bonus_min']);
+  var {data:bRows}=await sb.from('system_settings').select('key,value').in('key',['deposit_bonus_pct','deposit_bonus_min','deposit_bonus_days']);
   var bMap={};(bRows||[]).forEach(function(r){bMap[r.key]=r.value;});
   html.push('<div class="icard" style="margin-top:12px"><div class="ctitle">🎁 بونوس همگانی واریز</div>'
     +'<div style="display:grid;gap:10px;margin-top:10px">'
@@ -3360,6 +3378,8 @@ async function loadAdminBonusManager(c){
     +'<input id="dep-bonus-pct" type="number" min="0" max="100" step="0.1" value="'+(bMap.deposit_bonus_pct||0)+'" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);margin-top:4px;box-sizing:border-box"></div>'
     +'<div><label style="font-size:12px;color:var(--text2)">حداقل مبلغ واریز برای دریافت بونوس ($)</label>'
     +'<input id="dep-bonus-min" type="number" min="0" value="'+(bMap.deposit_bonus_min||0)+'" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);margin-top:4px;box-sizing:border-box"></div>'
+    +'<div><label style="font-size:12px;color:var(--text2)">مدت اعتبار بونوس (روز) — بونوس پس از این تعداد روز منقضی می‌شود</label>'
+    +'<input id="dep-bonus-days" type="number" min="1" value="'+(bMap.deposit_bonus_days||30)+'" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);margin-top:4px;box-sizing:border-box"></div>'
     +'<button onclick="saveDepBonusSettings()" style="padding:11px 20px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-family:Vazirmatn,sans-serif">💾 ذخیره تنظیمات بونوس</button>'
     +'</div></div>');
   c.innerHTML=html.join('');
@@ -3367,9 +3387,11 @@ async function loadAdminBonusManager(c){
 async function saveDepBonusSettings(){
   var pct=document.getElementById('dep-bonus-pct');
   var min=document.getElementById('dep-bonus-min');
+  var days=document.getElementById('dep-bonus-days');
   if(!pct||!min)return toast('فرم یافت نشد','red');
   await sb.from('system_settings').upsert({key:'deposit_bonus_pct',value:pct.value},{onConflict:'key'});
   await sb.from('system_settings').upsert({key:'deposit_bonus_min',value:min.value},{onConflict:'key'});
+  if(days)await sb.from('system_settings').upsert({key:'deposit_bonus_days',value:days.value||'30'},{onConflict:'key'});
   toast('✅ تنظیمات بونوس واریز ذخیره شد','green');
 }
 
@@ -4167,6 +4189,22 @@ async function loadWallet(){
   html.push('<div style="flex-shrink:0;min-width:130px;background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(245,158,11,.04));border:1px solid rgba(245,158,11,.2);border-radius:14px;padding:14px;text-align:center"><div style="font-size:11px;color:var(--text3);margin-bottom:6px">⏳ '+t('bal_pending_w')+'</div><div style="font-size:18px;font-weight:900;color:#f59e0b">$'+pendWithSum.toFixed(2)+'</div></div>');
   html.push('<div style="flex-shrink:0;min-width:130px;background:linear-gradient(135deg,rgba(59,130,246,.12),rgba(59,130,246,.04));border:1px solid rgba(59,130,246,.2);border-radius:14px;padding:14px;text-align:center"><div style="font-size:11px;color:var(--text3);margin-bottom:6px">🔒 '+t('bal_locked_inv')+'</div><div style="font-size:18px;font-weight:900;color:#3b82f6">$'+actInvSum.toFixed(2)+'</div></div>');
   html.push('</div>');
+  // Profit calculator
+  var plansForCalc=[];
+  try{var pcr=await sb.from('invest_plans').select('id,name,profit_pct,lock_days,min_amount').eq('is_active',true).eq('is_paused',false).order('min_amount');plansForCalc=pcr.data||[];}catch(e){}
+  if(plansForCalc.length){
+    html.push('<div class="icard" style="margin-bottom:14px"><div class="ctitle">🧮 '+t('profit_calc_title')+'</div>');
+    html.push('<div style="display:grid;gap:10px;margin-top:10px">');
+    html.push('<select id="pcPlan" onchange="calcProfit()" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:Vazirmatn,sans-serif">');
+    plansForCalc.forEach(function(p){html.push('<option value="'+p.profit_pct+'|'+p.lock_days+'|'+p.min_amount+'">'+p.name+' — '+p.profit_pct+'% / '+p.lock_days+' '+t('unit_day')+'</option>');});
+    html.push('</select>');
+    html.push('<input id="pcAmt" type="number" placeholder="'+t('profit_calc_enter_amount')+'" oninput="calcProfit()" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:Vazirmatn,sans-serif;box-sizing:border-box">');
+    html.push('<div id="pcResult" style="background:linear-gradient(135deg,rgba(0,212,170,.1),rgba(0,212,170,.05));border:1px solid rgba(0,212,170,.2);border-radius:12px;padding:14px;display:none">');
+    html.push('<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:12px;color:var(--text2)">'+t('inv_exp_profit')+'</span><span id="pcProfit" style="font-size:14px;font-weight:800;color:#00d4aa"></span></div>');
+    html.push('<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:12px;color:var(--text2)">'+t('inv_exp_final')+'</span><span id="pcFinal" style="font-size:14px;font-weight:800;color:var(--text)"></span></div>');
+    html.push('<div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:var(--text2)">'+t('inv_sum_lock')+'</span><span id="pcDays" style="font-size:12px;color:var(--text2)"></span></div>');
+    html.push('</div></div></div>');
+  }
   // Choice cards
   html.push('<div class="finance-choice">');
   html.push('<div class="fc-card dep"><span class="fc-card-icon">📥</span><div class="fc-card-title">'+t('w_dep_title')+'</div><div class="fc-card-desc">'+t('w_dep_desc')+'</div><button class="fc-card-btn" onclick="startDepFlow()">'+t('w_dep_btn')+'</button></div>');
@@ -4181,6 +4219,25 @@ async function loadWallet(){
   loadTxNew(document.getElementById('txItems'));
 }
 
+function calcProfit(){
+  var sel=document.getElementById('pcPlan');
+  var amtEl=document.getElementById('pcAmt');
+  var res=document.getElementById('pcResult');
+  if(!sel||!amtEl||!res)return;
+  var amt=parseFloat(amtEl.value)||0;
+  if(amt<=0){res.style.display='none';return;}
+  var parts=(sel.value||'').split('|');
+  var pct=parseFloat(parts[0])||0;
+  var days=parseInt(parts[1])||0;
+  var minAmt=parseFloat(parts[2])||0;
+  if(amt<minAmt){res.style.display='none';return;}
+  var profit=Math.round(amt*pct/100*100)/100;
+  var final=Math.round((amt+profit)*100)/100;
+  res.style.display='block';
+  document.getElementById('pcProfit').textContent='$'+profit.toFixed(2);
+  document.getElementById('pcFinal').textContent='$'+final.toFixed(2);
+  document.getElementById('pcDays').textContent=days+' '+t('unit_day');
+}
 function startDepFlow(){
   var c=document.getElementById("MC");
   window._flowType='dep';
@@ -4590,6 +4647,10 @@ async function subWith(){
   if(P.withdrawal_pass!==wpass)return toast(t("err_wrong_wpass"),"red");
   if(net==='trc20'&&!wa.startsWith('T'))return toast(t("err_trc20_T"),"red");
   if(net==='bep20'&&!wa.startsWith('0x'))return toast(t("err_bep20_0x"),"red");
+  // Daily withdrawal limit: max 1 per day
+  var todayStart=new Date();todayStart.setHours(0,0,0,0);
+  var todayWithR=await sb.from('withdrawals').select('id',{count:'exact',head:true}).eq('user_id',U.id).gte('created_at',todayStart.toISOString());
+  if((todayWithR.count||0)>=1)return toast(t("err_daily_with_limit"),"red");
   // Bonus confirmation modal (must confirm before proceeding)
   var activeBonus=getActiveBonus();
   if(activeBonus>0){
@@ -6165,20 +6226,23 @@ async function appDep(id, userId, amount){
   if(dep.error){toast('خطا: '+dep.error.message,'red');return;}
   await sb.from('notifications').insert({user_id:userId,type:'deposit_approved',message:'واریز $'+amount+' شما تأیید شد و به موجودی اضافه گردید.',is_read:false});
   await logAdminAction('Deposit Approved',userId,amount,'ID:'+id);
+  var _uEmail=cur.data&&cur.data.email;if(!_uEmail){var _ue=await sb.from('profiles').select('email').eq('user_id',userId).single();_uEmail=_ue.data&&_ue.data.email;}
+  if(_uEmail)sendEmailNotif(_uEmail,'Deposit Approved — WGInvest','Your deposit of $'+amount+' has been approved and added to your balance.');
   // Global deposit bonus
-  var {data:sRows}=await sb.from('system_settings').select('key,value').in('key',['deposit_bonus_pct','deposit_bonus_min']);
+  var {data:sRows}=await sb.from('system_settings').select('key,value').in('key',['deposit_bonus_pct','deposit_bonus_min','deposit_bonus_days']);
   var sMap={};if(sRows)sRows.forEach(function(r){sMap[r.key]=parseFloat(r.value)||0;});
   var bonusPct=sMap.deposit_bonus_pct||0;
   var bonusMin=sMap.deposit_bonus_min||0;
+  var bonusDays=sMap.deposit_bonus_days||30;
   if(bonusPct>0&&depAmount>=bonusMin){
     var bonusAmt=Math.round(depAmount*bonusPct/100*100)/100;
     var freshBal=await sb.from('profiles').select('balance,bonus,bonus_expires_at').eq('user_id',userId).single();
     if(freshBal.data){
-      var bonusExpiry=new Date(Date.now()+30*24*60*60*1000).toISOString();
+      var bonusExpiry=new Date(Date.now()+bonusDays*24*60*60*1000).toISOString();
       var curBonus=parseFloat(freshBal.data.bonus||0);
       var bonusUpdate={bonus:curBonus+bonusAmt,bonus_expires_at:bonusExpiry};
       await sb.from('profiles').update(bonusUpdate).eq('user_id',userId);
-      await sb.from('notifications').insert({user_id:userId,type:'bonus_received',message:'🎁 بونوس واریز '+bonusPct+'٪ = $'+bonusAmt+' به موجودی بونوس شما اضافه شد. (اعتبار ۳۰ روزه)',is_read:false});
+      await sb.from('notifications').insert({user_id:userId,type:'bonus_received',message:'🎁 بونوس واریز '+bonusPct+'٪ = $'+bonusAmt+' به موجودی بونوس شما اضافه شد. (اعتبار '+bonusDays+' روزه)',is_read:false});
     }
   }
   // Referral bonus: on user's first deposit, check if they have completed their first investment
@@ -6211,7 +6275,11 @@ async function appDep(id, userId, amount){
 async function rejDep(id){
   var dep=await sb.from('deposits').update({status:'rejected'}).eq('id',id).select('user_id,amount').single();
   if(dep.error){toast('خطا: '+dep.error.message,'red');return;}
-  if(dep.data)await sb.from('notifications').insert({user_id:dep.data.user_id,type:'deposit_rejected',message:'واریز $'+dep.data.amount+' شما رد شد.',is_read:false});
+  if(dep.data){
+    await sb.from('notifications').insert({user_id:dep.data.user_id,type:'deposit_rejected',message:'واریز $'+dep.data.amount+' شما رد شد.',is_read:false});
+    var _dRejEmail=await sb.from('profiles').select('email').eq('user_id',dep.data.user_id).single();
+    if(_dRejEmail.data&&_dRejEmail.data.email)sendEmailNotif(_dRejEmail.data.email,'Deposit Rejected — WGInvest','Your deposit of $'+dep.data.amount+' has been rejected. Please contact support if you believe this is an error.');
+  }
   await logAdminAction('Deposit Rejected',null,null,'ID:'+id);
   toast('❌ واریز رد شد','red');
   var c=document.getElementById('adminContent');
@@ -6227,6 +6295,8 @@ async function appWith(id, userId, amount){
   if(w.error){toast('خطا: '+w.error.message,'red');return;}
   await sb.from('notifications').insert({user_id:userId,type:'withdrawal_approved',message:'برداشت $'+amount+' شما تأیید و پردازش شد.',is_read:false});
   await logAdminAction('Withdrawal Approved',userId,amount,'ID:'+id);
+  var _wuEmail=await sb.from('profiles').select('email').eq('user_id',userId).single();
+  if(_wuEmail.data&&_wuEmail.data.email)sendEmailNotif(_wuEmail.data.email,'Withdrawal Approved — WGInvest','Your withdrawal of $'+amount+' has been approved and processed.');
   toast('✅ برداشت تأیید شد','green');
   var c=document.getElementById('adminContent');
   if(c)await loadAW2(c);
@@ -6244,6 +6314,8 @@ async function rejWith(id){
     }
     await sb.from('notifications').insert({user_id:w.data.user_id,type:'withdrawal_rejected',message:'درخواست برداشت $'+w.data.amount+' شما رد شد و مبلغ به موجودی شما برگشت داده شد.',is_read:false});
     await logAdminAction('Withdrawal Rejected',w.data.user_id,w.data.amount,'ID:'+id+' — refunded to balance');
+    var _wrEmail=await sb.from('profiles').select('email').eq('user_id',w.data.user_id).single();
+    if(_wrEmail.data&&_wrEmail.data.email)sendEmailNotif(_wrEmail.data.email,'Withdrawal Rejected — WGInvest','Your withdrawal request of $'+w.data.amount+' has been rejected and the amount has been refunded to your balance.');
   }
   toast('❌ برداشت رد شد و مبلغ بازگردانی شد','red');
   var c=document.getElementById('adminContent');
@@ -6270,6 +6342,15 @@ async function loadAdminSettings(c){
   +'<div style="display:flex;align-items:center;gap:10px">'
   +'<input id="ss-maintenance" type="checkbox" '+(S.maintenance_mode==='true'?'checked':'')+'>'
   +'<label>'+t('adm_setting_maintenance')+'</label></div>'
+  +'<div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px"><div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:10px">📧 Email Notifications (EmailJS)</div>'
+  +'<div style="font-size:11px;color:var(--text3);margin-bottom:10px">Register at <b>emailjs.com</b> — create a service, template with variables: <b>to_email, subject, message</b>, then fill in below.</div>'
+  +'<div><label style="font-size:12px;color:var(--text2)">EmailJS Service ID</label>'
+  +'<input id="ss-ejs-svc" value="'+(S.emailjs_service_id||'')+'" placeholder="service_xxxx" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);margin-top:4px;box-sizing:border-box"></div>'
+  +'<div style="margin-top:8px"><label style="font-size:12px;color:var(--text2)">EmailJS Template ID</label>'
+  +'<input id="ss-ejs-tmpl" value="'+(S.emailjs_template_id||'')+'" placeholder="template_xxxx" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);margin-top:4px;box-sizing:border-box"></div>'
+  +'<div style="margin-top:8px"><label style="font-size:12px;color:var(--text2)">EmailJS Public Key</label>'
+  +'<input id="ss-ejs-key" value="'+(S.emailjs_public_key||'')+'" placeholder="xxxxxxxxxxxx" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);margin-top:4px;box-sizing:border-box"></div>'
+  +'</div>'
   +'<button onclick="saveAdminSettings()" style="padding:12px 24px;background:var(--p);color:#fff;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-family:Vazirmatn,sans-serif">'+t('adm_save_settings')+'</button>'
   +'</div></div>';
 }
@@ -6282,9 +6363,17 @@ async function saveAdminSettings(){
     support_email:document.getElementById('ss-support-email').value,
     maintenance_mode:document.getElementById('ss-maintenance').checked?'true':'false',
   };
+  var ejsSvc=document.getElementById('ss-ejs-svc');
+  var ejsTmpl=document.getElementById('ss-ejs-tmpl');
+  var ejsKey=document.getElementById('ss-ejs-key');
+  if(ejsSvc)settings.emailjs_service_id=ejsSvc.value;
+  if(ejsTmpl)settings.emailjs_template_id=ejsTmpl.value;
+  if(ejsKey)settings.emailjs_public_key=ejsKey.value;
   for(var key in settings){
     await sb.from('system_settings').upsert({key:key,value:settings[key]},{onConflict:'key'});
   }
+  // Re-init EmailJS if keys changed
+  if(ejsKey&&ejsKey.value&&window.emailjs)window.emailjs.init({publicKey:ejsKey.value});
   toast(t('adm_settings_saved'));
 }
 
