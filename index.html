@@ -7,7 +7,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 @keyframes fadeInUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
@@ -2391,23 +2390,7 @@ function subscribeBalanceUpdates(){
     })
     .subscribe();
 }
-async function initEmailJS(){
-  if(!window.emailjs)return;
-  var {data:rows}=await sb.from('system_settings').select('key,value').in('key',['emailjs_public_key']);
-  if(rows&&rows.length){
-    var key=(rows[0]||{}).value;
-    if(key)window.emailjs.init({publicKey:key});
-  }
-}
-async function sendEmailNotif(toEmail,subject,message){
-  if(!window.emailjs)return;
-  var {data:rows}=await sb.from('system_settings').select('key,value').in('key',['emailjs_service_id','emailjs_template_id','emailjs_public_key']);
-  var S={};(rows||[]).forEach(function(r){S[r.key]=r.value;});
-  if(!S.emailjs_service_id||!S.emailjs_template_id||!S.emailjs_public_key)return;
-  try{
-    await window.emailjs.send(S.emailjs_service_id,S.emailjs_template_id,{to_email:toEmail,subject:subject,message:message},{publicKey:S.emailjs_public_key});
-  }catch(e){console.warn('EmailJS error:',e);}
-}
+
 function updateHeroDashboard(inv){
   var bal=P?getTotalBal():0;
   var name=(P&&P.display_name)||t('default_name');
@@ -6226,8 +6209,6 @@ async function appDep(id, userId, amount){
   if(dep.error){toast('خطا: '+dep.error.message,'red');return;}
   await sb.from('notifications').insert({user_id:userId,type:'deposit_approved',message:'واریز $'+amount+' شما تأیید شد و به موجودی اضافه گردید.',is_read:false});
   await logAdminAction('Deposit Approved',userId,amount,'ID:'+id);
-  var _uEmail=cur.data&&cur.data.email;if(!_uEmail){var _ue=await sb.from('profiles').select('email').eq('user_id',userId).single();_uEmail=_ue.data&&_ue.data.email;}
-  if(_uEmail)sendEmailNotif(_uEmail,'Deposit Approved — WGInvest','Your deposit of $'+amount+' has been approved and added to your balance.');
   // Global deposit bonus
   var {data:sRows}=await sb.from('system_settings').select('key,value').in('key',['deposit_bonus_pct','deposit_bonus_min','deposit_bonus_days']);
   var sMap={};if(sRows)sRows.forEach(function(r){sMap[r.key]=parseFloat(r.value)||0;});
@@ -6275,11 +6256,7 @@ async function appDep(id, userId, amount){
 async function rejDep(id){
   var dep=await sb.from('deposits').update({status:'rejected'}).eq('id',id).select('user_id,amount').single();
   if(dep.error){toast('خطا: '+dep.error.message,'red');return;}
-  if(dep.data){
-    await sb.from('notifications').insert({user_id:dep.data.user_id,type:'deposit_rejected',message:'واریز $'+dep.data.amount+' شما رد شد.',is_read:false});
-    var _dRejEmail=await sb.from('profiles').select('email').eq('user_id',dep.data.user_id).single();
-    if(_dRejEmail.data&&_dRejEmail.data.email)sendEmailNotif(_dRejEmail.data.email,'Deposit Rejected — WGInvest','Your deposit of $'+dep.data.amount+' has been rejected. Please contact support if you believe this is an error.');
-  }
+  if(dep.data)await sb.from('notifications').insert({user_id:dep.data.user_id,type:'deposit_rejected',message:'واریز $'+dep.data.amount+' شما رد شد.',is_read:false});
   await logAdminAction('Deposit Rejected',null,null,'ID:'+id);
   toast('❌ واریز رد شد','red');
   var c=document.getElementById('adminContent');
@@ -6295,8 +6272,6 @@ async function appWith(id, userId, amount){
   if(w.error){toast('خطا: '+w.error.message,'red');return;}
   await sb.from('notifications').insert({user_id:userId,type:'withdrawal_approved',message:'برداشت $'+amount+' شما تأیید و پردازش شد.',is_read:false});
   await logAdminAction('Withdrawal Approved',userId,amount,'ID:'+id);
-  var _wuEmail=await sb.from('profiles').select('email').eq('user_id',userId).single();
-  if(_wuEmail.data&&_wuEmail.data.email)sendEmailNotif(_wuEmail.data.email,'Withdrawal Approved — WGInvest','Your withdrawal of $'+amount+' has been approved and processed.');
   toast('✅ برداشت تأیید شد','green');
   var c=document.getElementById('adminContent');
   if(c)await loadAW2(c);
@@ -6314,8 +6289,6 @@ async function rejWith(id){
     }
     await sb.from('notifications').insert({user_id:w.data.user_id,type:'withdrawal_rejected',message:'درخواست برداشت $'+w.data.amount+' شما رد شد و مبلغ به موجودی شما برگشت داده شد.',is_read:false});
     await logAdminAction('Withdrawal Rejected',w.data.user_id,w.data.amount,'ID:'+id+' — refunded to balance');
-    var _wrEmail=await sb.from('profiles').select('email').eq('user_id',w.data.user_id).single();
-    if(_wrEmail.data&&_wrEmail.data.email)sendEmailNotif(_wrEmail.data.email,'Withdrawal Rejected — WGInvest','Your withdrawal request of $'+w.data.amount+' has been rejected and the amount has been refunded to your balance.');
   }
   toast('❌ برداشت رد شد و مبلغ بازگردانی شد','red');
   var c=document.getElementById('adminContent');
@@ -6342,15 +6315,6 @@ async function loadAdminSettings(c){
   +'<div style="display:flex;align-items:center;gap:10px">'
   +'<input id="ss-maintenance" type="checkbox" '+(S.maintenance_mode==='true'?'checked':'')+'>'
   +'<label>'+t('adm_setting_maintenance')+'</label></div>'
-  +'<div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px"><div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:10px">📧 Email Notifications (EmailJS)</div>'
-  +'<div style="font-size:11px;color:var(--text3);margin-bottom:10px">Register at <b>emailjs.com</b> — create a service, template with variables: <b>to_email, subject, message</b>, then fill in below.</div>'
-  +'<div><label style="font-size:12px;color:var(--text2)">EmailJS Service ID</label>'
-  +'<input id="ss-ejs-svc" value="'+(S.emailjs_service_id||'')+'" placeholder="service_xxxx" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);margin-top:4px;box-sizing:border-box"></div>'
-  +'<div style="margin-top:8px"><label style="font-size:12px;color:var(--text2)">EmailJS Template ID</label>'
-  +'<input id="ss-ejs-tmpl" value="'+(S.emailjs_template_id||'')+'" placeholder="template_xxxx" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);margin-top:4px;box-sizing:border-box"></div>'
-  +'<div style="margin-top:8px"><label style="font-size:12px;color:var(--text2)">EmailJS Public Key</label>'
-  +'<input id="ss-ejs-key" value="'+(S.emailjs_public_key||'')+'" placeholder="xxxxxxxxxxxx" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);margin-top:4px;box-sizing:border-box"></div>'
-  +'</div>'
   +'<button onclick="saveAdminSettings()" style="padding:12px 24px;background:var(--p);color:#fff;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-family:Vazirmatn,sans-serif">'+t('adm_save_settings')+'</button>'
   +'</div></div>';
 }
@@ -6363,17 +6327,9 @@ async function saveAdminSettings(){
     support_email:document.getElementById('ss-support-email').value,
     maintenance_mode:document.getElementById('ss-maintenance').checked?'true':'false',
   };
-  var ejsSvc=document.getElementById('ss-ejs-svc');
-  var ejsTmpl=document.getElementById('ss-ejs-tmpl');
-  var ejsKey=document.getElementById('ss-ejs-key');
-  if(ejsSvc)settings.emailjs_service_id=ejsSvc.value;
-  if(ejsTmpl)settings.emailjs_template_id=ejsTmpl.value;
-  if(ejsKey)settings.emailjs_public_key=ejsKey.value;
   for(var key in settings){
     await sb.from('system_settings').upsert({key:key,value:settings[key]},{onConflict:'key'});
   }
-  // Re-init EmailJS if keys changed
-  if(ejsKey&&ejsKey.value&&window.emailjs)window.emailjs.init({publicKey:ejsKey.value});
   toast(t('adm_settings_saved'));
 }
 
