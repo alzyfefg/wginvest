@@ -4495,7 +4495,7 @@ function startWithFlow(){
       +'<div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px">'+t('kyc_required_withdraw_desc')+'</div>'
       +(P&&P.kyc_status==='pending'
         ?'<div style="background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.3);border-radius:12px;padding:12px;font-size:13px;color:var(--gold);margin-bottom:16px">⏳ '+t('kyc_pending_team')+'</div>'
-        :'<button class="btn-p" onclick="goTab('profile')">'+t('kyc_go_profile')+'</button>')
+        :'<button class="btn-p" onclick="goTab(&quot;profile&quot;)">'+t('kyc_go_profile')+'</button>')
       +'<button onclick="loadWallet()" style="margin-top:10px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:Vazirmatn,sans-serif">← '+t('btn_back')+'</button>'
       +'</div>';
     return;
