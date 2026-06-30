@@ -1913,6 +1913,20 @@ body.light .im-phil{background:linear-gradient(135deg,rgba(26,86,219,.06),rgba(0
     <div class="fg"><label id="albl_e1">ایمیل</label><input type="email" id="le" placeholder="example@gmail.com"></div>
     <div class="fg"><label id="albl_p1">رمز عبور</label><input type="password" id="lp" placeholder="••••••••"><button class="eye-btn" onclick="toggleEye('lp',this)">👁️</button></div>
     <button class="btn-p" id="abtn_in" onclick="doLogin()">ورود ⚡</button>
+    <div style="text-align:center;margin-top:10px">
+      <button id="fpLink" onclick="showForgotPw()" style="background:none;border:none;color:var(--ac);font-size:12px;cursor:pointer;text-decoration:underline;font-family:Vazirmatn,sans-serif">رمز عبور را فراموش کردید؟</button>
+    </div>
+  </div>
+  <div id="forgotPwForm" style="display:none">
+    <div style="text-align:center;margin-bottom:14px">
+      <div style="font-size:18px;font-weight:900;color:var(--text);margin-bottom:6px" id="fpTitle">بازیابی رمز عبور</div>
+      <div style="font-size:12px;color:var(--text2)" id="fpDesc">ایمیل خود را وارد کنید تا لینک بازیابی برایتان ارسال شود.</div>
+    </div>
+    <div class="fg"><label id="fpEmailLbl">ایمیل</label><input type="email" id="fpEmail" placeholder="example@gmail.com"></div>
+    <button class="btn-p" id="fpSendBtn" onclick="doForgotPw()">📧 ارسال لینک بازیابی</button>
+    <div style="text-align:center;margin-top:10px">
+      <button onclick="hideForgotPw()" style="background:none;border:none;color:var(--text2);font-size:12px;cursor:pointer;font-family:Vazirmatn,sans-serif" id="fpBackBtn">← برگشت به ورود</button>
+    </div>
   </div>
   <div id="registerForm" style="display:none">
     <div class="fg"><label id="albl_e2">ایمیل</label><input type="email" id="re" placeholder="example@gmail.com"></div>
@@ -2170,7 +2184,9 @@ with_conf_title:"تأیید درخواست برداشت",with_conf_sub:"جزئی
 bonus_conf_title:"⚠️ هشدار بونوس",bonus_conf_body1:"شما در حال حاضر بونوس فعال",bonus_conf_body2:"دارید. ارسال این درخواست برداشت، بونوس و موجودی بونوس باقی‌مانده را به طور دائمی حذف خواهد کرد.",bonus_conf_irreversible:"این عمل قابل بازگشت نیست.",bonus_conf_btn:"ادامه برداشت",bonus_conf_cancel:"انصراف",wallet_change_sent:"✅ درخواست ثبت شد",wallet_change_pending:"درخواست در انتظار بررسی",with_fee_lbl:"کارمزد (۸٪)",with_net_lbl:"مبلغ دریافتی خالص",adm_wallet_changes:"تغییر کیف پول‌ها",adm_approve:"تأیید",adm_reject:"رد",adm_global_search:"جستجوی کلی",adm_search_placeholder:"جستجو در ایمیل، نام، شناسه، کیف پول...",adm_sys_settings:"تنظیمات سیستم",adm_setting_fee:"کارمزد برداشت (%)",adm_setting_min_dep:"حداقل واریز",adm_setting_min_with:"حداقل برداشت",adm_setting_maintenance:"حالت تعمیر",adm_setting_support_email:"ایمیل پشتیبانی",adm_setting_site_name:"نام سایت",adm_save_settings:"ذخیره تنظیمات",adm_settings_saved:"✅ تنظیمات ذخیره شد",adm_inc_bal:"افزایش موجودی",adm_dec_bal:"کاهش موجودی",adm_add_bonus:"افزودن بونوس",adm_block_user:"مسدود کردن",adm_unblock_user:"رفع مسدودیت",adm_view_ledger:"مشاهده دفتر کل",bal_available:"موجودی قابل استفاده",bal_pending_w:"برداشت در انتظار",bal_locked_inv:"سرمایه‌گذاری قفل",bal_bonus:"موجودی بونوس",inv_show_more:"نمایش همه",with_tab_pending:"در انتظار",with_tab_history:"تاریخچه",with_approved_today:"تأیید امروز",with_fee_today:"کارمزد امروز",with_fee_total:"کارمزد کل (از ابتدا)",with_dep_total:"واریز کل (از ابتدا)",adm_bonus_dep_title:"بونوس همگانی واریز",adm_bonus_dep_pct:"درصد بونوس واریز (% — صفر = غیرفعال)",adm_bonus_dep_min:"حداقل مبلغ واریز برای دریافت بونوس ($)",wtl_registered:"ثبت شد",wtl_review:"بررسی",wtl_approved:"تأیید",wtl_paid:"پرداخت",wtl_completed:"تکمیل",wtl_rejected:"رد شده",warn_only_net:"فقط از شبکه {NET} استفاده کنید.",dep_uploading_img:"⏳ در حال آپلود تصویر...",adm_dep_auto_count:"خودکار تأیید",adm_dep_tab_auto:"خودکار",adm_dep_tab_admin:"تأیید ادمین",adm_dep_tab_all:"همه",adm_dep_auto_lbl:"خودکار",adm_dep_admin_lbl:"ادمین",adm_dep_no_auto:"هیچ واریز خودکاری وجود ندارد",adm_dep_no_admin:"هیچ واریز تأیید ادمین وجود ندارد",adm_dep_receipt:"رسید تراکنش",adm_dep_click_zoom:"کلیک برای بزرگ‌نمایی",adm_dep_no_receipt:"رسید آپلود نشده",adm_dep_reviewed_by:"تأیید توسط",dep_auto_approved:"✅ واریز تأیید شد! موجودی اضافه گردید",dep_auto_approved_msg:"واریز شما روی بلاکچین تأیید شد و به موجودی اضافه گردید.",dep_auto_rejected:"❌ TX تأیید نشد — واریز رد شد",dep_auto_rejected_msg:"درخواست واریز رد شد: تراکنش در بلاکچین یافت نشد یا با آدرس ما مطابقت ندارد.",adm_dep_pending:"در انتظار",adm_dep_today_count:"تأیید امروز",adm_dep_today_amt:"واریز امروز",adm_dep_total_amt:"کل واریز (از ابتدا)",adm_dep_tab_pending:"در انتظار",adm_dep_tab_history:"تاریخچه",adm_dep_search:"جستجو ایمیل / TX / شناسه...",adm_dep_no_pending:"هیچ واریزی در انتظار نیست ✅",adm_dep_no_history:"تاریخچه واریزی وجود ندارد",adm_dep_approved:"تأیید",adm_dep_rejected:"رد",adm_dep_pending_lbl:"در انتظار",adm_dep_approve:"تأیید",adm_dep_reject:"رد",adm_copy:"کپی",adm_profile:"پروفایل",adm_sort_date:"تاریخ",adm_sort_amt:"مبلغ ↓",adm_kpi_members:"کل اعضا",adm_kpi_pdep:"واریز معلق",adm_kpi_pwit:"برداشت معلق",adm_kpi_inv:"سرمایه‌گذاری فعال",adm_kpi_bonus:"کمپین بونوس فعال",adm_kpi_fees:"درآمد امروز",adm_health_title:"سلامت پلتفرم",adm_health_db_ok:"Supabase: ✅ متصل",adm_health_db_err:"Supabase: ❌ قطع",adm_health_auth:"Auth: ✅ فعال",adm_health_dep_pend:"واریز در انتظار",adm_health_wit_pend:"برداشت در انتظار",adm_act_title:"فعالیت‌های اخیر",adm_act_deposit:"واریز",adm_act_withdrawal:"برداشت",
 kyc_file_hint:"JPG · PNG · حداکثر ۵MB",kyc_file_size_err:"حداکثر حجم عکس ۵MB است",kyc_select_photo:"لطفاً ابتدا عکس انتخاب کنید",kyc_uploading:"⏳ در حال ارسال...",kyc_submit_btn:"✅ ارسال برای تأیید",kyc_submitted:"✅ مدرک ارسال شد — در حال بررسی",kyc_pending_team:"⏳ در حال بررسی توسط تیم ما...",kyc_reset_btn:"🔄 عوض کن",kyc_err_prefix:"خطا: ",
 notif_empty:"📭 اعلانی وجود ندارد",notif_just_now:"همین الان",notif_min_ago:"دقیقه پیش",notif_hr_ago:"ساعت پیش",
-notif_invest_start_title:"سرمایه‌گذاری شروع شد",notif_invest_start_body:"قفل شد",notif_profit_ready_title:"سود دریافت شد",notif_profit_ready_body:"به موجودی شما افزوده شد",notif_comm_title:"کمیسیون سود سرمایه‌گذاری",notif_cancel_title:"سرمایه‌گذاری لغو شد",notif_cancel_body:"اصل سرمایه به موجودی شما بازگشت داده شد",notif_panel_title:"🔔 اعلان‌ها",notif_mark_all:"همه خوانده شد"},
+notif_invest_start_title:"سرمایه‌گذاری شروع شد",notif_invest_start_body:"قفل شد",notif_profit_ready_title:"سود دریافت شد",notif_profit_ready_body:"به موجودی شما افزوده شد",notif_comm_title:"کمیسیون سود سرمایه‌گذاری",notif_cancel_title:"سرمایه‌گذاری لغو شد",notif_cancel_body:"اصل سرمایه به موجودی شما بازگشت داده شد",notif_panel_title:"🔔 اعلان‌ها",notif_mark_all:"همه خوانده شد",
+fp_link:"رمز عبور را فراموش کردید؟",fp_title:"بازیابی رمز عبور",fp_desc:"ایمیل خود را وارد کنید تا لینک بازیابی برایتان ارسال شود.",fp_send:"📧 ارسال لینک بازیابی",fp_sent:"✅ لینک بازیابی به ایمیل شما ارسال شد. صندوق ورودی‌تان را بررسی کنید.",fp_back:"← برگشت به ورود",
+ref_how_title:"💡 چطور درآمد کسب کنی؟",ref_dep_comm_title:"کمیسیون واریز (دائمی)",ref_dep_comm_desc:"از هر واریز عضو سطح ۱ شما، یک درصد ثابت به موجودیتان اضافه می‌شود — برای همیشه.",ref_profit_comm_title:"کمیسیون سود سرمایه‌گذاری",ref_profit_comm_desc:"وقتی زیرمجموعه‌ها سود سرمایه‌گذاری دریافت می‌کنند، شما هم سهم می‌گیرید.",ref_milestone_desc_short:"با رسیدن به تعداد مشخص اعضای فعال، جایزه یک‌بار دریافت کنید.",ref_active_def:"عضو فعال = اولین واریز ≥ $۵۰",ref_how_hide:"پنهان کردن",ref_how_show:"نحوه کسب درآمد ↓"},
 en:{dir:"ltr",logo:"WGInvest",sub:"Fixed-Yield Investment",login:"Login",reg:"Register",email:"Email",pass:"Password",pass2:"Confirm Password",btn_in:"Login ⚡",btn_up:"Register Free 🚀",logout:"Logout",matches:"Invest",profile:"Profile",wallet:"Wallet",team:"Team",bal:"Balance",wins:"Wins",loses:"Losses",refs:"Referrals",acc:"Accuracy",no_m:"No active investment",pick:"How much do you want to invest?",waiting:"Locked — waiting for cycle to end",win_m:"✅ Profit received",lose_m:"Refunded",deadline:"Cycle ended",invite:"Personal Invite Link",copy_link:"Copy Invite Link",team_struct:"My Team Structure",no_team:"No referrals yet",deposit:"Deposit USDT (TRC20)",withdraw:"Withdraw USDT (TRC20)",amount:"Amount (USDT)",tx_hash:"TX Hash",upload_receipt:"Upload Transaction Screenshot",submit_dep:"📤 Submit Deposit",dest_addr:"Destination Wallet",min_w:"Amount (min 20 USDT)",w_pass:"🔐 Withdrawal Password",submit_w:"📥 Submit Withdrawal",tx_hist:"Transaction History",no_tx:"No transactions",dashboard:"📊 Dashboard",total_pred:"Total Invested",win_rate:"Yield Rate",today_p:"Today Profit",tomorrow:"Next Cycle",kyc_t:"🪪 Identity",kyc_ok:"✅ Identity verified.",kyc_hint:"Upload ID to enable withdrawals.",kyc_up:"Upload ID Card",wp_t:"🔐 Withdrawal Password",wp_ok:"✅ Password set.",wp_new:"New Password",wp_rep:"Confirm",wp_save:"Save Password 🔐",wp_change:"Change Password",dname:"Display Name",save:"Save",compound:"📈 Compound Growth — 2.5% per cycle",today_earn:"Today Profit",tx_dep:"💳 Deposit",tx_wit:"💸 Withdrawal",tx_ok:"✅ Approved",tx_rej:"❌ Rejected",tx_pend:"⏳ Pending",accuracy:"Accuracy",stake_title:"💰 How much to invest?",stake_hint:"Fixed +2.5% profit after lock period",cancel:"Cancel",w_info:"Withdrawal requests take 1-24 hours to be approved.",w_info_t:"Processing Time",ok:"Got it",claim_profit:"💰 Claim Profit",profit_claimed:"Profit Claimed",growth_chart:"📈 Capital Growth Chart",quick_menu:"Quick Access",support_title:"Support",new_ticket:"New Ticket",ticket_subject:"Subject",ticket_msg:"Your message",send_ticket:"Send Ticket",my_tickets:"My Tickets",no_tickets:"No tickets yet",ticket_open:"Open",ticket_closed:"Closed",ticket_reply:"Reply",send_reply:"Send Reply",adm_tickets:"Manage Tickets",qm_matches:"Invest",qm_wallet:"Finance",qm_team:"Referrals",qm_deposit:"Deposit",qm_withdraw:"Withdraw",qm_support:"Support",growth_desc:"X: Number of games | Y: Balance ($)",archive:"Investment History",archive_empty:"No history yet",move_archive:"Move to Archive",archived_on:"Archived",notifications:"Notifications",no_notifs:"No notifications",lbl_admin_replied:"Admin replied",lbl_admin:"Support",lbl_you:"You",
 w_total_bal:"Total Balance",w_dep_title:"Deposit",w_dep_desc:"Add USDT balance via TRC20 or BEP20 network",w_dep_btn:"Deposit Funds",w_wit_title:"Withdraw",w_wit_desc:"Transfer balance to your USDT wallet via any network",w_wit_btn:"Withdraw Funds",tx_all:"All",
 si_earning:"Earning Yield",si_ready_claim:"Ready to Claim ✦",si_ready_invest:"Ready to Invest",si_your_bal:"Your Balance",si_locked_stat:"Locked",si_time_left:"Time Left",si_exp_profit:"Expected Profit",si_earned_profit:"Profit Earned",si_claimable:"Claimable",si_yield_rate:"Yield",si_fixed_profit:"Fixed Profit",si_lock_period:"Lock Period",si_min_invest:"Min. Investment",si_badge_ready:"✦ Ready to Claim",si_badge_active:"Active",si_badge_idle:"Ready to Invest",si_per_cycle:"Fixed Yield Per Cycle",si_profit_type:"Profit Type",si_fixed:"Fixed",si_asset:"Supported Asset",si_disabled_msg:"⏸ Smart Invest disabled by admin",si_start_btn:"🚀 Start Investing",si_locked_amt:"Locked Amount",si_final_amt:"Final Amount",si_hr:"Hr",si_min_lbl:"Min",si_sec_lbl:"Sec",si_cycle_prog:"Cycle Progress",si_wait_end:"⏳ Waiting for cycle to end",si_profit_ready:"Profit Ready to Claim",si_final_lbl:"Final Amount:",si_principal:"Principal",si_earned2:"Profit Earned",si_trust1:"🔒 Secure Investment",si_trust2:"🛡️ Encrypted",
@@ -2223,7 +2239,9 @@ with_conf_title:"Withdrawal Confirmation",with_conf_sub:"Review details below",w
 bonus_conf_title:"⚠️ Bonus Warning",bonus_conf_body1:"You currently have an active bonus of",bonus_conf_body2:"Submitting this withdrawal will permanently remove your Active Bonus and any unused Bonus Balance.",bonus_conf_irreversible:"This action cannot be reversed.",bonus_conf_btn:"Continue Withdrawal",bonus_conf_cancel:"Cancel",wallet_change_sent:"✅ Request submitted",wallet_change_pending:"Request pending review",with_fee_lbl:"Fee (8%)",with_net_lbl:"Net Amount You Receive",adm_wallet_changes:"Wallet Changes",adm_approve:"Approve",adm_reject:"Reject",adm_global_search:"Global Search",adm_search_placeholder:"Search email, name, ID, wallet...",adm_sys_settings:"System Settings",adm_setting_fee:"Withdrawal Fee (%)",adm_setting_min_dep:"Min Deposit",adm_setting_min_with:"Min Withdrawal",adm_setting_maintenance:"Maintenance Mode",adm_setting_support_email:"Support Email",adm_setting_site_name:"Site Name",adm_save_settings:"Save Settings",adm_settings_saved:"✅ Settings saved",adm_inc_bal:"Increase Balance",adm_dec_bal:"Decrease Balance",adm_add_bonus:"Add Bonus",adm_block_user:"Block User",adm_unblock_user:"Unblock User",adm_view_ledger:"View Ledger",bal_available:"Available Balance",bal_pending_w:"Pending Withdrawal",bal_locked_inv:"Locked Investment",bal_bonus:"Bonus Balance",inv_show_more:"Show all",with_tab_pending:"Pending",with_tab_history:"History",with_approved_today:"Approved Today",with_fee_today:"Fee Today",with_fee_total:"Total Fees (All Time)",with_dep_total:"Total Deposits (All Time)",adm_bonus_dep_title:"Global Deposit Bonus",adm_bonus_dep_pct:"Deposit Bonus % (0 = disabled)",adm_bonus_dep_min:"Min Deposit for Bonus ($)",wtl_registered:"Registered",wtl_review:"Under Review",wtl_approved:"Approved",wtl_paid:"Paid",wtl_completed:"Completed",wtl_rejected:"Rejected",warn_only_net:"Only use {NET} network.",dep_uploading_img:"⏳ Uploading receipt...",adm_dep_auto_count:"Auto Approved",adm_dep_tab_auto:"Auto",adm_dep_tab_admin:"Admin Approved",adm_dep_tab_all:"All",adm_dep_auto_lbl:"Auto",adm_dep_admin_lbl:"Admin",adm_dep_no_auto:"No auto-approved deposits",adm_dep_no_admin:"No admin-approved deposits",adm_dep_receipt:"Transaction Receipt",adm_dep_click_zoom:"Click to zoom",adm_dep_no_receipt:"No receipt uploaded",adm_dep_reviewed_by:"Approved by",dep_auto_approved:"✅ Deposit verified & approved!",dep_auto_approved_msg:"Your deposit was confirmed on the blockchain and added to your balance.",dep_auto_rejected:"❌ TX not verified — deposit rejected",dep_auto_rejected_msg:"Deposit rejected: transaction not found on blockchain or does not match our wallet address.",adm_dep_pending:"Pending",adm_dep_today_count:"Approved Today",adm_dep_today_amt:"Today Deposits",adm_dep_total_amt:"Total Deposits (All Time)",adm_dep_tab_pending:"Pending",adm_dep_tab_history:"History",adm_dep_search:"Search email / TX / ID...",adm_dep_no_pending:"No pending deposits ✅",adm_dep_no_history:"No deposit history",adm_dep_approved:"Approved",adm_dep_rejected:"Rejected",adm_dep_pending_lbl:"Pending",adm_dep_approve:"Approve",adm_dep_reject:"Reject",adm_copy:"Copy",adm_profile:"Profile",adm_sort_date:"Date",adm_sort_amt:"Amount ↓",adm_kpi_members:"Total Members",adm_kpi_pdep:"Pending Deposits",adm_kpi_pwit:"Pending Withdrawals",adm_kpi_inv:"Active Investments",adm_kpi_bonus:"Active Bonus Campaigns",adm_kpi_fees:"Today's Revenue",adm_health_title:"Platform Health",adm_health_db_ok:"Supabase: ✅ Connected",adm_health_db_err:"Supabase: ❌ Disconnected",adm_health_auth:"Auth: ✅ Active",adm_health_dep_pend:"Deposits Pending",adm_health_wit_pend:"Withdrawals Pending",adm_act_title:"Recent Activity",adm_act_deposit:"Deposit",adm_act_withdrawal:"Withdrawal",
 kyc_file_hint:"JPG · PNG · Max 5MB",kyc_file_size_err:"Max file size is 5MB",kyc_select_photo:"Please select a photo first",kyc_uploading:"⏳ Uploading...",kyc_submit_btn:"✅ Submit for Verification",kyc_submitted:"✅ Document submitted — under review",kyc_pending_team:"⏳ Under review by our team...",kyc_reset_btn:"🔄 Change",kyc_err_prefix:"Error: ",
 notif_empty:"📭 No notifications",notif_just_now:"Just now",notif_min_ago:"min ago",notif_hr_ago:"hr ago",
-notif_invest_start_title:"Investment Started",notif_invest_start_body:"locked",notif_profit_ready_title:"Profit Received",notif_profit_ready_body:"added to your balance",notif_comm_title:"Investment Profit Commission",notif_cancel_title:"Investment Cancelled",notif_cancel_body:"Principal refunded to your balance",notif_panel_title:"🔔 Notifications",notif_mark_all:"Mark all read"},
+notif_invest_start_title:"Investment Started",notif_invest_start_body:"locked",notif_profit_ready_title:"Profit Received",notif_profit_ready_body:"added to your balance",notif_comm_title:"Investment Profit Commission",notif_cancel_title:"Investment Cancelled",notif_cancel_body:"Principal refunded to your balance",notif_panel_title:"🔔 Notifications",notif_mark_all:"Mark all read",
+fp_link:"Forgot your password?",fp_title:"Reset Password",fp_desc:"Enter your email and we'll send you a reset link.",fp_send:"📧 Send Reset Link",fp_sent:"✅ Reset link sent! Check your inbox.",fp_back:"← Back to Login",
+ref_how_title:"💡 How do you earn?",ref_dep_comm_title:"Deposit Commission (Lifetime)",ref_dep_comm_desc:"You earn a fixed % of every deposit made by your Level 1 members — forever.",ref_profit_comm_title:"Investment Profit Commission",ref_profit_comm_desc:"When your referrals complete investments, you get a share of their profit.",ref_milestone_desc_short:"Earn one-time cash rewards for reaching active member milestones.",ref_active_def:"Active member = first deposit ≥ $50",ref_how_hide:"Hide",ref_how_show:"How to earn ↓"},
 ar:{dir:"rtl",logo:"WGInvest",sub:"استثمار بعائد ثابت",login:"دخول",reg:"تسجيل",email:"البريد",pass:"كلمة المرور",pass2:"تأكيد",btn_in:"دخول ⚡",btn_up:"تسجيل مجاني 🚀",logout:"خروج",matches:"استثمار",profile:"الملف",wallet:"المحفظة",team:"الفريق",bal:"الرصيد",wins:"الأرباح",loses:"السحوبات",refs:"محالون",acc:"الدقة",no_m:"لا مباريات",pick:"كم تريد أن تستثمر؟",waiting:"مقفل — في انتظار نهاية الدورة",win_m:"✅ تم استلام الربح",lose_m:"تمت الاستعادة",deadline:"انتهى الوقت",invite:"رابط الدعوة",copy_link:"نسخ الرابط",team_struct:"هيكل فريقي",no_team:"لا إحالات",deposit:"إيداع USDT",withdraw:"سحب USDT",amount:"المبلغ",tx_hash:"TX Hash",upload_receipt:"رفع صورة المعاملة",submit_dep:"📤 تأكيد الإيداع",dest_addr:"عنوان المحفظة",min_w:"المبلغ (20 USDT)",w_pass:"🔐 كلمة سر السحب",submit_w:"📥 تأكيد السحب",tx_hist:"سجل المعاملات",no_tx:"لا معاملات",dashboard:"📊 لوحة التحكم",total_pred:"إجمالي الاستثمار",win_rate:"معدل العائد",today_p:"ربح اليوم",tomorrow:"الغد",kyc_t:"🪪 التحقق",kyc_ok:"✅ تم التحقق.",kyc_hint:"ارفع بطاقة الهوية.",kyc_up:"رفع بطاقة الهوية",wp_t:"🔐 كلمة سر السحب",wp_ok:"✅ تم التعيين.",wp_new:"كلمة سر جديدة",wp_rep:"تأكيد",wp_save:"حفظ كلمة السر 🔐",wp_change:"تغيير كلمة السر",dname:"الاسم",save:"حفظ",compound:"📈 فائدة مركبة 2.5%",today_earn:"ربح اليوم",tx_dep:"💳 إيداع",tx_wit:"💸 سحب",tx_ok:"✅ موافق",tx_rej:"❌ مرفوض",tx_pend:"⏳ انتظار",accuracy:"الدقة",stake_title:"💰 كم تستثمر؟",stake_hint:"عائد ثابت +2.5% بعد فترة القفل",cancel:"إلغاء",w_info:"طلبات السحب تستغرق 1-24 ساعة.",w_info_t:"وقت المعالجة",ok:"فهمت",claim_profit:"💰 استلام الربح",profit_claimed:"تم الاستلام",growth_chart:"📈 مخطط النمو",quick_menu:"وصول سريع",support_title:"الدعم",new_ticket:"تذكرة جديدة",ticket_subject:"الموضوع",ticket_msg:"رسالتك",send_ticket:"إرسال التذكرة",my_tickets:"تذاكري",no_tickets:"لا توجد تذاكر",ticket_open:"مفتوح",ticket_closed:"مغلق",ticket_reply:"رد",send_reply:"إرسال الرد",adm_tickets:"إدارة التذاكر",qm_matches:"استثمار",qm_wallet:"مالية",qm_team:"إحالات",qm_deposit:"إيداع",qm_withdraw:"سحب",qm_support:"دعم",growth_desc:"X: عدد الدورات | Y: الرصيد ($)",archive:"سجل الاستثمار",archive_empty:"لا يوجد سجل",move_archive:"نقل إلى الأرشيف",archived_on:"تم الأرشفة",notifications:"الإشعارات",no_notifs:"لا توجد إشعارات",lbl_admin_replied:"رد الدعم",lbl_admin:"الدعم",lbl_you:"أنت",
 w_total_bal:"الرصيد الكلي",w_dep_title:"إيداع",w_dep_desc:"إضافة رصيد USDT عبر شبكة TRC20 أو BEP20",w_dep_btn:"إيداع الأموال",w_wit_title:"سحب",w_wit_desc:"تحويل الرصيد إلى محفظة USDT عبر أي شبكة",w_wit_btn:"سحب الأموال",tx_all:"الكل",
 si_earning:"جاري كسب العائد",si_ready_claim:"جاهز للاستلام ✦",si_ready_invest:"جاهز للاستثمار",si_your_bal:"رصيدك",si_locked_stat:"مقفل",si_time_left:"الوقت المتبقي",si_exp_profit:"الربح المتوقع",si_earned_profit:"الربح المكتسب",si_claimable:"قابل للاستلام",si_yield_rate:"العائد",si_fixed_profit:"ربح ثابت",si_lock_period:"مدة القفل",si_min_invest:"الحد الأدنى",si_badge_ready:"✦ جاهز للاستلام",si_badge_active:"نشط",si_badge_idle:"جاهز للاستثمار",si_per_cycle:"عائد ثابت لكل دورة",si_profit_type:"نوع الربح",si_fixed:"ثابت",si_asset:"الأصل المدعوم",si_disabled_msg:"⏸ Smart Invest معطل من قبل المشرف",si_start_btn:"🚀 ابدأ الاستثمار",si_locked_amt:"المبلغ المقفل",si_final_amt:"المبلغ النهائي",si_hr:"ساعة",si_min_lbl:"دقيقة",si_sec_lbl:"ثانية",si_cycle_prog:"تقدم الدورة",si_wait_end:"⏳ انتظار انتهاء الدورة",si_profit_ready:"الربح جاهز للاستلام",si_final_lbl:"المبلغ النهائي:",si_principal:"رأس المال",si_earned2:"الربح المكتسب",si_trust1:"🔒 استثمار آمن",si_trust2:"🛡️ مشفر",
@@ -2292,7 +2310,7 @@ function t(k){return(TR[lang]&&TR[lang][k])?TR[lang][k]:(TR.en[k]||TR.fa[k]||k);
 function applyLang(){
   var l=TR[lang];
   document.documentElement.dir=l.dir;
-  var m={alogo:"logo",asub:"sub",atab_in:"login",atab_up:"reg",albl_e1:"email",albl_p1:"pass",albl_e2:"email",albl_p2:"pass",albl_p3:"pass2",abtn_in:"btn_in",abtn_up:"btn_up",nlogo:"logo",nbtn_out:"logout",sl_bal:"bal",sl_bal2:"bal",sl_win:"wins",sl_lose:"loses",sl_ref:"refs",sl_wr:"acc",bnl_m:"matches",bnl_p:"profile",bnl_w:"wallet",bnl_t:"team",bnl_a:"archive",bnl_im:"im_nav",qml_m:"qm_matches",qml_w:"qm_wallet",qml_t:"qm_team",qml_d:"qm_deposit",qml_wd:"qm_withdraw",qml_s:"qm_support",notifHeadTitle:"notif_panel_title",notifMarkAll:"notif_mark_all"};
+  var m={alogo:"logo",asub:"sub",atab_in:"login",atab_up:"reg",albl_e1:"email",albl_p1:"pass",albl_e2:"email",albl_p2:"pass",albl_p3:"pass2",abtn_in:"btn_in",abtn_up:"btn_up",nlogo:"logo",nbtn_out:"logout",sl_bal:"bal",sl_bal2:"bal",sl_win:"wins",sl_lose:"loses",sl_ref:"refs",sl_wr:"acc",bnl_m:"matches",bnl_p:"profile",bnl_w:"wallet",bnl_t:"team",bnl_a:"archive",bnl_im:"im_nav",qml_m:"qm_matches",qml_w:"qm_wallet",qml_t:"qm_team",qml_d:"qm_deposit",qml_wd:"qm_withdraw",qml_s:"qm_support",notifHeadTitle:"notif_panel_title",notifMarkAll:"notif_mark_all",fpLink:"fp_link",fpTitle:"fp_title",fpDesc:"fp_desc",fpSendBtn:"fp_send",fpBackBtn:"fp_back",fpEmailLbl:"email"};
   for(var id in m){var el=document.getElementById(id);if(el)el.textContent=t(m[id]);}
   // Update trust labels
   var tls={tl_investors:"trust_investors",tl_yield:"trust_yield",tl_support:"trust_support"};
@@ -2300,7 +2318,7 @@ function applyLang(){
   // Update placeholders
   var ph={
     re:"email",rp:"pwd_placeholder",rp2:"pwd_repeat_placeholder",
-    le:"email",lp:"pass",
+    le:"email",lp:"pass",fpEmail:"email",
     refCode:"ref_code_placeholder",
     da:"dep_amount_label",dh:"dep_tx_label",wa:"dest_addr",wamt:"min_w",wpass:"w_pass",
     dname:"dname"
@@ -2356,8 +2374,29 @@ function showAuthTab(tab){
   document.getElementById("atab_in").classList.toggle("on",tab==="login");
   document.getElementById("atab_up").classList.toggle("on",tab==="register");
   document.getElementById("loginForm").style.display=tab==="login"?"block":"none";
+  document.getElementById("forgotPwForm").style.display="none";
   document.getElementById("registerForm").style.display=tab==="register"?"block":"none";
   document.getElementById("authMsg").className="amsg";
+}
+function showForgotPw(){
+  document.getElementById("loginForm").style.display="none";
+  document.getElementById("forgotPwForm").style.display="block";
+  document.getElementById("authMsg").className="amsg";
+}
+function hideForgotPw(){
+  document.getElementById("forgotPwForm").style.display="none";
+  document.getElementById("loginForm").style.display="block";
+  document.getElementById("authMsg").className="amsg";
+}
+async function doForgotPw(){
+  var email=document.getElementById("fpEmail").value.trim().toLowerCase();
+  if(!email)return amsg("❌ "+t("email"),"err");
+  var btn=document.getElementById("fpSendBtn");btn.disabled=true;
+  var res=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.href});
+  btn.disabled=false;
+  if(res.error)return amsg("❌ "+res.error.message,"err");
+  amsg(t("fp_sent"),"ok");
+  document.getElementById("fpEmail").value="";
 }
 function amsg(msg,type){var el=document.getElementById("authMsg");el.textContent=msg;el.className="amsg "+type;}
 function showPage(id){document.querySelectorAll(".page").forEach(function(p){p.classList.remove("active");});document.getElementById(id).classList.add("active");}
@@ -6793,6 +6832,58 @@ async function loadTeam(){
   // Referral link
   var rl=window.location.origin+window.location.pathname+"?ref="+U.id;
   var html=[];
+
+  // ── HOW TO EARN explainer (collapsible) ──
+  html.push('<div class="icard" style="background:linear-gradient(135deg,rgba(0,212,170,.07),rgba(26,86,219,.05));border-color:rgba(0,212,170,.2);margin-bottom:12px">');
+  html.push('<div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="var b=document.getElementById(\'refHowBody\');var a=document.getElementById(\'refHowArrow\');var open=b.style.display!==\'none\';b.style.display=open?\'none\':\'block\';a.textContent=open?\'▼\':\'▲\';">');
+  html.push('<div style="font-size:14px;font-weight:900;color:var(--ac)">'+t('ref_how_title')+'</div>');
+  html.push('<span id="refHowArrow" style="color:var(--ac);font-size:12px">▼</span>');
+  html.push('</div>');
+  html.push('<div id="refHowBody" style="display:none;margin-top:14px">');
+
+  // Card 1: Deposit commission
+  html.push('<div style="background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);border-radius:12px;padding:12px;margin-bottom:10px">');
+  html.push('<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">');
+  html.push('<div style="width:36px;height:36px;background:rgba(0,212,170,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">💸</div>');
+  html.push('<div><div style="font-size:13px;font-weight:800;color:var(--ac)">'+t('ref_dep_comm_title')+'</div></div>');
+  html.push('</div>');
+  html.push('<div style="font-size:11px;color:var(--text2);line-height:1.5">'+t('ref_dep_comm_desc')+'</div>');
+  html.push('<div style="display:flex;gap:8px;margin-top:10px">');
+  html.push('<div style="flex:1;text-align:center;background:rgba(0,212,170,.1);border-radius:8px;padding:8px 4px"><div style="font-size:16px;font-weight:900;color:var(--ac)">L1</div><div style="font-size:10px;color:var(--text3)">'+t('ref_milestone_active_lbl')+'</div><div style="font-size:12px;font-weight:700;color:var(--ac)">%</div></div>');
+  html.push('</div></div>');
+
+  // Card 2: Profit commission (3 levels)
+  html.push('<div style="background:rgba(26,86,219,.08);border:1px solid rgba(26,86,219,.2);border-radius:12px;padding:12px;margin-bottom:10px">');
+  html.push('<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">');
+  html.push('<div style="width:36px;height:36px;background:rgba(26,86,219,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📈</div>');
+  html.push('<div><div style="font-size:13px;font-weight:800;color:#60a5fa">'+t('ref_profit_comm_title')+'</div></div>');
+  html.push('</div>');
+  html.push('<div style="font-size:11px;color:var(--text2);line-height:1.5;margin-bottom:10px">'+t('ref_profit_comm_desc')+'</div>');
+  html.push('<div style="display:flex;gap:8px">');
+  [{lv:'L1',pct:'10%',c:'rgba(0,212,170,.15)',tc:'var(--ac)'},{lv:'L2',pct:'5%',c:'rgba(26,86,219,.15)',tc:'#60a5fa'},{lv:'L3',pct:'1%',c:'rgba(168,139,250,.15)',tc:'#c084fc'}].forEach(function(x){
+    html.push('<div style="flex:1;text-align:center;background:'+x.c+';border-radius:8px;padding:8px 4px"><div style="font-size:15px;font-weight:900;color:'+x.tc+'">'+x.lv+'</div><div style="font-size:14px;font-weight:800;color:'+x.tc+'">'+x.pct+'</div><div style="font-size:9px;color:var(--text3)">of profit</div></div>');
+  });
+  html.push('</div></div>');
+
+  // Card 3: Milestone rewards table
+  html.push('<div style="background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);border-radius:12px;padding:12px">');
+  html.push('<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">');
+  html.push('<div style="width:36px;height:36px;background:rgba(139,92,246,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🏆</div>');
+  html.push('<div><div style="font-size:13px;font-weight:800;color:#c084fc">'+t('ref_milestone_title')+'</div></div>');
+  html.push('</div>');
+  html.push('<div style="font-size:11px;color:var(--text2);line-height:1.5;margin-bottom:10px">'+t('ref_milestone_desc_short')+'</div>');
+  html.push('<div style="font-size:10px;color:var(--gold);margin-bottom:8px">⚡ '+t('ref_active_def')+'</div>');
+  html.push('<div style="display:flex;gap:6px;flex-wrap:wrap">');
+  [{c:2,r:5},{c:5,r:15},{c:10,r:35},{c:20,r:80},{c:50,r:230}].forEach(function(ms){
+    html.push('<div style="flex:1;min-width:50px;text-align:center;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);border-radius:8px;padding:7px 4px">');
+    html.push('<div style="font-size:12px;font-weight:900;color:#c084fc">'+ms.c+'👥</div>');
+    html.push('<div style="font-size:13px;font-weight:900;color:var(--gold)">$'+ms.r+'</div>');
+    html.push('</div>');
+  });
+  html.push('</div></div>');
+
+  html.push('</div></div>'); // close refHowBody + icard
+
   html.push('<div class="icard" style="background:linear-gradient(135deg,rgba(26,86,219,.12),rgba(0,212,170,.08));border-color:rgba(0,212,170,.2)">');
   html.push('<div class="ctitle">🔗 Referral Link</div>');
   html.push('<div class="ref-link" onclick="cpText(&quot;'+rl+'&quot;)">📋 '+rl+'</div>');
