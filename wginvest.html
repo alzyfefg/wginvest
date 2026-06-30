@@ -6808,6 +6808,8 @@ async function markNotifRead(id,el){
 async function loadTeam(){
   var c=document.getElementById("MC");
   c.innerHTML='<div class="lbox"><div class="spin"></div></div>';
+  var depCommPct=5;
+  try{var {data:commRow}=await sb.from('system_settings').select('value').eq('key','referral_commission_pct').single();if(commRow&&commRow.value)depCommPct=parseFloat(commRow.value)||5;}catch(e){}
   // Load referral data
   var l1=await sb.from("profiles").select("user_id,email,balance,created_at").eq("referred_by",U.id);
   var l1data=l1.data||[];
@@ -6824,8 +6826,8 @@ async function loadTeam(){
   }
   var totalMem=l1data.length+l2data.length+l3data.length;
   // Income per level (2.5% of balance)
-  var inc1=l1data.reduce(function(s,u){return s+parseFloat(u.balance||0)*.025;},0);
-  var inc2=l2data.reduce(function(s,u){return s+parseFloat(u.balance||0)*.015;},0);
+  var inc1=l1data.reduce(function(s,u){return s+parseFloat(u.balance||0)*.1;},0);
+  var inc2=l2data.reduce(function(s,u){return s+parseFloat(u.balance||0)*.05;},0);
   var inc3=l3data.reduce(function(s,u){return s+parseFloat(u.balance||0)*.01;},0);
   var strongestLevel=inc1>=inc2&&inc1>=inc3?{n:"Level 1",m:l1data.length,inc:inc1}:inc2>=inc3?{n:"Level 2",m:l2data.length,inc:inc2}:{n:"Level 3",m:l3data.length,inc:inc3};
 
@@ -6849,7 +6851,7 @@ async function loadTeam(){
   html.push('</div>');
   html.push('<div style="font-size:11px;color:var(--text2);line-height:1.5">'+t('ref_dep_comm_desc')+'</div>');
   html.push('<div style="display:flex;gap:8px;margin-top:10px">');
-  html.push('<div style="flex:1;text-align:center;background:rgba(0,212,170,.1);border-radius:8px;padding:8px 4px"><div style="font-size:16px;font-weight:900;color:var(--ac)">L1</div><div style="font-size:10px;color:var(--text3)">'+t('ref_milestone_active_lbl')+'</div><div style="font-size:12px;font-weight:700;color:var(--ac)">%</div></div>');
+  html.push('<div style="flex:1;text-align:center;background:rgba(0,212,170,.1);border-radius:8px;padding:8px 4px"><div style="font-size:16px;font-weight:900;color:var(--ac)">L1</div><div style="font-size:10px;color:var(--text3)">'+t('ref_milestone_active_lbl')+'</div><div style="font-size:13px;font-weight:800;color:var(--ac)">'+depCommPct+'%</div><div style="font-size:9px;color:var(--text3)">of deposit</div></div>');
   html.push('</div></div>');
 
   // Card 2: Profit commission (3 levels)
@@ -6888,7 +6890,7 @@ async function loadTeam(){
   html.push('<div class="ctitle">🔗 Referral Link</div>');
   html.push('<div class="ref-link" onclick="cpText(&quot;'+rl+'&quot;)">📋 '+rl+'</div>');
   html.push('<button class="btn-p" onclick="cpText(&quot;'+rl+'&quot;)">'+t('copy_link')+'</button>');
-  html.push('<div class="ref-lvls"><div class="ref-lvl"><div class="rv">2.5%</div><div class="rl">L1</div></div><div class="ref-lvl"><div class="rv">1.5%</div><div class="rl">L2</div></div><div class="ref-lvl"><div class="rv">1%</div><div class="rl">L3</div></div></div>');
+  html.push('<div class="ref-lvls"><div class="ref-lvl"><div class="rv">10%</div><div class="rl">L1</div></div><div class="ref-lvl"><div class="rv">5%</div><div class="rl">L2</div></div><div class="ref-lvl"><div class="rv">1%</div><div class="rl">L3</div></div></div>');
   html.push('</div>');
 
   // Team overview stats
@@ -6902,8 +6904,8 @@ async function loadTeam(){
   // Level income cards
   html.push('<div class="ctitle" style="margin:14px 0 10px">📈 Income by Level</div>');
   var lvls=[
-    {n:"Level 1",data:l1data,inc:inc1,pct:"2.5%",color:"rgba(0,212,170,.1)",border:"rgba(0,212,170,.25)"},
-    {n:"Level 2",data:l2data,inc:inc2,pct:"1.5%",color:"rgba(26,86,219,.1)",border:"rgba(26,86,219,.25)"},
+    {n:"Level 1",data:l1data,inc:inc1,pct:"10%",color:"rgba(0,212,170,.1)",border:"rgba(0,212,170,.25)"},
+    {n:"Level 2",data:l2data,inc:inc2,pct:"5%",color:"rgba(26,86,219,.1)",border:"rgba(26,86,219,.25)"},
     {n:"Level 3",data:l3data,inc:inc3,pct:"1%",color:"rgba(168,139,250,.1)",border:"rgba(168,139,250,.25)"}
   ];
   var maxInc=Math.max(inc1,inc2,inc3,0.01);
