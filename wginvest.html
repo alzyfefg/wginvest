@@ -2533,6 +2533,8 @@ async function enterApp(){
   applyLang();
   try{clearExpiredBonus();}catch(e){}
   updateHeroDashboard(null);
+  // Set initial history state so back button works from first tab
+  history.replaceState({tab:'matches'},'',window.location.pathname+window.location.search);
   goTab("matches");
   setTimeout(applyTheme,100);
   try{loadStats();}catch(e){}
@@ -2563,8 +2565,12 @@ async function checkAlerts(){
   }catch(e){}
 }
 function animMC(){var c=document.getElementById("MC");c.classList.remove("tab-anim");void c.offsetWidth;c.classList.add("tab-anim");}
-function goTab(tab){
+function goTab(tab,_fromPop){
   curTab=tab;
+  if(!_fromPop){
+    // Push state so device back button can navigate within the app
+    history.pushState({tab:tab},'',(tab==='matches')?window.location.pathname:'#'+tab);
+  }
   // Show/hide member hero banner based on tab
   var heroBanner=document.getElementById("heroBanner");
   if(heroBanner)heroBanner.style.display=(tab==="admin")?"none":"";
@@ -2581,6 +2587,14 @@ function goTab(tab){
   else if(tab==="model")loadInvestModel();
   setTimeout(initScrollAnim,300);
 }
+window.addEventListener('popstate',function(e){
+  // Close any open overlay/modal first (back button dismisses modals)
+  var overlay=document.getElementById('cancelInvOverlay');
+  if(overlay){overlay.remove();history.pushState({tab:curTab},'','#'+curTab);return;}
+  // Navigate to the popped tab
+  var tab=(e.state&&e.state.tab)||'matches';
+  goTab(tab,true);
+});
 
 
 
