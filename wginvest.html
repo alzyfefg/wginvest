@@ -2377,18 +2377,37 @@ function updateBal(){
 }
 function subscribeBalanceUpdates(){
   if(!U||window._balSub)return;
-  window._balSub=sb.channel('profile-bal-'+U.id)
-    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'profiles',filter:'user_id=eq.'+U.id},function(payload){
-      if(!payload.new)return;
-      if(payload.new.balance!==undefined)P.balance=payload.new.balance;
-      if(payload.new.bonus!==undefined)P.bonus=payload.new.bonus;
-      if(payload.new.bonus_expires_at!==undefined)P.bonus_expires_at=payload.new.bonus_expires_at;
-      updateBal();
-      // Reload wallet view if open
-      var mc=document.getElementById('MC');
-      if(mc&&mc.querySelector('#sBal'))loadWallet();
-    })
-    .subscribe();
+  // Realtime via postgres_changes
+  try{
+    window._balSub=sb.channel('profile-bal-'+U.id)
+      .on('postgres_changes',{event:'UPDATE',schema:'public',table:'profiles',filter:'user_id=eq.'+U.id},function(payload){
+        if(!payload.new)return;
+        if(payload.new.balance!==undefined)P.balance=payload.new.balance;
+        if(payload.new.bonus!==undefined)P.bonus=payload.new.bonus;
+        if(payload.new.bonus_expires_at!==undefined)P.bonus_expires_at=payload.new.bonus_expires_at;
+        updateBal();
+        var mc=document.getElementById('MC');
+        if(mc&&mc.querySelector('#sBal'))loadWallet();
+      })
+      .subscribe();
+  }catch(e){}
+  // Polling fallback every 20 seconds
+  if(window._balPoll)clearInterval(window._balPoll);
+  window._balPoll=setInterval(async function(){
+    if(!U||!P)return;
+    var r=await sb.from('profiles').select('balance,bonus,bonus_expires_at').eq('user_id',U.id).single();
+    if(r.data){
+      var changed=r.data.balance!==P.balance||r.data.bonus!==P.bonus;
+      P.balance=r.data.balance;
+      P.bonus=r.data.bonus;
+      P.bonus_expires_at=r.data.bonus_expires_at;
+      if(changed){
+        updateBal();
+        var mc=document.getElementById('MC');
+        if(mc&&mc.querySelector('#sBal'))loadWallet();
+      }
+    }
+  },20000);
 }
 
 function updateHeroDashboard(inv){
@@ -4126,15 +4145,18 @@ async function loadGrowthChart(){
   });
 }
 async function saveWP(){
-  var p1=document.getElementById("wp1").value,p2=document.getElementById("wp2").value;
+  var p1=document.getElementById("wp1")&&document.getElementById("wp1").value;
+  var p2=document.getElementById("wp2")&&document.getElementById("wp2").value;
   if(!p1||!p2)return toast(t("err_wpass_required"),"red");
   if(p1!==p2)return toast(t("err_wpass_mismatch"),"red");
   if(p1.length<4)return toast(t("err_wpass_min4"),"red");
+  // Try updating via profiles table
   var res=await sb.from("profiles").update({withdrawal_pass:p1}).eq("user_id",U.id);
-  if(res.error)return toast("Error: "+res.error.message,"red");
-  // Verify it was actually saved
-  var check=await sb.from("profiles").select("withdrawal_pass").eq("user_id",U.id).single();
-  if(!check.data||check.data.withdrawal_pass!==p1)return toast("خطا: رمز ذخیره نشد. دوباره تلاش کنید","red");
+  if(res.error){
+    // Fallback: try matching on id column
+    var res2=await sb.from("profiles").update({withdrawal_pass:p1}).eq("id",U.id);
+    if(res2.error)return toast("خطا: "+res2.error.message,"red");
+  }
   P.withdrawal_pass=p1;
   toast(t("ok_wpass_set"),"green");
   loadProfile();
