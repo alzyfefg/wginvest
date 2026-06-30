@@ -6095,6 +6095,7 @@ async function loadUser360(uid,c){
   html.push('<button class="u360-tab" onclick="u360Tab(this,&quot;u360_deps&quot;)">💳 واریز</button>');
   html.push('<button class="u360-tab" onclick="u360Tab(this,&quot;u360_withs&quot;)">💸 برداشت</button>');
   html.push('<button class="u360-tab" onclick="u360Tab(this,&quot;u360_notes&quot;)">📝 یادداشت</button>');
+  html.push('<button class="u360-tab" onclick="u360Tab(this,&quot;u360_kyc&quot;)">🪪 KYC</button>');
   html.push('</div>');
   // Predictions
   html.push('<div id="u360_preds">');
@@ -6138,13 +6139,40 @@ async function loadUser360(uid,c){
   html.push('<button class="adm-btn" style="margin-top:8px" onclick="saveU360Note(&quot;'+uid+'&quot;)">💾 ذخیره یادداشت</button>');
   html.push('</div>');
   html.push('</div>');
+  // KYC tab
+  html.push('<div id="u360_kyc" style="display:none">');
+  var kycSt=u.kyc_status||'none';
+  var kycBg={none:'rgba(255,255,255,.06)',pending:'rgba(255,215,0,.1)',verified:'rgba(0,212,170,.1)'};
+  var kycBd={none:'rgba(255,255,255,.1)',pending:'rgba(255,215,0,.3)',verified:'rgba(0,212,170,.3)'};
+  var kycLbl={none:'❌ ارسال نشده',pending:'⏳ در انتظار تأیید',verified:'✅ تأیید شده'};
+  html.push('<div style="background:'+kycBg[kycSt]+';border:1px solid '+kycBd[kycSt]+';border-radius:14px;padding:16px;margin-bottom:14px;text-align:center">');
+  html.push('<div style="font-size:28px;margin-bottom:6px">'+(kycSt==='verified'?'✅':kycSt==='pending'?'⏳':'❌')+'</div>');
+  html.push('<div style="font-size:14px;font-weight:800;color:var(--text)">وضعیت: '+kycLbl[kycSt]+'</div>');
+  html.push('</div>');
+  if(u.kyc_doc_base64){
+    html.push('<div style="margin-bottom:14px"><div style="font-size:12px;color:var(--text3);margin-bottom:8px;font-weight:700">🪪 مدرک ارسالی:</div>');
+    html.push('<img src="'+u.kyc_doc_base64+'" style="width:100%;max-height:320px;border-radius:12px;border:1px solid var(--border2);object-fit:contain;cursor:pointer;display:block" onclick="this.style.maxHeight=this.style.maxHeight===\'none\'?\'320px\':\'none\'">');
+    html.push('<div style="font-size:10px;color:var(--text3);text-align:center;margin-top:4px">کلیک برای بزرگ‌نمایی</div></div>');
+    if(kycSt==='pending'){
+      html.push('<div style="display:flex;gap:8px;margin-top:4px">');
+      html.push('<button class="dep-btn app" style="flex:1" onclick="appKYC(&quot;'+u.user_id+'&quot;).then(function(){loadUser360(&quot;'+u.user_id+'&quot;,document.getElementById(&quot;adminContent&quot;))})">✅ تأیید هویت</button>');
+      html.push('<button class="dep-btn rej" style="flex:1" onclick="rejKYC(&quot;'+u.user_id+'&quot;).then(function(){loadUser360(&quot;'+u.user_id+'&quot;,document.getElementById(&quot;adminContent&quot;))})">❌ رد</button>');
+      html.push('</div>');
+    }else if(kycSt==='verified'){
+      html.push('<button class="dep-btn rej" style="width:100%;margin-top:4px" onclick="rejKYC(&quot;'+u.user_id+'&quot;).then(function(){loadUser360(&quot;'+u.user_id+'&quot;,document.getElementById(&quot;adminContent&quot;))})">🔄 لغو تأیید</button>');
+    }
+  }else{
+    html.push('<div style="text-align:center;padding:24px;color:var(--text3);font-size:13px">📎 هیچ مدرکی ارسال نشده</div>');
+  }
+  html.push('</div>');
+  html.push('</div>');
   c.innerHTML=html.join("");
 }
 
 function u360Tab(btn,tabId){
   btn.closest(".user360").querySelectorAll(".u360-tab").forEach(function(b){b.classList.remove("on");});
   btn.classList.add("on");
-  ["u360_preds","u360_deps","u360_withs","u360_notes"].forEach(function(id){
+  ["u360_preds","u360_deps","u360_withs","u360_notes","u360_kyc"].forEach(function(id){
     var el=document.getElementById(id);if(el)el.style.display="none";
   });
   var el=document.getElementById(tabId);if(el)el.style.display="block";
