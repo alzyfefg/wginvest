@@ -2225,7 +2225,7 @@ faq_title:"Frequently Asked Questions",faq_items:[
 {q:"How do deposits work?",a:"Go to Wallet → Deposit, select your network (TRC20 or BEP20), send USDT to the displayed address, enter the TX Hash, and submit. Admin reviews and approves the deposit, usually within 1–24 hours."},
 {q:"How long does a withdrawal take?",a:"Withdrawals are processed within 1–24 hours. You are limited to 1 withdrawal request per day, and the minimum withdrawal is $20 USDT."},
 {q:"What is the withdrawal password and why do I need it?",a:"The withdrawal password is an extra security layer you set in your Profile. Without it, no withdrawal can be submitted. It protects your funds in case your account is accessed by someone else."},
-{q:"How does the referral and commission system work?",a:"Share your personal invite link. You earn a commission on every deposit made by your Level 1 referrals. You also earn profit commissions when any referral claims investment profit: L1: 10%, L2: 5%, L3: 1% of their profit amount."},
+{q:"How does the referral and commission system work?",a:"Share your personal invite link. You earn a commission on every deposit made by your Level 1 referrals. You also earn profit commissions when any referral claims investment profit: L1: 10%, L2: 5%, L3: 2% of their profit amount."},
 {q:"What are milestone rewards?",a:"In addition to ongoing commissions, you earn one-time bonuses for reaching team milestones. For 2, 5, 10, 20, and 50 active referrals (first deposit ≥ $50), you receive $5, $15, $35, $80, and $230 respectively."},
 {q:"What is the deposit bonus?",a:"When a global deposit bonus campaign is active, you receive a bonus percentage on deposits above a minimum amount. The bonus is added to your bonus balance. Note: if you withdraw before the bonus expires, the bonus is cancelled."},
 {q:"Is my investment safe?",a:"Yes. WGInvest uses enterprise-grade encrypted infrastructure. Three independent security layers protect your funds: account authentication, withdrawal password, and manual admin approval for all withdrawal requests."},
@@ -4090,10 +4090,10 @@ async function withdrawInvestment(invId,finalAmt){
   showClaimSuccess(finalAmt);
   pushNotif('profit_ready',t('notif_profit_ready_title'),'$'+siFmt(finalAmt)+' '+t('notif_profit_ready_body'));
   fireConfetti();
-  // Investment profit commissions for referrer chain (L1:10%, L2:5%, L3:1% of profit only)
+  // Investment profit commissions for referrer chain (L1:10%, L2:5%, L3:2% of profit only)
   if(profitAmt>0){
     try{
-      var COMM_PCTS=[0.10,0.05,0.01];
+      var COMM_PCTS=[0.10,0.05,0.02];
       var curId=U.id;
       for(var lvl=0;lvl<3;lvl++){
         var refRow=await sb.from('profiles').select('user_id,balance,referred_by').eq('user_id',curId).single();
@@ -6891,7 +6891,7 @@ async function loadTeam(){
   // Income per level (2.5% of balance)
   var inc1=l1data.reduce(function(s,u){return s+parseFloat(u.balance||0)*.1;},0);
   var inc2=l2data.reduce(function(s,u){return s+parseFloat(u.balance||0)*.05;},0);
-  var inc3=l3data.reduce(function(s,u){return s+parseFloat(u.balance||0)*.01;},0);
+  var inc3=l3data.reduce(function(s,u){return s+parseFloat(u.balance||0)*.02;},0);
   var strongestLevel=inc1>=inc2&&inc1>=inc3?{n:"Level 1",m:l1data.length,inc:inc1}:inc2>=inc3?{n:"Level 2",m:l2data.length,inc:inc2}:{n:"Level 3",m:l3data.length,inc:inc3};
 
   // Referral link
@@ -6925,7 +6925,7 @@ async function loadTeam(){
   html.push('</div>');
   html.push('<div style="font-size:11px;color:var(--text2);line-height:1.5;margin-bottom:10px">'+t('ref_profit_comm_desc')+'</div>');
   html.push('<div style="display:flex;gap:8px">');
-  [{lv:'L1',pct:'10%',c:'rgba(0,212,170,.15)',tc:'var(--ac)'},{lv:'L2',pct:'5%',c:'rgba(26,86,219,.15)',tc:'#60a5fa'},{lv:'L3',pct:'1%',c:'rgba(168,139,250,.15)',tc:'#c084fc'}].forEach(function(x){
+  [{lv:'L1',pct:'10%',c:'rgba(0,212,170,.15)',tc:'var(--ac)'},{lv:'L2',pct:'5%',c:'rgba(26,86,219,.15)',tc:'#60a5fa'},{lv:'L3',pct:'2%',c:'rgba(168,139,250,.15)',tc:'#c084fc'}].forEach(function(x){
     html.push('<div style="flex:1;text-align:center;background:'+x.c+';border-radius:8px;padding:8px 4px"><div style="font-size:15px;font-weight:900;color:'+x.tc+'">'+x.lv+'</div><div style="font-size:14px;font-weight:800;color:'+x.tc+'">'+x.pct+'</div><div style="font-size:9px;color:var(--text3)">of profit</div></div>');
   });
   html.push('</div></div>');
@@ -6953,7 +6953,7 @@ async function loadTeam(){
   html.push('<div class="ctitle">🔗 Referral Link</div>');
   html.push('<div class="ref-link" onclick="cpText(&quot;'+rl+'&quot;)">📋 '+rl+'</div>');
   html.push('<button class="btn-p" onclick="cpText(&quot;'+rl+'&quot;)">'+t('copy_link')+'</button>');
-  html.push('<div class="ref-lvls"><div class="ref-lvl"><div class="rv">10%</div><div class="rl">L1</div></div><div class="ref-lvl"><div class="rv">5%</div><div class="rl">L2</div></div><div class="ref-lvl"><div class="rv">1%</div><div class="rl">L3</div></div></div>');
+  html.push('<div class="ref-lvls"><div class="ref-lvl"><div class="rv">10%</div><div class="rl">L1</div></div><div class="ref-lvl"><div class="rv">5%</div><div class="rl">L2</div></div><div class="ref-lvl"><div class="rv">2%</div><div class="rl">L3</div></div></div>');
   html.push('</div>');
 
   // Team overview stats
@@ -6969,7 +6969,7 @@ async function loadTeam(){
   var lvls=[
     {n:"Level 1",data:l1data,inc:inc1,pct:"10%",color:"rgba(0,212,170,.1)",border:"rgba(0,212,170,.25)"},
     {n:"Level 2",data:l2data,inc:inc2,pct:"5%",color:"rgba(26,86,219,.1)",border:"rgba(26,86,219,.25)"},
-    {n:"Level 3",data:l3data,inc:inc3,pct:"1%",color:"rgba(168,139,250,.1)",border:"rgba(168,139,250,.25)"}
+    {n:"Level 3",data:l3data,inc:inc3,pct:"2%",color:"rgba(168,139,250,.1)",border:"rgba(168,139,250,.25)"}
   ];
   var maxInc=Math.max(inc1,inc2,inc3,0.01);
   lvls.forEach(function(lv){
