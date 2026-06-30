@@ -2392,7 +2392,7 @@ async function doForgotPw(){
   var email=document.getElementById("fpEmail").value.trim().toLowerCase();
   if(!email)return amsg("❌ "+t("email"),"err");
   var btn=document.getElementById("fpSendBtn");btn.disabled=true;
-  var res=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.href});
+  var res=await sb.auth.resetPasswordForEmail(email);
   btn.disabled=false;
   if(res.error)return amsg("❌ "+res.error.message,"err");
   amsg(t("fp_sent"),"ok");
