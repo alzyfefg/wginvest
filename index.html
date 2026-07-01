@@ -2433,7 +2433,7 @@ async function doRegister(){
     var rr=await sb.from('profiles').select('user_id').eq('member_id',rawRef).single();
     if(rr.data)ref=rr.data.user_id;
   }
-  var res=await sb.auth.signUp({email:email,password:pass,options:{data:{referred_by:ref||null}}});
+  var res=await sb.auth.signUp({email:email,password:pass,options:{emailRedirectTo:window.location.origin+window.location.pathname,data:{referred_by:ref||null}}});
   btn.disabled=false;btn.textContent=t("btn_up");
   if(res.error)return amsg("❌ "+res.error.message,"err");
   amsg(t("ok_registered"),"ok");
